@@ -1,89 +1,69 @@
-# Solid - Free Next.js Web Template and Starter Kit for SaaS
+# Tom Mboya University Smart Campus Management System
 
-Solid is a free Next.js template specifically crafted for startups, SaaS, and software websites. It provides an extensive array of necessary sections, elements, and pages required to build a fully-equipped website for any SaaS, software, or startup site. Comes with all cutting edge React and Next.js features - **Built with Next.js 13, React 18 and TypeScript.**
+The **Tom Mboya University Smart Campus Management System** is an advanced web application designed to enhance campus operations through digital transformation. This system provides essential modules for managing student services, facility bookings, academic activities, staff management, and other critical university operations. 
 
-This Next.js template's homepage comes with an awesome hero area, logos of associated brands, a features section, an about section, another features section with tabs, counters, and star ratings, integration options, clear call-to-actions, an FAQ section with accordions, a testimonials section, pricing tables, a contact page, a blog, and a distinctive footer.
+The platform is built on cutting-edge web technologies, offering a seamless and efficient user experience for both students and administrators. The system is scalable and customizable, making it adaptable to the unique needs of the university environment. 
 
-**Solid Next.js template packed with all necessary external pages** - such as login, registration, blog grids, and single blog pages, among others. This broad collection of pages provides all the necessary tools to create a feature-packed, comprehensive, and visually appealing website or landing page for software, a web application, or SaaS.
+**Built with Next.js 13, React 18, Django 5.0 and TypeScript.**
 
-### [🔥 Get Solid Pro - Next.js SaaS Boilerplate and Starter Kit](https://nextjstemplates.com/templates/solid)
+This system's homepage features a user-friendly interface with:
+- **Comprehensive booking systems** for classrooms, lecture halls, sports facilities, and more.
+- A **student dashboard** for course registration, fee payments, and grade tracking.
+- An **administration portal** for managing staff, student records, and university resources.
+- **Real-time notifications** for important events, deadlines, and system updates.
+- Integration with **Google Calendar** for scheduling and reminders.
+- An **FAQ section** with accordion-style menus for ease of navigation.
+- **Authentication systems** for secure login, registration, and role-based access control.
 
-![Startup Pro](https://uideck.com/wp-content/uploads/edd/2023/07/solid-saas.png)
+### [🚀 Live Demo](https://tmucampus.ac.ke/)
 
-### [🚀 Solid PRO Live Demo](https://solid.nextjstemplates.com/)
+![Campus Management](https://tmu.ac.ke/images/tom-mboya-campus-management.png)
 
-### [🚀 Solid FREE Live Demo](https://solid-free.nextjstemplates.com/)
+### [🔥 Download Full Version](https://tmu.ac.ke/download/tmu-smart-campus)
 
-### TailAdmin React PRO vs TailAdmin React FREE Comparison 📊
 
-#### [Solid PRO](https://solid.nextjstemplates.com/)
-- SaaS Boilerplate + Starter Kit with Essential Integrations and Functionalities
-- Essential Integrations: Auth, DB, Stripe, MDX and More ...
-- Fully Functional, Ready to Use Sanity Blog Support
-- Premium Email Support
-- Functional External Pages
-- Free Lifetime Future Updates
-___
-#### [Solid FREE](https://solid-free.nextjstemplates.com/)
-- Only UI - Coded for Next.js
-- No Integrations
-- No Functional Blogging System
-- External Pages without Functions/Integrations
-- Community Support
-- Free Lifetime Future Updates
-___
-
-### [📦 Download](https://nextjstemplates.com/templates/solid)
-
-### [🔥 Get Pro](https://nextjstemplates.com/templates/solid)
-
-### [🔌 Documentation](https://nextjstemplates.com/docs)
 
 ### ⚡ Deploy Now
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FNextJSTemplates%2Fsolid-nextjs)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FYourRepo%2FTMU-Smart-Campus)
 
-[![Deploy with Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/NextJSTemplates/solid-nextjs)
-
+[![Deploy with Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/YourRepo/TMU-Smart-Campus)
 
 ## Installation
 
-Here are the steps you need to follow to install the dependencies.
+To set up the **Tom Mboya University Smart Campus Management System**, follow these steps:
 
-1.Download and extract the template from **Next.js Templates.**
+1. **Clone the repository** from GitHub:
+    ```bash
+    git clone https://github.com/YourRepo/TMU-Smart-Campus.git
+    ```
 
-2.**cd** into the template directory then run this command to install all the dependencies
-    
-```bash
+2. Navigate to the project directory and install dependencies:
+    ```bash
+    cd TMU-Smart-Campus
     npm install
-```
-    
-or
-    
-```bash
+    ```
+    or
+    ```bash
     yarn install
- ```
+    ```
 
-
-You can start the project on the local server
-    
-```bash
+3. Start the project on the local server:
+    ```bash
     npm run dev
- ```
+    ```
+    The app will be live at [http://localhost:3000](http://localhost:3000).
 
-It’ll start the template on [localhost:3000](http://localhost:3000). 
+## Deploying on Cloud Platforms
 
-The documentation includes all the guides you need for the integrations. 
+For easy deployment, you can use **Vercel** or **Netlify** for hosting:
+- **Vercel**: [Vercel Deployment](https://vercel.com/)
+- **Netlify**: [Netlify Deployment](https://netlify.com/)
 
-
-### Deploying on PaaS
-
-If you are using a GitHub repo then you can go with free-of-cost and easy-to-use options like [Vercel](https://vercel.com/), or [Netlify](https://netlify.com/) they offer decent-free tiers for Next.js hosting.
+Both platforms provide free tiers for Next.js hosting, making them ideal for the university's requirements.
 
 ### 📄 License
-Solid Free is 100% free and open-source, feel free to use with your personal and commercial projects.
+Tom Mboya University Smart Campus Management System is open-source and free for both personal and commercial projects.
 
 ### 💜 Support
-If you like the template, please star this repository to inspire the team to create more stuff like this and reach more users like you!
-
-### ✨ Browse and Download - Best Free [Next.js Templates](https://nextjstemplates.com/templates)
+If you find this system useful, feel free to give it a ⭐️ on the repository to encourage future improvements and help the project reach more universities!
