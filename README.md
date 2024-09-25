@@ -17,7 +17,7 @@ This system's homepage features a user-friendly interface with:
 
 ### [🚀 Live Demo](https://tmucampus.ac.ke/)
 
-![Campus Management](https://tmu.ac.ke/images/tom-mboya-campus-management.png)
+![Campus Management](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTO_pPxgIHkJkUa-bLuOtGLsAdMuygZAySflA&s)
 
 ### [🔥 Download Full Version](https://tmu.ac.ke/download/tmu-smart-campus)
 
@@ -35,7 +35,7 @@ To set up the **Tom Mboya University Smart Campus Management System**, follow th
 
 1. **Clone the repository** from GitHub:
     ```bash
-    git clone https://github.com/YourRepo/TMU-Smart-Campus.git
+    git clone https://github.com/GILBERTKETER/tmu-scms.git
     ```
 
 2. Navigate to the project directory and install dependencies:
