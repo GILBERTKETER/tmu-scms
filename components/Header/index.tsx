@@ -3,18 +3,20 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-
+import { useAuth } from "@/context/Auth";
 import ThemeToggler from "./ThemeToggler";
 import menuData from "./menuData";
 
+import { toast } from "react-toastify";
+import App from "@/app/(site)/api/api";
 const Header = () => {
   const [navigationOpen, setNavigationOpen] = useState(false);
   const [dropdownToggler, setDropdownToggler] = useState(false);
   const [stickyMenu, setStickyMenu] = useState(false);
 
+
   const pathUrl = usePathname();
 
-  // Sticky menu
   const handleStickyMenu = () => {
     if (window.scrollY >= 80) {
       setStickyMenu(true);
@@ -26,10 +28,19 @@ const Header = () => {
   useEffect(() => {
     window.addEventListener("scroll", handleStickyMenu);
   });
+  const { user, loading, logout } = useAuth();
+
+  const handleLogout = async () => {
+    await logout();
+  };
+
+  if (loading) {
+    return <div>Loading...</div>; 
+  }
 
   return (
     <header
-      className={`fixed left-0 top-0 z-99999 w-full py-7 ${
+      className={`fixed left-0 z-10 top-0 w-full py-7 ${
         stickyMenu
           ? "bg-white !py-4 shadow transition duration-100 dark:bg-black"
           : ""
@@ -154,19 +165,35 @@ const Header = () => {
           <div className="mt-7 flex items-center gap-6 xl:mt-0">
             <ThemeToggler />
 
-            <Link
-              href="#"
-              className="text-regular font-medium text-waterloo hover:text-primary"
-            >
-              Gilbert Keter
-            </Link>
-
-            <Link
-              href="auth/signin"
+           
+            {user ? (
+          <>
+            <span className="text-regular font-medium text-waterloo hover:text-primary">
+              {user.first_name}
+            </span>
+            <button
+              onClick={handleLogout}
               className="flex items-center justify-center rounded-full bg-primary px-7.5 py-2.5 text-regular text-white duration-300 ease-in-out hover:bg-primaryho"
             >
-              Login
+              Logout
+            </button>
+          </>
+        ) : (
+          <>
+            <Link
+              href="/auth/signin"
+              className="flex items-center justify-center rounded-full bg-primary px-7.5 py-2.5 text-regular text-white duration-300 ease-in-out hover:bg-primaryho"
+            >
+              Sign In
             </Link>
+            <Link
+              href="/auth/signup"
+              className="flex items-center justify-center rounded-full bg-primary px-7.5 py-2.5 text-regular text-white duration-300 ease-in-out hover:bg-primaryho"
+            >
+              Sign Up
+            </Link>
+          </>
+        )}
           </div>
         </div>
       </div>

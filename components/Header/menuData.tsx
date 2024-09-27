@@ -26,10 +26,16 @@ const menuData: Menu[] = [
     path: "/advisor",
   },
   {
-    id: 4,
-    title: "Explore",
+    id: 2.4,
+    title: "Students",
     newTab: false,
-    path: "/explore",
+    path: "https://student.tmu.ac.ke",
+  },
+  {
+    id: 4,
+    title: "HEF",
+    newTab: false,
+    path: "https://hef.co.ke",
   },
 ];
 

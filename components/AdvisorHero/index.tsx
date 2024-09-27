@@ -1,6 +1,6 @@
 
 const Hero: React.FC = () => (
-    <div className="relative bg-gradient-to-r from-purple-600 to-blue-600 h-[80vh] text-white overflow-hidden">
+    <div className="z-[-1] relative bg-gradient-to-r from-purple-600 to-blue-600 h-[80vh] text-white overflow-hidden">
     <div className="absolute inset-0">
       <img src="https://img.freepik.com/free-vector/isometric-business-concept-man-thinking-crm-system-artificial-intelligence-robot-ai_39422-771.jpg?t=st=1727170161~exp=1727173761~hmac=cdab18d37b774ba07b7c040908832d393af2385f86825fbe3554305fc24d9231&w=1060" alt="Background Image" className="object-cover object-center w-full h-full" />
       <div className="absolute inset-0 bg-black opacity-50"></div>
