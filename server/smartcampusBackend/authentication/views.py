@@ -21,6 +21,11 @@ from django.template.loader import render_to_string
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import EmailMessage
 
+from django.core.mail import EmailMessage
+from django.template.loader import render_to_string
+import os
+from django.conf import settings
+from .utils import send_email
 @csrf_exempt
 def user_registration(request):
     if request.method == 'POST':
@@ -61,8 +66,12 @@ def user_registration(request):
                 user.userprofile.save()
 
                 login(request, user)
+                html_content = render_to_string('signup.html',{'firstName': first_name})
 
-            return JsonResponse({"message": "User registered and logged in successfully."}, status=201)
+                subject = 'Welcome to Tom Mboya Smart Campus Management System'
+                send_email(subject, email, html_content)
+                
+            return JsonResponse({"message": "You are successfully registered."}, status=201)
 
         except Exception as e:
             return JsonResponse({"message": str(e)}, status=400)
@@ -78,9 +87,11 @@ def user_login(request):
 
     if not username or not password:
         return JsonResponse({"message": "Username and password are required."}, status=400)
-
+    print("user:", username)
+    print("password:", password)
     user = authenticate(username=username, password=password)
-
+    print("user:", user)
+    
     if user is not None:
         login(request, user)
         
@@ -131,13 +142,13 @@ def get_user(request):
     else:
         return JsonResponse({"user": None}, status=401)
    
-   
 @csrf_exempt
 def request_password_reset_link(request):
     if request.method == 'POST':
         data = json.loads(request.body)
         email = data.get('email')
         user = User.objects.filter(email=email).first()
+
         if user is None:
             return JsonResponse({'message': 'Email does not exist', "success": False}, status=400)
 
@@ -146,9 +157,12 @@ def request_password_reset_link(request):
 
         reset_url = f"http://localhost:3000/auth/reset-password/?uid={uid}&token={token}"
 
-        # Here you would send the reset_url via email
+        html_content = render_to_string('index.html', {'reset_url': reset_url})
 
-        return JsonResponse({'reset_url': reset_url, "success": True}, status=200)
+        subject = 'Password Reset Request'
+        send_email(subject, email, html_content)
+
+        return JsonResponse({'message': 'Password reset link has been sent to your email.', "success": True}, status=200)
 
     return JsonResponse({'message': 'Invalid request method.', "success": False}, status=400)
 
@@ -169,12 +183,15 @@ def reset_password(request):
         try:
             uid = force_str(urlsafe_base64_decode(uidb64))
             user = User.objects.get(pk=uid)
-
-            # Log the tokens for debugging
-            print(f"Generated Token: {token}")
+            email = user.email
             if default_token_generator.check_token(user, token):
                 user.set_password(new_password)
                 user.save()
+                html_content = render_to_string('confirmation.html')
+
+                subject = 'Password Reset Confirmation'
+                send_email(subject, email, html_content)
+                
                 return JsonResponse({'message': 'Password has been reset successfully', "success": True}, status=200)
             else:
                 return JsonResponse({'message': 'Invalid token', "success": False}, status=400)

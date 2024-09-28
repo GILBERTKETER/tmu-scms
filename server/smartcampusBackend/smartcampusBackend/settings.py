@@ -107,7 +107,7 @@ TEMPLATES = [
         },
     },
 ]
-
+RESEND_API_KEY = 're_JLfprdsM_FUg9ZERkcp5D3zhwZ5sMzViw'
 WSGI_APPLICATION = "smartcampusBackend.wsgi.application"
 
 
@@ -124,6 +124,17 @@ DATABASES = {
         "PORT": 3306
     }
 }
+EMAIL_USE_TLS = True
+EMAIL_TIMEOUT = 10 
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'gilbertketer759@gmail.com'
+EMAIL_HOST_PASSWORD = 'qexrteswrrothucv'
+DEFAULT_FROM_EMAIL = 'gilbertketer759@gmail.com'
+
 
 
 # Password validation

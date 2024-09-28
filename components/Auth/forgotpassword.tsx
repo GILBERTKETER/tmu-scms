@@ -6,13 +6,12 @@ import { useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import App from "@/app/(site)/api/api";
-import axios from "axios";
 const ForgotPassword = () => {
   const [data, setData] = useState({
     email: "",
   });
 
-  const [email, setEmail] = useState(""); // Initialize email state
+  const [email, setEmail] = useState("");
 
   const requestResetLink = async (e) => {
     e.preventDefault();
@@ -29,7 +28,7 @@ const ForgotPassword = () => {
           draggable: true,
           progress: undefined,
         });
-        window.location.href = response.data.reset_url;
+        window.location.href = '/auth/signin';
       } else {
         toast.error(response.data.message);
       }
