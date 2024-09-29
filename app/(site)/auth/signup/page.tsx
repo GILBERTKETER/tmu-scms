@@ -2,15 +2,18 @@ import Signup from "@/components/Auth/Signup";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Sign Up - Compliance Is Us",
-  description: "Create your Compliance Is Us account to start managing your compliance processes and access all features tailored for your needs.",
-  // other metadata
+  title: "Sign Up - Smart Campus",
+  description:
+    "Create a new Smart Campus account to start managing your academic life and access campus resources.",
 };
+import HomeLayout from "@/components/Layouts/homeLayout";
 
 export default function Register() {
   return (
     <>
-      <Signup />
+      <HomeLayout>
+        <Signup />
+      </HomeLayout>
     </>
   );
 }

@@ -1,10 +1,8 @@
 "use client";
 import { ThemeProvider } from "next-themes";
 import { Inter } from "next/font/google";
-import "../globals.css";
+import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
-import Footer from "@/components/Footer";
-import Header from "@/components/Header";
 export default function RootLayout({
   children,
 }: {

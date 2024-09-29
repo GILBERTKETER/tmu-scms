@@ -1,16 +1,19 @@
 import ResetPassword from "@/components/Auth/reset-password";
 import { Metadata } from "next";
-
 export const metadata: Metadata = {
-  title: "Reset Password - Compliance Is Us",
-  description: "Securely access your Compliance Is Us account. Log in to manage your compliance processes and stay updated with our latest features.",
+  title: "Reset Password - Smart Campus",
+  description:
+    "Create a new password for your Smart Campus account and regain access to your academic dashboard and university services.",
 };
 
+import HomeLayout from "@/components/Layouts/homeLayout";
 
 const ResetPasswordPage = () => {
   return (
     <>
-      <ResetPassword />
+      <HomeLayout>
+        <ResetPassword />
+      </HomeLayout>
     </>
   );
 };

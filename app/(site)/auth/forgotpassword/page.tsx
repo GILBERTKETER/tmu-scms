@@ -1,16 +1,18 @@
 import ForgotPassword from "@/components/Auth/forgotpassword";
 import { Metadata } from "next";
-
 export const metadata: Metadata = {
-  title: "Forgot Password - Compliance Is Us",
-  description: "Securely access your Compliance Is Us account. Log in to manage your compliance processes and stay updated with our latest features.",
+  title: "Forgot Password - Smart Campus",
+  description:
+    "Easily reset your Smart Campus account password. Stay connected with your courses and campus resources.",
 };
-
+import HomeLayout from "@/components/Layouts/homeLayout";
 
 const ForgotPasswordPage = () => {
   return (
     <>
-      <ForgotPassword />
+      <HomeLayout>
+        <ForgotPassword />
+      </HomeLayout>
     </>
   );
 };

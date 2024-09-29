@@ -8,6 +8,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/Auth";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { useEffect } from "react";
 
 const Signin: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -20,16 +21,21 @@ const Signin: React.FC = () => {
     setShowPassword(!showPassword);
   };
   const router = useRouter();
-  const { login } = useAuth();
+  const { login, user, loading } = useAuth();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     const result = await login(data.email, data.password);
     if (result == true) {
-      router.push("/dashboard");
+      router.push("/smartcampus/dashboard");
     }
   };
 
+  useEffect(() => {
+    if (!loading && user) {
+      router.push("/"); 
+    }
+  }, [user, loading, router]);
   return (
     <>
       <ToastContainer />

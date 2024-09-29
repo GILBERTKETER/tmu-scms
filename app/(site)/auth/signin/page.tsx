@@ -1,17 +1,19 @@
 import Signin from "@/components/Auth/Signin";
 import { Metadata } from "next";
-
 export const metadata: Metadata = {
-  title: "Login - Compliance Is Us",
-  description: "Securely access your Compliance Is Us account. Log in to manage your compliance processes and stay updated with our latest features.",
-  // other metadata
+  title: "Sign In - Smart Campus",
+  description:
+    "Log in to your Smart Campus account to manage your courses, academic progress, and campus activities.",
 };
 
+import HomeLayout from "@/components/Layouts/homeLayout";
 
 const SigninPage = () => {
   return (
     <>
-      <Signin />
+      <HomeLayout>
+        <Signin />
+      </HomeLayout>
     </>
   );
 };

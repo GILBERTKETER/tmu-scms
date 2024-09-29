@@ -12,14 +12,15 @@ import Testimonial from "@/components/Testimonial";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 export const metadata: Metadata = {
-  title: "Compliance Is Us - Expert Solutions for Regulatory Compliance",
-  description:
-    "Your go-to source for comprehensive compliance services, including risk analysis, transaction monitoring, regulatory advisory, and more.",
+  title: "Home - Smart Campus",
+  description: "Welcome to Smart Campus, your centralized platform for managing courses, bookings, academic advising, and more.",
 };
 
+import HomeLayout from "@/components/Layouts/homeLayout"
 export default function Home() {
   return (
     <main>
+      <HomeLayout>
         <ToastContainer />
         <Hero />
         <Brands />
@@ -31,6 +32,8 @@ export default function Home() {
         <CTA />
         <FAQ />
         <Testimonial />
+      </HomeLayout>
+       
     </main>
   );
 }
