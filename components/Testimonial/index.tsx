@@ -1,7 +1,7 @@
 "use client";
 import SectionHeader from "../Common/SectionHeader";
 
-import { Autoplay, Pagination } from "swiper";
+import { Autoplay, Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
@@ -18,14 +18,13 @@ const Testimonial = () => {
         <div className="mx-auto max-w-c-1315 px-4 md:px-8 xl:px-0">
           {/* <!-- Section Title Start --> */}
           <div className="animate_top mx-auto text-center">
-          <SectionHeader
-  headerInfo={{
-    title: `USER TESTIMONIALS`,
-    subtitle: `What Our Users Are Saying`,
-    description: `The Tom Mboya University Smart Campus Management System (SCMS) has transformed the way students, lecturers, and administrators interact with the university. Here’s what they have to say about how SCMS enhances their daily tasks and university experience.`,
-  }}
-/>
-
+            <SectionHeader
+              headerInfo={{
+                title: `USER TESTIMONIALS`,
+                subtitle: `What Our Users Are Saying`,
+                description: `The Tom Mboya University Smart Campus Management System (SCMS) has transformed the way students, lecturers, and administrators interact with the university. Here’s what they have to say about how SCMS enhances their daily tasks and university experience.`,
+              }}
+            />
           </div>
           {/* <!-- Section Title End --> */}
         </div>
@@ -36,7 +35,6 @@ const Testimonial = () => {
               opacity: 0,
               y: -20,
             },
-
             visible: {
               opacity: 1,
               y: 0,
