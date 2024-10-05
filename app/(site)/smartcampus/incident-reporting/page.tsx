@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import DefaultLayout from "@/components/Layouts/DefaultLayout";
+import Reporting from "@/components/safetyReporting"
 export const metadata: Metadata = {
   title: "Dashboard - Smart Campus",
   description: "Access your personalized dashboard with a quick overview of your classes, assignments, and campus notifications.",
@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 export default function IncidentReporting() {
   return (
     <>
-      Hello IncidentReporting here
+      <Reporting/>
     </>
   );
 }

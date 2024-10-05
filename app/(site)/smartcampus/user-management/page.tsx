@@ -1,15 +1,15 @@
 import { Metadata } from "next";
-import DefaultLayout from "@/components/Layouts/DefaultLayout";
+import UserManagement from "@/components/user-management";
 export const metadata: Metadata = {
   title: "Dashboard - Smart Campus",
   description: "Access your personalized dashboard with a quick overview of your classes, assignments, and campus notifications.",
 };
 
 
-export default function UserManagement() {
+export default function Management() {
   return (
     <>
-      Hello UserManagement here
+      <UserManagement/>
     </>
   );
 }

@@ -1,11 +1,12 @@
-import React from 'react'
+import React from "react";
+import SettingsComponent from "@/components/settings";
 
-function Settings() {
+function SettingsPage() {
   return (
     <div>
-      system settings page here
+      <SettingsComponent />
     </div>
-  )
+  );
 }
 
-export default Settings
+export default SettingsPage;

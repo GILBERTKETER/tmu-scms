@@ -1,0 +1,89 @@
+.sx-react-calendar-wrapper {
+    max-width: 100vw;
+    height: 800px;
+    max-height: 90vh;
+  }
+
+
+  .list-demo-actions-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    transition: all 0.1s;
+  }
+  
+  .list-demo-actions-icon:hover {
+    background-color: var(--color-fill-3);
+  }
+  
+  .list-demo-actions-button[tabindex]:focus-visible {
+    box-shadow: 0 0 0 2px var(--color-primary-light-3);
+  }
+  
+  .list-demo-actions-button {
+    position: relative;
+    padding: 0 4px;
+    border-radius: 2px;
+    color: rgb(var(--arcoblue-6));
+    cursor: pointer;
+    transition: all 0.1s;
+  }
+  
+  .list-demo-actions-button:hover {
+    background-color: var(--color-fill-3);
+  }
+  
+  .list-demo-actions .arco-list-item-action li:not(:last-child) .list-demo-actions-button::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    right: -10px;
+    width: 1px;
+    height: 12px;
+    background-color: var(--color-fill-3);
+  }
+/* components/Timeline.module.css */
+.timelineWrapper {
+  position: relative;
+  margin: 20px 0;
+  padding: 10px 0;
+}
+
+.timelineWrapper::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #cfcfcf;
+  left: 20px;
+  margin-left: -1px;
+}
+
+.event {
+  position: relative;
+  margin: 10px 0;
+  padding-left: 40px;
+}
+
+.dot {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: #4caf50;
+  border-radius: 50%;
+  top: 0;
+  left: 13px;
+}
+
+.time {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.description {
+  color: #555;
+}

@@ -41,14 +41,14 @@
 }
 
 @layer utilities {
-  /* Chrome, Safari and Opera */
-  .no-scrollbar::-webkit-scrollbar {
+  Chrome, Safari and Opera 
+   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
 
   .no-scrollbar {
     -ms-overflow-style: none; /* IE and Edge */
-    scrollbar-width: none; /* Firefox */
+     scrollbar-width: none;  
   }
 
   .img-white {
@@ -124,4 +124,17 @@ pre {
 
 .active-tab {
   @apply bg-stroke text-black dark:bg-blackho dark:text-white;
+}
+
+
+
+@media screen and (max-width: 695px){
+.flex-cards{
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(1, 1fr) !important;
+}
+.card-custom-hover-style{
+  width: 100vw;
+}
 }
