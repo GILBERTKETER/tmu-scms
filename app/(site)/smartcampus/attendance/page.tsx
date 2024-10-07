@@ -1,15 +1,15 @@
 import { Metadata } from "next";
-import DefaultLayout from "@/components/Layouts/DefaultLayout";
+import Attendance from "@/components/Attendance";
 export const metadata: Metadata = {
   title: "Dashboard - Smart Campus",
   description: "Access your personalized dashboard with a quick overview of your classes, assignments, and campus notifications.",
 };
 
 
-export default function Attendance() {
+export default function AttendancePage() {
   return (
     <>
-      Hello Attendance here
+      <Attendance/>
     </>
   );
 }

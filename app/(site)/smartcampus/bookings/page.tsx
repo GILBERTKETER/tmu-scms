@@ -1,15 +1,16 @@
 import { Metadata } from "next";
-import DefaultLayout from "@/components/Layouts/DefaultLayout";
+import Bookings from '@/components/HallBooking'
 export const metadata: Metadata = {
   title: "Dashboard - Smart Campus",
   description: "Access your personalized dashboard with a quick overview of your classes, assignments, and campus notifications.",
 };
 
 
-export default function Bookings() {
+export default function BookingsPage() {
   return (
     <>
-      Hello Bookings here
+      <Bookings/>
+      {/* <h2>hello</h2> */}
     </>
   );
 }

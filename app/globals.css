@@ -126,7 +126,12 @@ pre {
   @apply bg-stroke text-black dark:bg-blackho dark:text-white;
 }
 
-
+.yearCards{
+  position: relative;
+  border: 2px solid red;
+  width: 100%;
+  display:flex;
+}
 
 @media screen and (max-width: 695px){
 .flex-cards{
@@ -137,4 +142,46 @@ pre {
 .card-custom-hover-style{
   width: 100vw;
 }
+
+}
+
+.schedule-cards{
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 20px;
+  flex-direction: column;
+  height: auto;
+}
+.schedules{
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+
+}
+.cardDiv, .otherDiv{
+  width: 50%;
+}
+@media screen and (max-width: 1200px) {
+  .cardDiv, .otherDiv{
+    width: 100%;
+  }
+  .schedule-cards{
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+  }
+  .schedules{
+    display: flex;
+    flex-direction: column;
+  }
+  
+}
+@media screen and (max-width:800px) {
+  .schedule-cards{
+    display: flex;
+    flex-direction: column;
+  }
+  
 }
