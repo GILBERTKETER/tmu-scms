@@ -14,7 +14,9 @@ import UpcomingEventsComponent from "./UpcomingEventsComponent";
 import EventManagement from "./AddEvents";
 import Timelines from "./Timline";
 import App from "@/app/(site)/api/api";
-
+import Swal from "sweetalert2";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 interface Event {
   id: number;
   title: string;
@@ -145,6 +147,7 @@ function CalenderComponent() {
 
   return (
     <>
+    <ToastContainer/>
       <div className="flex h-auto w-full items-center justify-end py-4">
         <EventManagement />
       </div>
