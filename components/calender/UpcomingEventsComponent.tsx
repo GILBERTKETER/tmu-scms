@@ -1,20 +1,27 @@
-import React, { useState } from "react";
-import { List, Avatar, Popconfirm, Message, Modal, Input, Button, Form } from "@arco-design/web-react";
+import React, { useState, useEffect } from "react";
+import { List, Avatar, Popconfirm, Message, Modal, Input, Button, Form, Switch, Select } from "@arco-design/web-react";
 import { IconEdit, IconDelete, IconDown } from "@arco-design/web-react/icon";
 
 interface Event {
   id: number;
   title: string;
+  date: string;
   description: string;
-  start: string;
-  end: string;
+  start_time: string;
+  end_time: string;
+  event_type: string;
+  address: string;
+  link: string;
+  is_online: boolean;
 }
 
 interface UpcomingEventsComponentProps {
   events: Event[];
-  onEdit: (updatedEvent: Event) => void; // Update the event after editing
+  onEdit: (updatedEvent: Event) => void;
   onDelete: (eventId: number) => void;
 }
+
+const FormItem = Form.Item;
 
 const UpcomingEventsComponent: React.FC<UpcomingEventsComponentProps> = ({
   events,
@@ -22,38 +29,66 @@ const UpcomingEventsComponent: React.FC<UpcomingEventsComponentProps> = ({
   onDelete,
 }) => {
   const [showMore, setShowMore] = useState(false);
-  const [isModalVisible, setIsModalVisible] = useState(false); // Modal visibility
-  const [editingEvent, setEditingEvent] = useState<Event | null>(null); // Event being edited
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [editingEvent, setEditingEvent] = useState<Event | null>(null);
+  const [isOnline, setIsOnline] = useState(false);
+  const [form] = Form.useForm();
 
-  const displayedEvents: Event[] = showMore ? events : events.slice(0, 5);
+  const displayedEvents = showMore ? events : events.slice(0, 5);
 
-  // Handle opening the modal with the selected event's data
+  // Update isOnline state when the form value changes
+  useEffect(() => {
+    if (editingEvent) {
+      setIsOnline(editingEvent.is_online);
+    }
+  }, [editingEvent]);
+
   const handleEditClick = (event: Event) => {
     setEditingEvent(event);
+    setIsOnline(event.is_online);
+    form.setFieldsValue(event);
     setIsModalVisible(true);
   };
 
-  // Handle saving the edited event
-  const handleSaveEdit = () => {
-    if (editingEvent) {
-      onEdit(editingEvent); // Pass the updated event data to the parent component
-      setIsModalVisible(false); // Close the modal
+  const handleSaveEdit = async () => {
+    try {
+      const values = await form.validate();
+      if (editingEvent) {
+        const updatedEvent: Event = {
+          ...editingEvent,
+          ...values,
+        };
+        onEdit(updatedEvent);
+        setIsModalVisible(false);
+        form.clearFields();
+      }
+    } catch (error) {
+      console.error('Validation error:', error);
     }
   };
 
-  // Handle form field changes
-  const handleFormChange = (key: keyof Event, value: string) => {
-    if (editingEvent) {
-      setEditingEvent({ ...editingEvent, [key]: value });
+  const handleCancel = () => {
+    setIsModalVisible(false);
+    form.clearFields();
+    setEditingEvent(null);
+  };
+
+  const handleSwitchChange = (checked: boolean) => {
+    setIsOnline(checked);
+    form.setFieldValue('is_online', checked);
+    // Clear the opposite field when switching
+    if (checked) {
+      form.setFieldValue('address', '');
+    } else {
+      form.setFieldValue('link', '');
     }
   };
 
   const render = (actions: React.ReactNode[], item: Event, index: number) => (
-    <List.Item key={index} actions={actions}>
+    <List.Item key={item.id} actions={actions}>
       <List.Item.Meta
-        avatar={<Avatar shape="square">A</Avatar>}
         title={item.title}
-        description={`${item.description} - ${item.start}`}
+        description={`${item.description} on ${item.date} as from ${item.start_time} to ${item.end_time} at ${item.address || item.link}`}
       />
     </List.Item>
   );
@@ -68,12 +103,12 @@ const UpcomingEventsComponent: React.FC<UpcomingEventsComponentProps> = ({
     </span>,
     <Popconfirm
       focusLock
-      title="Confirm"
-      content="Are you sure you want to delete?"
+      title="Confirm Delete"
+      content="Are you sure you want to delete this event?"
       onOk={() => {
-        onDelete(event.id);  // Handle delete action inside onOk
-        Message.info({
-          content: "Event deleted",
+        onDelete(event.id);
+        Message.success({
+          content: "Event deleted successfully",
         });
       }}
       onCancel={() => {
@@ -81,7 +116,6 @@ const UpcomingEventsComponent: React.FC<UpcomingEventsComponentProps> = ({
           content: "Delete canceled",
         });
       }}
-      key="delete"  // Make sure the key is applied to Popconfirm
     >
       <span className="list-demo-actions-icon">
         <IconDelete />
@@ -89,7 +123,7 @@ const UpcomingEventsComponent: React.FC<UpcomingEventsComponentProps> = ({
     </Popconfirm>,
   ];
 
-  const footer = (
+  const footer = events.length > 5 ? (
     <div
       style={{
         display: "flex",
@@ -98,38 +132,32 @@ const UpcomingEventsComponent: React.FC<UpcomingEventsComponentProps> = ({
         cursor: "pointer",
       }}
       onClick={() => setShowMore(!showMore)}
-      onKeyDown={(e) => {
-        const keyCode = e.keyCode || e.which;
-        if (keyCode === 13) {
-          setShowMore(!showMore);
-        }
-      }}
     >
-      <span className="list-demo-actions-button" tabIndex={0}>
+      <span className="list-demo-actions-button">
         {showMore ? "Show Less" : "Show More"}
         <IconDown style={{ marginLeft: 8 }} />
       </span>
     </div>
-  );
+  ) : null;
 
   return (
     <>
       <List
         className="list-demo-actions"
-        style={{ width: "100%", marginBottom: 48 }}
+        style={{ width: "100%" }}
         dataSource={displayedEvents}
         render={(item, index) => render(actions(item), item, index)}
         footer={footer}
       />
 
-      {/* Modal for editing event */}
       <Modal
         visible={isModalVisible}
         title="Edit Event"
         onOk={handleSaveEdit}
-        onCancel={() => setIsModalVisible(false)}
+        onCancel={handleCancel}
+        autoFocus={false}
         footer={[
-          <Button key="cancel" onClick={() => setIsModalVisible(false)}>
+          <Button key="cancel" onClick={handleCancel}>
             Cancel
           </Button>,
           <Button key="submit" type="primary" onClick={handleSaveEdit}>
@@ -137,41 +165,62 @@ const UpcomingEventsComponent: React.FC<UpcomingEventsComponentProps> = ({
           </Button>,
         ]}
       >
-        {editingEvent && (
-          <Form>
-            <Form.Item label="Title">
-              <Input
-                value={editingEvent.title}
-                onChange={(value) => handleFormChange("title", value)}
-              />
-            </Form.Item>
-            <Form.Item label="Description">
-              <Input
-                value={editingEvent.description}
-                onChange={(value) => handleFormChange("description", value)}
-              />
-            </Form.Item>
-            <Form.Item label="Start Time">
-              <Input
-                value={editingEvent.start}
-                onChange={(value) => handleFormChange("start", value)}
-              />
-            </Form.Item>
-            <Form.Item label="End Time">
-              <Input
-                value={editingEvent.end}
-                onChange={(value) => handleFormChange("end", value)}
-              />
-            </Form.Item>
-          </Form>
-        )}
+        <Form
+          form={form}
+          layout="vertical"
+          initialValues={editingEvent}
+        >
+          <FormItem label="Title" field="title" rules={[{ required: true }]}>
+            <Input placeholder="Event title" />
+          </FormItem>
+
+          <FormItem label="Description" field="description" rules={[{ required: true }]}>
+            <Input.TextArea placeholder="Event description" />
+          </FormItem>
+
+          <FormItem label="Date" field="date" rules={[{ required: true }]}>
+            <Input type="date" />
+          </FormItem>
+
+          <FormItem label="Start Time" field="start_time" rules={[{ required: true }]}>
+            <Input type="time" />
+          </FormItem>
+
+          <FormItem label="End Time" field="end_time" rules={[{ required: true }]}>
+            <Input type="time" />
+          </FormItem>
+
+          <FormItem label="Event Type" field="event_type" rules={[{ required: true }]}>
+            <Select
+              options={[
+                { label: 'Public', value: 'public' },
+                { label: 'Private', value: 'private' }
+              ]}
+            />
+          </FormItem>
+
+          <FormItem label="Event Format" field="is_online" rules={[{ required: true }]}>
+            <Switch
+              checked={isOnline}
+              onChange={handleSwitchChange}
+              checkedText="Online"
+              uncheckedText="Offline"
+            />
+          </FormItem>
+
+          {isOnline ? (
+            <FormItem label="Meeting Link" field="link" rules={[{ required: true }]}>
+              <Input placeholder="Enter meeting link" />
+            </FormItem>
+          ) : (
+            <FormItem label="Address" field="address" rules={[{ required: true }]}>
+              <Input placeholder="Enter physical address" />
+            </FormItem>
+          )}
+        </Form>
       </Modal>
     </>
   );
-};
-
-UpcomingEventsComponent.defaultProps = {
-  events: [],
 };
 
 export default UpcomingEventsComponent;

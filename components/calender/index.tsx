@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ScheduleXCalendar, useCalendarApp } from "@schedule-x/react";
 import {
   createViewDay,
@@ -11,10 +11,10 @@ import "@schedule-x/theme-default/dist/calendar.css";
 import { createEventModalPlugin } from "@schedule-x/event-modal";
 import { createDragAndDropPlugin } from "@schedule-x/drag-and-drop";
 import UpcomingEventsComponent from "./UpcomingEventsComponent";
-import { IconPlus } from "@arco-design/web-react/icon";
-import { Button, Popover } from "@arco-design/web-react";
 import EventManagement from "./AddEvents";
 import Timelines from "./Timline";
+import App from "@/app/(site)/api/api";
+
 interface Event {
   id: number;
   title: string;
@@ -23,56 +23,125 @@ interface Event {
   end: string;
 }
 
+interface TransformedEvent {
+  id: number;
+  title: string;
+  description: string;
+  start: string;
+  end: string;
+  isAllDay?: boolean;
+}
+
 function CalenderComponent() {
+  const [rawEvents, setRawEvents] = useState<Event[]>([]);
+  const [transformedEvents, setTransformedEvents] = useState<TransformedEvent[]>([]);
+  const [loading, setLoading] = useState(true);
   const currentDate = new Date().toISOString().split("T")[0];
 
-  const initialEvents: Event[] = [
-    {
-      id: 1,
-      title: "My new event",
-      start: "2024-10-03T00:00:00",
-      end: "2024-10-03T02:00:00",
-      description: "My new event on this day",
-    },
-    {
-      id: 2,
-      title: "My new event",
-      start: "2024-10-03T00:00:00",
-      end: "2024-10-03T02:00:00",
-      description: "My new event on this day",
-    },
-    {
-      id: 3,
-      title: "My new event",
-      start: "2024-10-03T00:00:00",
-      end: "2024-10-03T02:00:00",
-      description: "My new event on this day",
-    },
-  ];
-
-  const [events, setEvents] = useState<Event[]>(initialEvents);
-
+  // Create calendar configuration with monthly view as default
   const calendar = useCalendarApp({
     views: [
+      createViewMonthGrid(),
       createViewDay(),
       createViewWeek(),
-      createViewMonthGrid(),
       createViewMonthAgenda(),
     ],
-    events,
+    defaultView: 'month-grid',
+    events: [],
     selectedDate: currentDate,
     plugins: [createEventModalPlugin(), createDragAndDropPlugin()],
+    dateFormat: {
+      weekday: 'short',
+      month: 'numeric',
+      day: 'numeric',
+      year: 'numeric',
+    },
   });
+
+  // Function to transform events into Schedule-X format
+  const transformEvents = (events: Event[]): TransformedEvent[] => {
+    return events.map(event => {
+      // Ensure dates are valid
+      const startDate = new Date(event.start);
+      const endDate = new Date(event.end);
+
+      return {
+        id: event.id,
+        title: event.title,
+        description: event.description,
+        start: startDate.toISOString(),
+        end: endDate.toISOString(),
+        isAllDay: false,
+      };
+    }).filter(event => {
+      // Filter out events with invalid dates
+      return !isNaN(new Date(event.start).getTime()) && !isNaN(new Date(event.end).getTime());
+    });
+  };
+
+  // Fetch and process events
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const response = await App.get('/api/get-events/');
+        console.log('Raw API response:', response.data);
+
+        const fetchedEvents = response.data;
+        setRawEvents(fetchedEvents); // Store raw events for UpcomingEvents
+
+        const processed = transformEvents(fetchedEvents);
+        console.log('Transformed events:', processed);
+        
+        setTransformedEvents(processed);
+        calendar.setEvents(processed);
+        
+        console.log('Calendar events set:', calendar.getEvents());
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching events:', error);
+        setLoading(false);
+      }
+    };
+
+    fetchEvents();
+  }, []);
 
   const handleEdit = (eventId: number) => {
     console.log("Edit event with ID:", eventId);
   };
 
-  const handleDelete = (eventId: number) => {
-    setEvents((prevEvents) =>
-      prevEvents.filter((event) => event.id !== eventId),
-    );
+  const handleDelete = async (eventId: number) => {
+    try {
+      // Update both raw and transformed events
+      const updatedRawEvents = rawEvents.filter(event => event.id !== eventId);
+      setRawEvents(updatedRawEvents);
+
+      const updatedTransformed = transformEvents(updatedRawEvents);
+      setTransformedEvents(updatedTransformed);
+      calendar.setEvents(updatedTransformed);
+
+      // Optional: Delete from backend
+      // await App.delete(`/api/events/${eventId}`);
+    } catch (error) {
+      console.error('Error deleting event:', error);
+    }
   };
+
+  // Function to add new event
+  const handleAddEvent = async (newEvent: Event) => {
+    try {
+      setRawEvents(prev => [...prev, newEvent]);
+      const updatedTransformed = transformEvents([...rawEvents, newEvent]);
+      setTransformedEvents(updatedTransformed);
+      calendar.setEvents(updatedTransformed);
+    } catch (error) {
+      console.error('Error adding event:', error);
+    }
+  };
+
+  if (loading) {
+    return <div className="flex items-center justify-center p-4">Loading calendar...</div>;
+  }
 
   return (
     <>
@@ -84,14 +153,13 @@ function CalenderComponent() {
       </div>
       <div className="flex flex-col gap-6 lg:flex-row">
         <div className="w-[100%] lg:w-[50%]">
-          {" "}
           <UpcomingEventsComponent
-            events={events}
+            events={rawEvents} // Pass raw events to UpcomingEvents
             onEdit={handleEdit}
             onDelete={handleDelete}
           />
         </div>
-        <div className="w-[100%] overflow-hidden rounded-lg bg-white shadow-lg lg:w-[50%]">
+        <div className="w-[100%] overflow-hidden rounded-lg bg-white shadow-lg lg:w-[50%] h-[auto]">
           <ScheduleXCalendar calendarApp={calendar} />
         </div>
       </div>
