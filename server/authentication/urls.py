@@ -9,5 +9,7 @@ urlpatterns = [
     path("get-user/", views.get_user,name="Get user"),
     path('reset-password/', views.reset_password, name='reset_password'),
     path('requestlink/', views.request_password_reset_link, name='Request link'),
+    path('get-users-count/', views.get_users_count, name='users'),
+    path('get-all-users/', views.get_all_users, name='get all users'),
 
 ]

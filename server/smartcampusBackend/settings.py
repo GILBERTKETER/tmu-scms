@@ -71,7 +71,7 @@ INSTALLED_APPS = [
     "authentication",
     "academicEvents",
     "Halls",
-    "academics"
+    "academics",
 ]
 
 MIDDLEWARE = [

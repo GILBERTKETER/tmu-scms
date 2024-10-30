@@ -26,38 +26,45 @@ from django.template.loader import render_to_string
 import os
 from django.conf import settings
 from .utils import send_email
+from .models import UserProfile
 @csrf_exempt
 def user_registration(request):
     if request.method == 'POST':
         data = json.loads(request.body)
 
-        first_name = data.get('firstName')
-        last_name = data.get('lastName')
+        # Required fields
+        first_name = data.get('firstName', "")
+        last_name = data.get('lastName', "")
         admission = data.get('admission')
         phone_number = data.get('phone')
         password = data.get('password')
         email = data.get('email')
         cpassword = data.get('cpassword')
-        
-        yos = data.get('yos')
-        semester = data.get('semester')
-        program = data.get('program')
-        full_name = first_name + last_name
+        role = data.get('role', None)
 
-        if not all([first_name, last_name, admission, phone_number, password,cpassword, email]):
-            return JsonResponse({"message": "All fields are required."}, status=400)
+        # Optional fields
+        yos = data.get('yos', None)
+        semester = data.get('semester', None)
+        program = data.get('program', None)
+        full_name = f"{first_name} {last_name}".strip()
+
+        # Check for required fields
+        if not all([first_name, last_name, admission, phone_number, password, cpassword, email]):
+            return JsonResponse({"success":False,"message": "All required fields are missing."}, status=400)
 
         try:
             with transaction.atomic():
+                # Check if the user with email, phone, or admission already exists
                 if User.objects.filter(email=email).exists():
-                    return JsonResponse({"message": "Email is already registered."}, status=400)
-                if password != cpassword: return JsonResponse({"message":"Passwords don't match. Please try again."}, status=401)
+                    return JsonResponse({"success":False,"message": "Email is already registered."}, status=400)
+                if password != cpassword:
+                    return JsonResponse({"success":False,"message": "Passwords don't match. Please try again."}, status=401)
                 if UserProfile.objects.filter(phone_number=phone_number).exists():
-                    return JsonResponse({"message": "Phone number is already registered."}, status=400)
-
+                    return JsonResponse({"success":False,"message": "Phone number is already registered."}, status=400)
                 if UserProfile.objects.filter(admission=admission).exists():
-                    return JsonResponse({"message": "Admission number is already registered."}, status=400)
+                    return JsonResponse({"success":False,"message": "Admission number is already registered."}, status=400)
 
+                # Create the user and user profile
                 user = User.objects.create_user(
                     username=email,
                     password=password,
@@ -66,27 +73,92 @@ def user_registration(request):
                     last_name=last_name
                 )
 
+                # Assign profile details, handling optional fields
                 user.userprofile.phone_number = phone_number
                 user.userprofile.admission = admission
                 user.userprofile.year_of_study = yos
                 user.userprofile.semester = semester
                 user.userprofile.program = program
                 user.userprofile.full_name = full_name
+                user.userprofile.role = role
                 
                 user.userprofile.save()
 
+                # Log the user in and send welcome email
                 login(request, user)
-                html_content = render_to_string('signup.html',{'firstName': first_name})
+                html_content = render_to_string('signup.html', {'firstName': first_name})
 
                 subject = 'Welcome to Tom Mboya Smart Campus Management System'
                 send_email(subject, email, html_content)
-                
-            return JsonResponse({"message": "You are successfully registered."}, status=201)
+
+            return JsonResponse({"success":True,"message": "You are successfully registered."}, status=201)
 
         except Exception as e:
-            return JsonResponse({"message": str(e)}, status=400)
+            return JsonResponse({"success":False,"message": str(e)}, status=400)
 
-    return JsonResponse({"message": "Invalid request method."}, status=405)
+    return JsonResponse({"success":False,"message": "Invalid request method."}, status=405)
+# def user_registration(request):
+#     if request.method == 'POST':
+#         data = json.loads(request.body)
+
+#         first_name = data.get('firstName')
+#         last_name = data.get('lastName')
+#         admission = data.get('admission')
+#         phone_number = data.get('phone')
+#         password = data.get('password')
+#         email = data.get('email')
+#         cpassword = data.get('cpassword')
+#         role = data.get('role')
+        
+#         yos = data.get('yos')
+#         semester = data.get('semester')
+#         program = data.get('program')
+#         full_name = first_name + last_name
+
+#         if not all([first_name, last_name, admission, phone_number, password,cpassword, email]):
+#             return JsonResponse({"message": "All fields are required."}, status=400)
+
+#         try:
+#             with transaction.atomic():
+#                 if User.objects.filter(email=email).exists():
+#                     return JsonResponse({"message": "Email is already registered."}, status=400)
+#                 if password != cpassword: return JsonResponse({"message":"Passwords don't match. Please try again."}, status=401)
+#                 if UserProfile.objects.filter(phone_number=phone_number).exists():
+#                     return JsonResponse({"message": "Phone number is already registered."}, status=400)
+
+#                 if UserProfile.objects.filter(admission=admission).exists():
+#                     return JsonResponse({"message": "Admission number is already registered."}, status=400)
+
+#                 user = User.objects.create_user(
+#                     username=email,
+#                     password=password,
+#                     email=email,
+#                     first_name=first_name,
+#                     last_name=last_name
+#                 )
+
+#                 user.userprofile.phone_number = phone_number
+#                 user.userprofile.admission = admission
+#                 user.userprofile.year_of_study = yos
+#                 user.userprofile.semester = semester
+#                 user.userprofile.program = program
+#                 user.userprofile.full_name = full_name
+#                 user.userprofile.role = role
+                
+#                 user.userprofile.save()
+
+#                 login(request, user)
+#                 html_content = render_to_string('signup.html',{'firstName': first_name})
+
+#                 subject = 'Welcome to Tom Mboya Smart Campus Management System'
+#                 send_email(subject, email, html_content)
+                
+#             return JsonResponse({"message": "You are successfully registered."}, status=201)
+
+#         except Exception as e:
+#             return JsonResponse({"message": str(e)}, status=400)
+
+#     return JsonResponse({"message": "Invalid request method."}, status=405)
 
 @csrf_exempt
 @require_http_methods(["POST"])
@@ -214,3 +286,33 @@ def reset_password(request):
             return JsonResponse({'message': 'Invalid UID', "success": False}, status=400)
 
     return JsonResponse({'message': 'Invalid request method.', "success": False}, status=400)
+
+
+def get_users_count(request):
+    user = request.user
+    if user.is_authenticated:
+        students = UserProfile.objects.filter(role="student").count()
+        admins = UserProfile.objects.filter(role="admin").count()
+        class_reps = UserProfile.objects.filter(role="representative").count()
+        lecturers = UserProfile.objects.filter(role="lecturer").count()
+        
+        data = {
+            "students": students,
+            "admins": admins,
+            "class_reps": class_reps,
+            "lecturers": lecturers,
+        }
+        
+        return JsonResponse({"success": True, "message": "These are the details", "data": data}, status=200)
+    else:
+        return JsonResponse({"success": False, "message": "You are not authenticated"}, status=403)
+    
+    
+    
+def get_all_users(request):
+    user = request.user
+    if user.is_authenticated:
+        users = UserProfile.objects.all().values()  # Fetches all users and converts them to a list of dictionaries
+        return JsonResponse({"success": True, "message": "These are the details", "data": list(users)}, status=200)        
+    else:
+        return JsonResponse({"success": False, "message": "You are not authenticated"}, status=403)
