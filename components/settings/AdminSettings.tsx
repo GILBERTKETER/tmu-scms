@@ -2,6 +2,7 @@ import React from "react";
 import YearCards from "./YearCards";
 import AdminTable from "./AdminTables";
 import AddCourse from "./AddCourse"
+import AddProgram from "./AddProgram"
 function AdminSettings() {
   const Cards = [
     {
@@ -39,8 +40,9 @@ function AdminSettings() {
             <p className="font- text-slate-600">
               Lorem ipsum dolor, sit amet consectetur adipisicing elit.
             </p></div>
-            <div>
+            <div className="flex items-center justify-between gap-1">
               <AddCourse/>
+              <AddProgram/>
             </div>
           </div>
           <hr className="mb-8 mt-4" />

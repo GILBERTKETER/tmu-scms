@@ -2,9 +2,7 @@ import React from "react";
 import { Card, Grid, Link } from "@arco-design/web-react";
 import EnrolledCourses from "./EnrolledList";
 import Details from "./Details";
-import DetailsDrawer from "./DetailsDrawer"
 function Cards() {
-  const extra = <DetailsDrawer/>;
   return (
     <div
     style={{
@@ -19,7 +17,7 @@ function Cards() {
     }}
   >
     <Card
-      title="Arco Card"
+      title="Enrolled courses"
       bordered={false}
       style={{
         width: "100%",
@@ -29,8 +27,7 @@ function Cards() {
       <EnrolledCourses />
     </Card>
     <Card
-      title="Arco Card"
-      extra={extra}
+      title="My School Details"
       bordered={false}
       style={{
         width: "100%", 

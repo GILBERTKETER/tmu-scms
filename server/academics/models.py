@@ -3,9 +3,7 @@ from django.contrib.auth.models import User
 
 class Program(models.Model):
     name = models.CharField(max_length=255, unique=True)  
-    description = models.TextField(blank=True) 
-    duration = models.IntegerField()  
-    level = models.CharField(max_length=100)  
+    description = models.TextField(blank=True)  
     created_at = models.DateTimeField(auto_now_add=True)  
     updated_at = models.DateTimeField(auto_now=True) 
 
@@ -18,7 +16,9 @@ class Course(models.Model):
     name = models.CharField(max_length=255)  
     description = models.TextField(blank=True)  
     program = models.ForeignKey(Program, related_name='courses', on_delete=models.CASCADE)  
-    semester = models.CharField(max_length=100, blank=True)  
+    semester = models.CharField(max_length=100, blank=True) 
+    year = models.CharField(max_length=200, null=True, blank=True) 
+   
     created_at = models.DateTimeField(auto_now_add=True)  
     updated_at = models.DateTimeField(auto_now=True)  
 
@@ -27,15 +27,18 @@ class Course(models.Model):
 
 
 class Enrollment(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)  
-    course = models.ForeignKey(Course, on_delete=models.CASCADE)  
-    enrolled_on = models.DateTimeField(auto_now_add=True) 
-
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    enrolled_on = models.DateTimeField(auto_now_add=True)
+    year = models.IntegerField()  # Year in school, e.g., 1, 2, 3, or 4
+    semester = models.CharField(max_length=10)  # e.g., 'Spring' or 'Fall'
+    course_code = models.CharField(max_length=100, blank=True, null=True)
+    course_name = models.CharField(max_length=200, blank=True, null=True)
     class Meta:
-        unique_together = ('user', 'course')  # Prevent duplicate enrollments
+        unique_together = ('user', 'course', 'year', 'semester')  # Prevent duplicate enrollments
 
     def __str__(self):
-        return f"{self.user.username} enrolled in {self.course.name}"
+        return f"{self.user.username} enrolled in {self.course.name} - Year {self.year}, {self.semester}"
 
 
 class Instructor(models.Model):

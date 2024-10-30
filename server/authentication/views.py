@@ -38,6 +38,11 @@ def user_registration(request):
         password = data.get('password')
         email = data.get('email')
         cpassword = data.get('cpassword')
+        
+        yos = data.get('yos')
+        semester = data.get('semester')
+        program = data.get('program')
+        full_name = first_name + last_name
 
         if not all([first_name, last_name, admission, phone_number, password,cpassword, email]):
             return JsonResponse({"message": "All fields are required."}, status=400)
@@ -63,6 +68,11 @@ def user_registration(request):
 
                 user.userprofile.phone_number = phone_number
                 user.userprofile.admission = admission
+                user.userprofile.year_of_study = yos
+                user.userprofile.semester = semester
+                user.userprofile.program = program
+                user.userprofile.full_name = full_name
+                
                 user.userprofile.save()
 
                 login(request, user)
@@ -136,11 +146,15 @@ def get_user(request):
             "first_name": user.first_name,
             "last_name": user.last_name,
             "phone_number": user.userprofile.phone_number,
-            "admission": user.userprofile.admission
+            "admission": user.userprofile.admission,
+            "full_name":user.userprofile.full_name,
+            "semester": user.userprofile.semester,
+            "year_of_study": user.userprofile.year_of_study,
+            "program":user.userprofile.program
         }
-        return JsonResponse({"user": user_data})
+        return JsonResponse({"success":True,"user": user_data})
     else:
-        return JsonResponse({"user": None}, status=401)
+        return JsonResponse({"success":False,"user": None}, status=401)
    
 @csrf_exempt
 def request_password_reset_link(request):
