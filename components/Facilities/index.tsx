@@ -2,7 +2,7 @@
 import React from 'react';
 import FacilityDashboard from './FacilityDashboard';
 import FacilityList from './FacilityList';
-import BookingForm from './BookingForm';
+import AddFacility from './AddFacility';
 
 const Facilities: React.FC = () => {
   return (
@@ -10,7 +10,7 @@ const Facilities: React.FC = () => {
       <h1 className="text-2xl font-bold mb-4">Facility Booking & Activities</h1>
       <FacilityDashboard />
       <div className="my-6">
-        <BookingForm />
+        <AddFacility />
       </div>
       <FacilityList />
     </div>

@@ -1,72 +1,81 @@
-import React, { useState } from 'react';
-import { Table, Input, Select, Button, Space, Message, Popconfirm } from '@arco-design/web-react';
-import { IconDelete, IconEdit, IconSearch } from '@arco-design/web-react/icon';
-import EditUser from "./EditUser"
+import React, { useState, useEffect } from "react";
+import { Table, Input, Select, Space, Popconfirm, Message } from "@arco-design/web-react";
+import { IconDelete, IconSearch } from "@arco-design/web-react/icon";
+import EditUser from "./EditUser"; // Ensure correct naming
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import App from "@/app/(site)/api/api";
 
 const UserTable: React.FC = () => {
-  const [filterRole, setFilterRole] = useState('');
-  const [searchText, setSearchText] = useState('');
- 
-  // Sample data for users
-  const originalData = [
-    { key: 1, name: 'John Doe', role: 'student' },
-    { key: 2, name: 'Jane Smith',role: 'lecturer' },
-    { key: 3, name: 'Paul Adams', role: 'admin' },
-    { key: 4, name: 'Alice Johnson',  role: 'student' },
-    { key: 5, name: 'Michael Brown', role: 'lecturer' },
-  ];
+  const [filterRole, setFilterRole] = useState("");
+  const [searchText, setSearchText] = useState("");
+  const [users, setUsers] = useState([]);
 
-  // Filter data based on search and role filter
-  const filteredData = originalData.filter((item) => {
-    const matchesSearch = item.name.toLowerCase().includes(searchText.toLowerCase())
+  useEffect(() => {
+    const get_all_users = async () => {
+      try {
+        const response = await App.get("/api/auth/get-all-users/");
+        if (!response.data.success) {
+          toast.error(response.data.message);
+        }
+        setUsers(response.data.data);
+      } catch (error) {
+        toast.error("An error occurred: " + error.message);
+      }
+    };
+    get_all_users();
+  }, []);
+
+  const filteredData = users.filter((item) => {
+    const matchesSearch = item.full_name.toLowerCase().includes(searchText.toLowerCase());
     const matchesRole = filterRole ? item.role === filterRole : true;
     return matchesSearch && matchesRole;
   });
 
   const columns = [
     {
-      title: 'Name',
-      dataIndex: 'name',
+      title: "Name",
+      dataIndex: "full_name",
       sorter: true,
     },
     {
-      title: 'Role',
-      dataIndex: 'role',
+      title: "Email",
+      dataIndex: "email",
+      sorter: true,
+    },
+    {
+      title: "Role",
+      dataIndex: "role",
       filters: [
-        { text: 'Student', value: 'student' },
-        { text: 'Lecturer', value: 'lecturer' },
-        { text: 'Admin', value: 'admin' },
+        { text: "Student", value: "student" },
+        { text: "Lecturer", value: "lecturer" },
+        { text: "Admin", value: "admin" },
       ],
       onFilter: (value, record) => record.role.includes(value),
     },
     {
-      title: 'Action',
-      dataIndex: 'action',
+      title: "Action",
+      dataIndex: "action",
       render: (_, record) => (
         <Space>
-        <EditUser/>
-        <Popconfirm
-        focusLock
-        title='Confirm'
-        content='Are you sure you want to delete?'
-        onOk={() => handleDeleteUser(record.id)}
-        onCancel={() => {
-          Message.error({
-            content: 'cancel',
-          });
-        }}
-
-      >
-          <IconDelete className='cursor-pointer' />
+          <EditUser email={record.email} role={record.role} />
+          <Popconfirm
+            focusLock
+            title="Confirm"
+            content="Are you sure you want to delete?"
+            onOk={() => handleDeleteUser(record.id)}
+            onCancel={() => {
+              Message.error({
+                content: "cancel",
+              });
+            }}
+          >
+            <IconDelete className="cursor-pointer" />
           </Popconfirm>
         </Space>
       ),
     },
   ];
-
-  const handleEditUser = (id) => {
-    // Handle editing user
-  };
 
   const handleDeleteUser = (id) => {
     // Handle deleting user
@@ -74,12 +83,13 @@ const UserTable: React.FC = () => {
 
   return (
     <div>
-      <Space  style={{ width:"100%", marginBottom: 16 }}>
+      <ToastContainer />
+      <Space style={{ width: "100%", marginBottom: 16 }}>
         <Input
           prefix={<IconSearch />}
-          placeholder="Name or Email"
+          placeholder="Search by name"
           value={searchText}
-          onChange={setSearchText}  // Fixed: set the search text directly
+          onChange={(value) => setSearchText(value)}
           style={{ width: "100%" }}
         />
         <Select
@@ -93,8 +103,13 @@ const UserTable: React.FC = () => {
           <Select.Option value="lecturer">Lecturer</Select.Option>
           <Select.Option value="admin">Admin</Select.Option>
         </Select>
-      </Space> 
-      <Table columns={columns} data={filteredData} pagination={{ pageSize: 5 }} rowKey="key" />
+      </Space>
+      <Table
+        columns={columns}
+        data={filteredData}
+        pagination={{ pageSize: 5 }}
+        rowKey="id"
+      />
     </div>
   );
 };
