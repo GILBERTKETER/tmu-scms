@@ -11,5 +11,6 @@ urlpatterns = [
     path('requestlink/', views.request_password_reset_link, name='Request link'),
     path('get-users-count/', views.get_users_count, name='users'),
     path('get-all-users/', views.get_all_users, name='get all users'),
+    path('update-user/', views.update_user, name='update user'),
 
 ]

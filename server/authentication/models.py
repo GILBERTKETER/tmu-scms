@@ -12,7 +12,7 @@ class UserProfile(models.Model):
     semester = models.CharField(max_length=10, blank=True, null=True)
     program = models.CharField(max_length=200, blank=True, null=True)
     role = models.CharField(max_length=100, default="student", null=True, blank=True)
-
+    email = models.CharField(max_length=50, blank=True, null=True)
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:

@@ -81,6 +81,7 @@ def user_registration(request):
                 user.userprofile.program = program
                 user.userprofile.full_name = full_name
                 user.userprofile.role = role
+                user.userprofile.email = email
                 
                 user.userprofile.save()
 
@@ -312,7 +313,57 @@ def get_users_count(request):
 def get_all_users(request):
     user = request.user
     if user.is_authenticated:
-        users = UserProfile.objects.all().values()  # Fetches all users and converts them to a list of dictionaries
+        users = UserProfile.objects.all().values()
         return JsonResponse({"success": True, "message": "These are the details", "data": list(users)}, status=200)        
     else:
         return JsonResponse({"success": False, "message": "You are not authenticated"}, status=403)
+    
+    
+    
+    
+@csrf_exempt  # Use this for testing, but consider proper CSRF handling in production
+def update_user(request):
+    if request.method == 'PUT':
+        try:
+            # Decode the JSON data from the request body
+            data = json.loads(request.body)
+            email = data.get('email')
+            role = data.get('role')
+            
+            # Fetch the user based on email
+            user = User.objects.get(email=email)
+            profile = UserProfile.objects.get(email=email)
+            # Update the user's role and save
+            user.email = email  # Adjust this if your User model has a different field for role
+            user.save()
+            profile.email = email
+            profile.role = role
+            profile.save()
+            
+            
+
+            return JsonResponse({
+                'success': True,
+                'message': 'User updated successfully!'
+            }, status=200)
+
+        except User.DoesNotExist:
+            return JsonResponse({
+                'success': False,
+                'message': 'User not found.'
+            }, status=404)
+        except json.JSONDecodeError:
+            return JsonResponse({
+                'success': False,
+                'message': 'Invalid JSON data.'
+            }, status=400)
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'message': str(e)
+            }, status=500)
+
+    return JsonResponse({
+        'success': False,
+        'message': 'Only PUT requests are allowed.'
+    }, status=405)
