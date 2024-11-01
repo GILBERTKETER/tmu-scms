@@ -34,6 +34,7 @@ class Enrollment(models.Model):
     semester = models.CharField(max_length=10)  # e.g., 'Spring' or 'Fall'
     course_code = models.CharField(max_length=100, blank=True, null=True)
     course_name = models.CharField(max_length=200, blank=True, null=True)
+    scheduled = models.CharField(default=1, max_length=50, blank=True, null=True)
     class Meta:
         unique_together = ('user', 'course', 'year', 'semester')  # Prevent duplicate enrollments
 
@@ -49,3 +50,14 @@ class Instructor(models.Model):
 
     def __str__(self):
         return self.user.username
+
+
+class Activities(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)  
+    activity_name = models.TextField()
+    activity_description = models.TextField()
+    activity_date = models.DateField()
+    activity_start_time = models.TimeField()
+    activity_end_time = models.TimeField()
+    activity_location = models.TextField()
+    

@@ -2,10 +2,13 @@ from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 import json
-from .models import Program, Course
+from .models import Program, Course, Instructor, Activities
 from django.db import IntegrityError
 from .models import Enrollment
 from authentication.views import get_user
+from django.core import serializers
+from datetime import datetime
+
 @csrf_exempt  
 @require_http_methods(["GET"])
 def get_programs(request):
@@ -112,7 +115,6 @@ def enroll_student(request):
         semester = course.semester
         course_code = course.code
         course_name = course.name
-        # Create or get the enrollment instance
         enrollment, created = Enrollment.objects.get_or_create(
             user=user,
             course=course,
@@ -122,7 +124,6 @@ def enroll_student(request):
             course_name = course_name,
         )
 
-        # Check if the enrollment was newly created or already existed
         if created:
             return JsonResponse({"success": True, "message": "Enrolled successfully."})
         else:
@@ -136,7 +137,7 @@ def enroll_student(request):
         return JsonResponse({"success": False, "message": str(e)})
     
     
-    
+@csrf_exempt    
 @require_http_methods(["GET"])
 def get_enrolled_courses(request):
     """
@@ -182,5 +183,173 @@ def discard_course(request):
         return JsonResponse({"success": False, "message": "An error occurred while enrolling."})
     except Exception as e:
         return JsonResponse({"success": False, "message": str(e)})
+ 
+@csrf_exempt   
+def get_unscheduled_courses(request):
+    user = request.user
+    if user.is_authenticated:
+        unscheduled_courses = Enrollment.objects.filter(scheduled=1).values()
+        return JsonResponse({"success": True, "message": "Enrolled courses fetched.", "data": list(unscheduled_courses)}, status=200)
+    else:
+        return JsonResponse({"success": False, "message": "You are not authenticated."}, status=401)
+    
+@csrf_exempt
+def get_instructors(request):
+    user = request.user
+    if user.is_authenticated:
+        instructors = Instructor.objects.select_related('user').all()
+        instructors_data = [
+            {
+                "id": instructor.id,
+                "name": f"{instructor.user.first_name} {instructor.user.last_name}",
+                "bio": instructor.bio,
+                "expertise": instructor.expertise,
+                "courses": list(instructor.courses.values("id", "name"))
+            }
+            for instructor in instructors
+        ]
+        return JsonResponse({
+            "success": True,
+            "message": "Fetched successfully",
+            "data": instructors_data
+        }, status=201)
+    else:
+        return JsonResponse({
+            "success": False,
+            "message": "You are not authenticated"
+        }, status=401)
+@csrf_exempt    
+def add_activity(request):
+    user = request.user
+    if user.is_authenticated:
+        if request.method == 'POST':
+            data = json.loads(request.body)
+            
+            activity_name = data.get('activity_name')
+            activity_description = data.get('activity_description')
+            activity_date = data.get('activity_date')
+            start_time = data.get('activity_start_time')
+            end_time = data.get('activity_end_time')
+            activity_location = data.get('activity_location')
+            
+            if not all([activity_name, activity_description, activity_date, start_time, end_time, activity_location]):
+                return JsonResponse({"success": False, "message": "All fields are required. Please fill in all fields."}, status=400)
+            
+            activity = Activities(
+                user=user,
+                activity_name=activity_name,
+                activity_description=activity_description,
+                activity_date=activity_date,
+                activity_start_time=start_time,
+                activity_end_time=end_time,
+                activity_location=activity_location
+            )
+            activity.save()
+            
+            return JsonResponse({"success": True, "message": "Your activity has been successfully added."}, status=200)
+        
+        return JsonResponse({"success": False, "message": "Invalid request method!"}, status=403)
+    
+    return JsonResponse({"success": False, "message": "You are not authenticated"}, status=401)
+
+@csrf_exempt
+def get_activities(request):
+    user = request.user
+    if user.is_authenticated:
+        if request.method == 'GET':
+            activities = Activities.objects.all().values()
+            return JsonResponse({"success":True, "message":"Success", "data":list(activities)}, status = 200)
+        else:
+            return JsonResponse({"success":False, "message":"Invalid request method."}, status=403)
+    else:
+        return JsonResponse({"success":False, "message":"You are not authenticated."}, status=401)
     
     
+@csrf_exempt
+def delete_activity(request):
+    user = request.user
+    if user.is_authenticated:
+        if request.method == 'DELETE':
+            try:
+                data = json.loads(request.body)
+                id = data.get('id')
+                
+                activity = Activities.objects.get(id=id)
+                activity.delete()
+                
+                return JsonResponse({
+                    "success": True,
+                    "message": "You have successfully deleted the activity."
+                }, status=200)
+
+            except Activities.DoesNotExist:
+                return JsonResponse({
+                    "success": False,
+                    "message": "Activity not found."
+                }, status=404)
+
+            except json.JSONDecodeError:
+                return JsonResponse({
+                    "success": False,
+                    "message": "Invalid JSON data."
+                }, status=400)
+
+        else:
+            return JsonResponse({
+                "success": False,
+                "message": "Invalid request method."
+            }, status=403)
+
+    else:
+        return JsonResponse({
+            "success": False,
+            "message": "You are not authenticated."
+        }, status=401)
+        
+    
+
+@csrf_exempt
+def update_activity(request):
+    user = request.user
+    if user.is_authenticated:
+        if request.method == 'PUT':
+            data = json.loads(request.body)
+            id = data.get('id')
+            activity_name = data.get('activity_name')
+            activity_date = data.get('activity_date')
+            activity_location = data.get('activity_location')
+            time_range = data.get('time_range')  # Assuming this is a list [start_time, end_time]
+
+            # Check for required fields
+            if not all([id, time_range, activity_date, activity_name, activity_location]):
+                return JsonResponse({"success": False, "message": "All fields are required."}, status=403)
+            
+            try:
+                # Parse the date and time range fields
+                activity_date = datetime.strptime(activity_date, '%Y-%m-%d').date()
+                start_time = datetime.strptime(time_range[0], '%H:%M:%S').time()
+                end_time = datetime.strptime(time_range[1], '%H:%M:%S').time()
+                
+                # Retrieve the activity
+                activity = Activities.objects.get(id=id)
+                
+                # Update the fields
+                activity.activity_name = activity_name
+                activity.activity_date = activity_date
+                activity.activity_location = activity_location
+                activity.activity_start_time = start_time
+                activity.activity_end_time = end_time
+                activity.save()
+
+                return JsonResponse({"success": True, "message": "Activity updated successfully."}, status=200)
+
+            except Activities.DoesNotExist:
+                return JsonResponse({"success": False, "message": "Activity not found."}, status=404)
+            except ValueError:
+                return JsonResponse({"success": False, "message": "Invalid date or time format."}, status=400)
+            except Exception as e:
+                return JsonResponse({"success": False, "message": f"Error: {str(e)}"}, status=500)
+        else:
+            return JsonResponse({"success": False, "message": "Invalid request method."}, status=400)
+    else:
+        return JsonResponse({"success": False, "message": "You are not logged in."}, status=401)

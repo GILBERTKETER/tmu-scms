@@ -13,10 +13,11 @@ const UnscheduledClasses: React.FC = () => {
   useEffect(() => {
     const fetchUnscheduledClasses = async () => {
       try {
-        const response = await App.get('/api/unscheduled-classes/'); 
-        setUnscheduledClasses(response.data);
+        const response = await App.get('/api/get-unscheduled-courses/');
+       
+        setUnscheduledClasses(response.data.data);
       } catch (error) {
-        toast.error(error.message || "An error occured during getting the classes.")
+        toast.error(error.message || "An error occurred while fetching the classes.");
       }
     };
 
@@ -26,20 +27,21 @@ const UnscheduledClasses: React.FC = () => {
   const columns = [
     {
       title: 'Class',
-      dataIndex: 'class',
+      dataIndex: 'course_name',
       key: 'class',
     },
     {
-      title: 'Description',
-      dataIndex: 'description',
-      key: 'description',
+      title: 'Course Code',
+      dataIndex: 'course_code',
+      key: 'course_code',
     },
+   
     {
       title: 'Action',
       key: 'action',
       render: (_, record) => (
         <Space size="middle">
-          <ScheduleClassModal classRecord={record} />
+          <ScheduleClassModal course_code={record.course_code} course_id={record.course_id} course_name={record.course_name} />
         </Space>
       ),
     },
@@ -49,6 +51,7 @@ const UnscheduledClasses: React.FC = () => {
     <div className="bg-white shadow-md p-6 rounded-lg">
       <h2 className="text-xl font-semibold mb-4">Unscheduled Classes</h2>
       <Table data={unscheduledClasses} columns={columns} pagination={false} />
+      <ToastContainer />
     </div>
   );
 };

@@ -73,6 +73,7 @@ INSTALLED_APPS = [
     "Halls",
     "academics",
     "facilities",
+    "courseschedules"
 ]
 
 MIDDLEWARE = [

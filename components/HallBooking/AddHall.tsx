@@ -17,10 +17,7 @@ const AddHall: React.FC = () => {
 
   const handleSubmit = async () => {
     try {
-      // Close the drawer
       setVisible(false);
-
-      // Validate if all required fields are filled
       if (!hallName || !hallCapacity || !hallDescription || !hallNumber) {
         toast.error("Please fill all required fields.");
         return;
@@ -33,10 +30,8 @@ const AddHall: React.FC = () => {
         hallNumber,
       };
 
-      // Make the API request
       const response = await App.post("/api/add-hall/", data);
 
-      // Check if the request was successful
       if (response.data.success === false) {
         toast.error(response.data.message);
         Swal.fire({
@@ -49,7 +44,6 @@ const AddHall: React.FC = () => {
         return;
       }
 
-      // Show success notifications
       Swal.fire({
         icon: "success",
         title: "Hall Submitted",
@@ -57,12 +51,10 @@ const AddHall: React.FC = () => {
       });
       toast.success(response.data.message);
 
-      // Clear form fields after successful submission
       setHallName("");
       setHallCapacity("");
       setHallDescription("");
     } catch (error) {
-      // Handle any errors that occur during the API call
       toast.error("An error occurred while submitting the details.");
       Swal.fire({
         icon: "error",
@@ -84,7 +76,6 @@ const AddHall: React.FC = () => {
         pauseOnFocusLoss
         draggable
         pauseOnHover
-        //   style={{ width: "300px" }}  // Custom width for the toast
       />
 
       <div>
