@@ -115,12 +115,12 @@ const ClassSchedule: React.FC = () => {
         ))}
         {modalVisible && (
           <AddEditClassModal
+          id={editingClass?.id || ""}
             visible={modalVisible}
             onClose={() => {
               setModalVisible(false);
-              setEditingClass(null);  // Clear editing state on close
+              setEditingClass(null);  
             }}
-            onSave={handleSave}
             instructor={editingClass?.instructor_name || ""}
             start_time={editingClass?.time_start || ""}
             end_time={editingClass?.time_end || ""}

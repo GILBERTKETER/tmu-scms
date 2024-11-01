@@ -26,6 +26,7 @@ def get_scheduled_classes(request):
                     hall_number = "N/A"
 
                 schedule_data.append({
+                    'id':schedule.id,
                     'course_name': schedule.enrollment.course_name,
                     'course_code': schedule.enrollment.course_code,
                     'program_name': schedule.enrollment.course.program.name,
@@ -97,4 +98,33 @@ def create_schedule(request):
 
     return JsonResponse({"success": False, "message": "Invalid request method."}, status=405)
 
+
+@csrf_exempt
+def update_class_details(request):
+    user = request.user
+    if user.is_authenticated:
+        if request.method == 'POST':
+            data = json.loads(request.body)
+            hall_id = data.get('hall_id')
+            instructor_id = data.get('instructor_id')
+            end_time = data.get('end_time')
+            start_time = data.get('start_time')
+            recurring_days = data.get('recurring_days')
+            schedule_id = data.get('id')
+            
+            schedule = Schedule.objects.get(id=schedule_id)
+            if schedule:
+                schedule.hall = hall_id
+                schedule.instructor_id = instructor_id
+                schedule.time_start = start_time
+                schedule.time_end = end_time
+                schedule.recurring_days = recurring_days
+                schedule.save()
+                return JsonResponse({"success":True, "message":"The schedule has been successfully updated."}, status = 200)
+            else:
+                return JsonResponse({"success":False, "message":"The class could not be found on our system."},status=404)
+        else:
+            return JsonResponse({"success":False, "message":"Invalid request method."},status=400)
+    else:
+        return JsonResponse({"success":False, "message":"You are not authenticated."},status=403)
 
