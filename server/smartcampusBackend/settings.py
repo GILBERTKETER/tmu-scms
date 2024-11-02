@@ -73,7 +73,9 @@ INSTALLED_APPS = [
     "Halls",
     "academics",
     "facilities",
-    "courseschedules"
+    "courseschedules",
+    "safetymonitoring",
+    "threads",
 ]
 
 MIDDLEWARE = [

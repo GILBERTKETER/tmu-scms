@@ -6,9 +6,16 @@ import {
   Button,
   Select,
   Input,
+  DatePicker,
+  Form,
+  Time,
+  TimePicker,
 } from "@arco-design/web-react";
-import { IconFilter, IconPlus, IconSearch } from "@arco-design/web-react/icon";
+import { IconInfoCircle, IconSearch } from "@arco-design/web-react/icon";
 import App from "@/app/(site)/api/api";
+import Swal from "sweetalert2";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const FacilityList: React.FC = () => {
   const [filterType, setFilterType] = useState("");
@@ -17,6 +24,7 @@ const FacilityList: React.FC = () => {
   const [selectedFacility, setSelectedFacility] = useState(null);
   const [facilities, setFacilities] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [form] = Form.useForm();
 
   const columns = [
     {
@@ -41,11 +49,49 @@ const FacilityList: React.FC = () => {
   const handleBook = (facility) => {
     setSelectedFacility(facility);
     setIsModalVisible(true);
+    form.resetFields();
   };
 
   const handleModalClose = () => {
     setIsModalVisible(false);
     setSelectedFacility(null);
+  };
+
+  const handleBookingSubmit = async (values) => {
+    const bookingData = {
+      facility_id: selectedFacility.id,
+      title: values.title,
+      date: values.date,
+      start_time: values.time[0],
+      end_time: values.time[1],
+    };
+
+    try {
+      const response = await App.post("/api/facility-booking/", bookingData);
+      if (response.data.success) {
+        Swal.fire({
+          icon: "success",
+          title: "Booking Successful",
+          text: response.data.message || "Facility booked successfully!",
+        });
+        toast.success(response.data.message || "Facility booked successfully!");
+        handleModalClose();
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Booking Failed",
+          text: response.data.message || "There was a problem with the booking.",
+        });
+        toast.error(response.data.message || "Error occurred while booking!");
+      }
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Booking Failed",
+        text: "An error occurred while processing your booking. Please try again.",
+      });
+      toast.error("An error occurred while processing your booking. Please try again.");
+    }
   };
 
   useEffect(() => {
@@ -81,6 +127,7 @@ const FacilityList: React.FC = () => {
 
   return (
     <div className="w-full">
+      <ToastContainer />
       <div className="mb-4 grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-2">
         <Input
           prefix={<IconSearch />}
@@ -113,23 +160,57 @@ const FacilityList: React.FC = () => {
       <Modal
         title={`Book Facility: ${selectedFacility?.facility_name}`}
         visible={isModalVisible}
-        onOk={handleModalClose}
+        onOk={form.submit}
         onCancel={handleModalClose}
         okText="Submit Booking"
         cancelText="Cancel"
       >
         {selectedFacility && (
-          <div>
-            <p>
-              <strong>Facility Name:</strong> {selectedFacility.facility_name}
-            </p>
-            <p>
-              <strong>Capacity:</strong> {selectedFacility.capacity}
-            </p>
-            <p>
-              <strong>Status:</strong> {selectedFacility.status}
-            </p>
-          </div>
+          <Form form={form} onSubmit={handleBookingSubmit}>
+          
+            <Form.Item
+              label="Facility Name"
+              initialValue={selectedFacility.facility_name}
+              field="facility_name"
+            >
+              <Input readOnly />
+            </Form.Item>
+            <Form.Item
+              label="Capacity"
+              initialValue={selectedFacility.capacity}
+              field="capacity"
+            >
+              <Input readOnly />
+            </Form.Item>
+            <Form.Item
+              label="Status"
+              initialValue={selectedFacility.status}
+              field="status"
+            >
+              <Input readOnly />
+            </Form.Item>
+            <Form.Item
+              label="Booking Title"
+              field="title"
+              rules={[{ required: true, message: 'Please enter a booking title' }]}
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item
+              label="Booking Date"
+              field="date"
+              rules={[{ required: true, message: 'Please select a booking date' }]}
+            >
+              <DatePicker />
+            </Form.Item>
+            <Form.Item
+              label="Time Range"
+              field="time"
+              rules={[{ required: true, message: 'Please select a time range' }]}
+            >
+      <TimePicker.RangePicker prefix={<IconInfoCircle/>} style={{ width: 250, }} />
+      </Form.Item>
+          </Form>
         )}
       </Modal>
     </div>

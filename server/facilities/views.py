@@ -1,8 +1,8 @@
 from django.http import JsonResponse
 import json
-from .models import Facilities
+from .models import Facilities, FacilityBooking
 from django.views.decorators.csrf import csrf_exempt
-
+from django.views.decorators.http import require_POST
 @csrf_exempt
 def add_facility(request):
     if request.method == "POST":
@@ -107,3 +107,67 @@ def get_all_facilities(request):
         "success": False,
         "message": "You are not authenticated."
     }, status=403)
+    
+
+@csrf_exempt
+@require_POST
+def book_facility(request):
+    user = request.user
+    if user.is_authenticated:
+        data = json.loads(request.body)
+        facility_id = data.get('facility_id')
+        title = data.get('title')
+        date = data.get('date')
+        start_time = data.get('start_time')
+        end_time = data.get('end_time')
+
+        if not all([facility_id, title, date, start_time, end_time]):
+            return JsonResponse({
+                'success': False,
+                'message': 'All fields are required.'
+            }, status=400)
+
+        try:
+            facility = Facilities.objects.get(id=facility_id)
+            if facility:
+                if facility.status == 'Available':
+                    booking = FacilityBooking.objects.create(
+                        facility=facility,
+                        title=title,
+                        booking_date=date,
+                        start_time=start_time,
+                        end_time=end_time,
+                    )
+                    facility.status = 'Occupied'
+                    facility.save()
+                    return JsonResponse({
+                        'success': True,
+                        'message': 'Facility booked successfully!'
+                    }, status=201)
+                else:
+                    return JsonResponse({
+                        'success': False,
+                        'message': "The facility is not available for booking."
+                    }, status=409)  # Conflict status code
+            else:
+                return JsonResponse({
+                    'success': False,
+                    'message': "The facility was not found in the system."
+                }, status=404)  # Not found status code
+
+        except Facilities.DoesNotExist:
+            return JsonResponse({
+                'success': False,
+                'message': "The facility does not exist."
+            }, status=404)  # Not found status code
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'message': str(e)
+            }, status=500)  # Internal server error
+
+    else:
+        return JsonResponse({
+            'success': False,
+            'message': "You are not authenticated."
+        }, status=403)  # Forbidden status code
