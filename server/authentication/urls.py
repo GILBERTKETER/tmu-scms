@@ -11,6 +11,11 @@ urlpatterns = [
     path('requestlink/', views.request_password_reset_link, name='Request link'),
     path('get-users-count/', views.get_users_count, name='users'),
     path('get-all-users/', views.get_all_users, name='get all users'),
+    path('get-all-admins/', views.get_all_admins, name='get all admins'),
     path('update-user/', views.update_user, name='update user'),
+    path('change-password/', views.change_password, name='change_password'),
+    path('change-email/', views.change_email, name='Change email address'),
+    path('change-phone/', views.change_phone, name='Change phone number'),
+
 
 ]

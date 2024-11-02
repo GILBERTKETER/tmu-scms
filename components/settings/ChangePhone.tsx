@@ -6,7 +6,7 @@ import { toast, ToastContainer } from "react-toastify";
 import App from "@/app/(site)/api/api";
 import Swal from "sweetalert2";
 import "react-toastify/dist/ReactToastify.css";
-function ChangeEmail() {
+function ChangePhone() {
   const [visible, setVisible] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [form] = Form.useForm();
@@ -17,23 +17,23 @@ function ChangeEmail() {
       const values = await form.validate();
       setConfirmLoading(true);
 
-      const response = await App.post("/api/auth/change-email/", {
+      const response = await App.post("/api/auth/change-phone/", {
           currentEmail: user.email,
-          newEmail: values.email,
+          phoneNumber: values.phone,
         
       });
 
       if (response.data.success == true) {
         Swal.fire({
           icon: "success",
-          title: "Email address Updated",
+          title: "Phone number Updated",
           text:
             response.data.message ||
-            "Your Email has been successfully updated!",
+            "Your phone number has been successfully updated!",
         });
 
         toast.success(
-          response.data.message || "Email updated successfully!",
+          response.data.message || "Phone number updated successfully!",
         );
         setVisible(false);
       } else {
@@ -42,12 +42,12 @@ function ChangeEmail() {
           title: "Error",
           text:
             response.data.message ||
-            "Failed to update email. Please try again.",
+            "Failed to update phone number. Please try again.",
         });
 
         toast.error(
           response.data.message ||
-            "Failed to update email. Please try again.",
+            "Failed to update phone number. Please try again.",
         );
       }
     } catch (error) {
@@ -55,11 +55,11 @@ function ChangeEmail() {
         icon: "error",
         title: "Error",
         text:
-          "Failed to update email. Please try again.",
+          "Failed to update phone number. Please try again.",
       });
 
       toast.error(
-          "Failed to update email. Please try again.",
+          "Failed to update phone number. Please try again.",
       );
     } finally {
       setConfirmLoading(false);
@@ -85,7 +85,7 @@ function ChangeEmail() {
         Change
       </p>
       <Modal
-        title="Change Email"
+        title="Change Phone Number"
         visible={visible}
         onOk={onOk}
         confirmLoading={confirmLoading}
@@ -102,14 +102,14 @@ function ChangeEmail() {
           }}
         >
           <FormItem
-            label="Email Address"
-            field="email"
+            label="Phone Number"
+            field="phone"
             rules={[
-              { required: true, message: "Please enter an email address." },
-              { type: "email", message: "Please enter a valid email address." },
+              { required: true, message: "Please enter phone number." },
+              { type: "number", message: "Please enter a valid phone number" },
             ]}
           >
-            <Input type="email" placeholder="New Email" />
+            <Input placeholder="New Phone Number" />
           </FormItem>
         </Form>
       </Modal>
@@ -117,4 +117,4 @@ function ChangeEmail() {
   );
 }
 
-export default ChangeEmail;
+export default ChangePhone;

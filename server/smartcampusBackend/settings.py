@@ -76,6 +76,7 @@ INSTALLED_APPS = [
     "courseschedules",
     "safetymonitoring",
     "threads",
+    "portfolio",
 ]
 
 MIDDLEWARE = [

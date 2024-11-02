@@ -4,6 +4,7 @@ import { Tabs, Typography } from '@arco-design/web-react';
 import AccountSettings from './AccountSettings';
 import ProfileSettings from './ProfileSettings';
 import AdminSettings from './AdminSettings';
+import EditProfile from "./EditProfile"
 const TabPane = Tabs.TabPane;
 
 const initTabs = [
@@ -20,7 +21,7 @@ const initTabs = [
     {
         key: "key3",
         title: "Edit Profile",
-        content: <ProfileSettings/>
+        content: <EditProfile/>
     },
     {
         key: "key4",

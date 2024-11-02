@@ -306,7 +306,30 @@ def delete_activity(request):
             "message": "You are not authenticated."
         }, status=401)
         
-    
+def get_program_details(request):
+    user = request.user
+    if not user.is_authenticated:
+        return JsonResponse({"success": False, "message": "You are not authenticated."}, status=401)
+
+    if request.method != 'GET':
+        return JsonResponse({"success": False, "message": "Invalid request method."}, status=403)
+
+    years = [1, 2, 3, 4, 5]
+    program_details = {}
+
+    for year in years:
+        courses = Course.objects.filter(year=year)
+        number_of_courses = courses.count()
+        semesters = courses.values_list('semester', flat=True).distinct()
+        enrolled_count = Enrollment.objects.filter(course__in=courses).count()
+
+        program_details[f'year_{year}'] = {
+            'number_of_courses': number_of_courses,
+            'semesters': [2],
+            'enrolled_count': enrolled_count,
+        }
+
+    return JsonResponse({"success": True, "data": program_details})   
 
 @csrf_exempt
 def update_activity(request):

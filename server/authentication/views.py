@@ -27,6 +27,9 @@ import os
 from django.conf import settings
 from .utils import send_email
 from .models import UserProfile
+
+from django.contrib.auth.hashers import check_password, make_password
+
 @csrf_exempt
 def user_registration(request):
     if request.method == 'POST':
@@ -170,8 +173,7 @@ def user_login(request):
 
     if not username or not password:
         return JsonResponse({"message": "Username and password are required."}, status=400)
-    print("user:", username)
-    print("password:", password)
+    
     user = authenticate(username=username, password=password)
     print("user:", user)
     
@@ -318,8 +320,14 @@ def get_all_users(request):
     else:
         return JsonResponse({"success": False, "message": "You are not authenticated"}, status=403)
     
-    
-    
+def get_all_admins(request):
+    user = request.user
+    if user.is_authenticated:
+        # Filter for users with the role "admin"
+        admins = UserProfile.objects.filter(role="admin").values()
+        return JsonResponse({"success": True, "message": "These are the details", "data": list(admins)}, status=200)
+    else:
+        return JsonResponse({"success": False, "message": "You are not authenticated"}, status=403)
     
 @csrf_exempt  # Use this for testing, but consider proper CSRF handling in production
 def update_user(request):
@@ -367,3 +375,84 @@ def update_user(request):
         'success': False,
         'message': 'Only PUT requests are allowed.'
     }, status=405)
+    
+    
+    
+@csrf_exempt
+def change_password(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        email = data.get('email')
+        current_password = data.get('currentPassword')
+        new_password = data.get('newPassword')
+        confirm_new_password = data.get('confirmNewPassword')
+
+        try:
+            user = User.objects.get(email=email)
+            
+            # Check if the current password is correct
+            if not check_password(current_password, user.password):
+                return JsonResponse({'success': False, 'message': 'Current password is incorrect.'}, status=400)
+
+            # Check if new passwords match
+            if new_password != confirm_new_password:
+                return JsonResponse({'success': False, 'message': 'New passwords do not match.'}, status=400)
+
+            # Set new password and save
+            user.set_password(new_password)
+            user.save()
+
+            return JsonResponse({'success': True, 'message': 'Password successfully updated!'}, status=200)
+            
+        except User.DoesNotExist:
+            return JsonResponse({'success': False, 'message': 'User not found.'}, status=404)
+    return JsonResponse({'success': False, 'message': 'Invalid request method.'}, status=405)
+
+
+@csrf_exempt
+def change_email(request):
+    user = request.user
+    if user.is_authenticated:
+        if request.method == 'POST':
+            data = json.loads(request.body)
+            email = data.get('currentEmail')
+            new_email = data.get('newEmail')
+            user = User.objects.get(email=email)
+            profile = UserProfile.objects.get(email=email)
+
+            try:
+                user.email = new_email
+                profile.email = new_email
+                user.save()
+                profile.save()
+                return JsonResponse({"success":True, "message":"Your email has been updated successfully."}, status=200)
+            except user.DoesNotExist:
+                return JsonResponse({"success":False, "message":"The email is not on our records."}, status=404)
+
+        else:
+            return JsonResponse({"success":False, "message":"Invalid request method."}, status=405)
+    else:
+        return JsonResponse({"success":False, "message":"You are not aauthenticated."}, status=403)
+    
+@csrf_exempt
+def change_phone(request):
+    user = request.user
+    if user.is_authenticated:
+        if request.method == 'POST':
+            data = json.loads(request.body)
+            email = data.get('currentEmail')
+            phone_number = data.get('phoneNumber')
+            user = User.objects.get(email=email)
+            profile = UserProfile.objects.get(email=email)
+
+            try:
+                profile.phone_number = phone_number
+                profile.save()
+                return JsonResponse({"success":True, "message":"Your phone number has been updated successfully."}, status=200)
+            except user.DoesNotExist:
+                return JsonResponse({"success":False, "message":"You are not on our records."}, status=404)
+
+        else:
+            return JsonResponse({"success":False, "message":"Invalid request method."}, status=405)
+    else:
+        return JsonResponse({"success":False, "message":"You are not aauthenticated."}, status=403)
