@@ -6,6 +6,7 @@ import json
 from .models import PersonalInfo, Skill, Experience, Education, Project, SocialMedia
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
+from django.conf import settings
 
 
 @login_required
@@ -101,15 +102,36 @@ def upload_image(request):
     if request.method == 'POST' and request.FILES.get('file'):
         file = request.FILES['file']
         filename = request.POST.get('filename')
-        file_type = request.POST.get('type')
+        file_type = request.POST.get('type') 
+        user_id = request.POST.get('id')
+        
+        try:
+            profile_user = PersonalInfo.objects.get(user_id=user_id)
+        except PersonalInfo.DoesNotExist:
+            return JsonResponse({'message': 'User not found'}, status=404)
+        
+        file_path = f'{filename}'
+        if default_storage.exists(file_path):
+            default_storage.delete(file_path) 
+        
+        saved_file_path = default_storage.save(file_path, ContentFile(file.read()))
+        
+        if file_type == 'profile':
+            profile_user.profile_image = saved_file_path
+        elif file_type == 'cover':
+            profile_user.cover_image = saved_file_path
+        else:
+            return JsonResponse({'message': 'Invalid file type'}, status=400)
 
-        # Save the file to the desired location
-        file_path = default_storage.save(f'{filename}', ContentFile(file.read()))
+        profile_user.save() 
 
-        return JsonResponse({'message': 'File uploaded successfully'}, status=200)
+        file_url = f"{settings.MEDIA_URL}{saved_file_path}"
+        return JsonResponse({'message': 'File uploaded successfully', 'file_url': file_url}, status=200)
+    
     return JsonResponse({'message': 'No file provided'}, status=400)
 
 @login_required
+@csrf_exempt
 @require_http_methods(["GET"])
 def get_portfolio(request):
     try:

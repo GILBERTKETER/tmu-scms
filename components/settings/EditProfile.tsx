@@ -207,36 +207,31 @@ const StudentPortfolio: React.FC = () => {
         return '';
       }
   
-      // Check file size (5MB limit)
       const maxSize = 5 * 1024 * 1024;
       if (file.size > maxSize) {
         Message.error('File size should be less than 5MB');
         return '';
       }
   
-      // Get file extension
       const extension = file.name.split('.').pop()?.toLowerCase() || 'png';
       
-      // Create filename using user.id
       const filename = `img-${user.id}-${type}.${extension}`;
   
-      // Create a blob URL for preview
       const objectUrl = URL.createObjectURL(file);
   
-      // Update state based on type
+      const userId: number = user.id
       if (type === 'profile') {
         setProfileImageUrl(objectUrl);
       } else {
         setCoverPhotoUrl(objectUrl);
       }
   
-      // Create form data to send to the server
       const formData = new FormData();
       formData.append('file', file);
       formData.append('filename', filename);
       formData.append('type', type);
+      formData.append('id', userId);
   
-      // Send the file to the Django backend using Axios
       const response = await App.post('/api/upload/', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -247,7 +242,6 @@ const StudentPortfolio: React.FC = () => {
         throw new Error('Failed to upload image');
       }
   
-      // Return the URL of the uploaded image
       return `/images/${filename}`;
   
     } catch (error) {

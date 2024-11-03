@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-s-sk--ft292qwerq*l&v^k-mh&(ouyt)gg*und18lsjx1ib#v*"
 
 
-MEDIA_ROOT = os.path.join(BASE_DIR, '../../images')  
+MEDIA_ROOT = os.path.join(BASE_DIR, 'images')  
 MEDIA_URL = '/media/'
 
 # SECURITY WARNING: don't run with debug turned on in production!
