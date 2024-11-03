@@ -153,6 +153,8 @@ def get_portfolio(request):
                 'phone': personal_info.phone if personal_info else '',
                 'location': personal_info.location if personal_info else '',
                 'summary': personal_info.summary if personal_info else '',
+                'profile_image': personal_info.profile_image if personal_info else '',
+                'cover_image': personal_info.cover_image if personal_info else '',
             },
             'skills': [skill.name for skill in skills],
             'experiences': [{

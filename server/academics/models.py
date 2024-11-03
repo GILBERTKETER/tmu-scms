@@ -43,7 +43,7 @@ class Enrollment(models.Model):
 
 
 class Instructor(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)  
+    user = models.ForeignKey(User, on_delete=models.CASCADE)  
     bio = models.TextField(blank=True)  
     expertise = models.CharField(max_length=255) 
     courses = models.ManyToManyField(Course, related_name='instructors', blank=True)  
@@ -53,7 +53,7 @@ class Instructor(models.Model):
 
 
 class Activities(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)  
+    user = models.ForeignKey(User, on_delete=models.CASCADE)  
     activity_name = models.TextField()
     activity_description = models.TextField()
     activity_date = models.DateField()

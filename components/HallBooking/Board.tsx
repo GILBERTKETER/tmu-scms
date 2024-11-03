@@ -54,48 +54,7 @@ function Dashboard() {
         </Typography.Title>
         <AddHall />
       </div>
-      <StatisticalCards totalHalls={20} bookedHalls={16} />
-
-      <Row gutter={24} style={{ marginTop: "20px" }}>
-        <Col span={12} lg={12} sm={24} xs={24} style={{ marginBottom: "20px" }}>
-          <Card>
-            <Typography.Title heading={6}>Upcoming Meetings</Typography.Title>
-            <List
-              dataSource={upcomingMeetings}
-              render={(item, index) => (
-                <List.Item key={item.id}>
-                  <div>
-                    <Typography.Text strong>{item.name}</Typography.Text>
-                    <br />
-                    <Typography.Text type="secondary">
-                      {item.hall} - {item.time}
-                    </Typography.Text>
-                  </div>
-                </List.Item>
-              )}
-            />
-          </Card>
-        </Col>
-        <Col span={12} lg={12} sm={24} xs={24} style={{ marginBottom: "20px" }}>
-          <Card>
-            <Typography.Title heading={6}>Ongoing Activities</Typography.Title>
-            <List
-              dataSource={ongoingActivities}
-              render={(item, index) => (
-                <List.Item key={item.id}>
-                  <div>
-                    <Typography.Text strong>{item.name}</Typography.Text>
-                    <br />
-                    <Typography.Text type="secondary">
-                      {item.hall} - Ends: {item.endTime}
-                    </Typography.Text>
-                  </div>
-                </List.Item>
-              )}
-            />
-          </Card>
-        </Col>
-      </Row>
+      <StatisticalCards />
     </div>
   );
 }

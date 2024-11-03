@@ -70,21 +70,7 @@ function StatisticalCards() {
           </Row>
         </Card>
       </Col>
-      <Col span={12} lg={12} xl={12} sm={24} xs={24} style={{ marginBottom: '20px' }}>
-        <Card>
-          <IconCalendar style={{ fontSize: 24, marginBottom: 16, color: '#14C9C9' }} />
-          <Typography.Title heading={6} className="text-primary">
-            Upcoming Events
-          </Typography.Title>
-          <Typography.Text>
-            Next 7 days: <span className="text-secondary">5 events</span>
-          </Typography.Text>
-          <br />
-          <Typography.Text>
-            This month: <span className="text-secondary">12 events</span>
-          </Typography.Text>
-        </Card>
-      </Col>
+      
     </Row>
   );
 }
