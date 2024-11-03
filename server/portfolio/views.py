@@ -4,6 +4,9 @@ from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 import json
 from .models import PersonalInfo, Skill, Experience, Education, Project, SocialMedia
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
+
 
 @login_required
 @csrf_exempt
@@ -12,6 +15,7 @@ def handle_portfolio(request):
     try:
         data = json.loads(request.body)
         user = request.user
+
 
         # Handle Personal Info
         personal_info_data = data.get('personalInfo', {})
@@ -90,6 +94,20 @@ def handle_portfolio(request):
             'status': 'error',
             'message': str(e)
         }, status=500)
+
+
+@csrf_exempt
+def upload_image(request):
+    if request.method == 'POST' and request.FILES.get('file'):
+        file = request.FILES['file']
+        filename = request.POST.get('filename')
+        file_type = request.POST.get('type')
+
+        # Save the file to the desired location
+        file_path = default_storage.save(f'{filename}', ContentFile(file.read()))
+
+        return JsonResponse({'message': 'File uploaded successfully'}, status=200)
+    return JsonResponse({'message': 'No file provided'}, status=400)
 
 @login_required
 @require_http_methods(["GET"])

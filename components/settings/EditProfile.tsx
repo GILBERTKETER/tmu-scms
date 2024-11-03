@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect,useState } from 'react';
 import {
   Form,
   Input,
@@ -10,7 +10,8 @@ import {
   Grid,
   Message,
   Select,
-  Link
+  Link,
+  Upload
 } from '@arco-design/web-react';
 import {
   IconPlus,
@@ -21,14 +22,15 @@ import {
   IconFacebook,
   IconYoutube,
   IconGithub,
-  IconLink
-} from '@arco-design/web-react/icon';
+  IconLink,
+  IconUpload
+} from '@arco-design/web-react/icon';;
 import App from "@/app/(site)/api/api"
 const FormItem = Form.Item;
 const { Row, Col } = Grid;
 const { Title, Paragraph } = Typography;
 const { TextArea } = Input;
-
+import { useAuth } from '@/context/Auth';
 // Interfaces
 interface Experience {
   company: string;
@@ -67,6 +69,8 @@ interface PersonalInfo {
   github: string;
   portfolio: string;
   summary: string;
+  profileImage?: string;
+  coverPhoto?: string;
 }
 
 interface StudentPortfolioForm {
@@ -104,13 +108,70 @@ const StudentPortfolio: React.FC = () => {
   const [skills, setSkills] = useState<string[]>([]);
   const [newSkill, setNewSkill] = useState('');
   const [loading, setLoading] = useState(false);
+  const [profileImageUrl, setProfileImageUrl] = useState('');
+  const [coverPhotoUrl, setCoverPhotoUrl] = useState('');
+  const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
+  const [coverPhotoFile, setCoverPhotoFile] = useState<File | null>(null);
+  
+  const {user} = useAuth();
 
+  useEffect(() => {
+    if (user) {
+      form.setFieldsValue({
+        personalInfo: {
+          fullName: `${user.first_name} ${user.last_name}`,
+          email: user.email,
+          phone: user.phone_number,
+          // Keep other fields as is if they exist
+          ...form.getFieldValue('personalInfo'),
+        }
+      });
+    }
+  }, [user, form]);
+
+  
+
+  // const handleSubmit = async (values: StudentPortfolioForm) => {
+  //   setLoading(true);
+  //   try {
+  //     const response = App.post("/api/portfolio/", values)
+  //     console.log('Form values:', values);
+  //     Message.success(response.data.message||'Portfolio saved successfully!');
+  //   } catch (error) {
+  //     Message.error('Failed to save portfolio');
+  //     console.error('Error saving portfolio:', error);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
   const handleSubmit = async (values: StudentPortfolioForm) => {
     setLoading(true);
     try {
-      const response = App.post("/api/portfolio/", values)
-      console.log('Form values:', values);
-      Message.success(response.data.message||'Portfolio saved successfully!');
+      // Upload profile image if provided
+      if (profileImageUrl) {
+        const profileImageFile = new File([], profileImageUrl.split('/').pop() || 'profile.png', { type: 'image/png' });
+        await handleImageUpload(profileImageFile, 'profile');
+      }
+  
+      // Upload cover photo if provided
+      if (coverPhotoUrl) {
+        const coverPhotoFile = new File([], coverPhotoUrl.split('/').pop() || 'cover.png', { type: 'image/png' });
+        await handleImageUpload(coverPhotoFile, 'cover');
+      }
+  
+      // Include image URLs in the form data
+      const portfolioData = {
+        ...values,
+        personalInfo: {
+          ...values.personalInfo,
+          profileImage: profileImageUrl,
+          coverPhoto: coverPhotoUrl,
+        },
+      };
+  
+      // Submit the portfolio data
+      const response = await App.post("/api/portfolio/", portfolioData);
+      Message.success(response.data.message || 'Portfolio saved successfully!');
     } catch (error) {
       Message.error('Failed to save portfolio');
       console.error('Error saving portfolio:', error);
@@ -118,6 +179,7 @@ const StudentPortfolio: React.FC = () => {
       setLoading(false);
     }
   };
+  
 
   const addSkill = () => {
     if (newSkill && !skills.includes(newSkill)) {
@@ -128,6 +190,139 @@ const StudentPortfolio: React.FC = () => {
     }
   };
 
+
+  
+
+  const handleImageUpload = async (file: File, type: 'profile' | 'cover') => {
+    try {
+      if (!user?.id) {
+        Message.error('User ID not found');
+        return '';
+      }
+  
+      // Check file type
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+      if (!allowedTypes.includes(file.type)) {
+        Message.error('Please upload an image file (JPG, PNG, GIF, or WebP)');
+        return '';
+      }
+  
+      // Check file size (5MB limit)
+      const maxSize = 5 * 1024 * 1024;
+      if (file.size > maxSize) {
+        Message.error('File size should be less than 5MB');
+        return '';
+      }
+  
+      // Get file extension
+      const extension = file.name.split('.').pop()?.toLowerCase() || 'png';
+      
+      // Create filename using user.id
+      const filename = `img-${user.id}-${type}.${extension}`;
+  
+      // Create a blob URL for preview
+      const objectUrl = URL.createObjectURL(file);
+  
+      // Update state based on type
+      if (type === 'profile') {
+        setProfileImageUrl(objectUrl);
+      } else {
+        setCoverPhotoUrl(objectUrl);
+      }
+  
+      // Create form data to send to the server
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('filename', filename);
+      formData.append('type', type);
+  
+      // Send the file to the Django backend using Axios
+      const response = await App.post('/api/upload/', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+  
+      if (response.status !== 200) {
+        throw new Error('Failed to upload image');
+      }
+  
+      // Return the URL of the uploaded image
+      return `/images/${filename}`;
+  
+    } catch (error) {
+      Message.error('Failed to upload image');
+      console.error('Error uploading image:', error);
+      return '';
+    }
+  };
+  
+
+  const imageUploadSection = (
+    <Row gutter={[16, 16]}>
+      <Col span={12}>
+        <FormItem
+          label="Profile Image"
+          field="personalInfo.profileImage"
+        >
+          <Upload
+            listType="picture-card"
+            limit={1}
+            beforeUpload={(file) => {
+              handleImageUpload(file, 'profile');
+              return false;
+            }}
+            imagePreview
+            defaultFileList={
+              profileImageUrl 
+                ? [{
+                    uid: '1',
+                    name: 'profile',
+                    url: profileImageUrl
+                  }] 
+                : []
+            }
+          >
+            <div className="flex flex-col items-center justify-center">
+              <IconUpload />
+              <div className="mt-2">Upload Profile Image</div>
+            </div>
+          </Upload>
+        </FormItem>
+      </Col>
+      <Col span={12}>
+        <FormItem
+          label="Cover Photo"
+          field="personalInfo.coverPhoto"
+        >
+          <Upload
+            listType="picture-card"
+            limit={1}
+            beforeUpload={(file) => {
+              handleImageUpload(file, 'cover');
+              return false;
+            }}
+            imagePreview
+            defaultFileList={
+              coverPhotoUrl 
+                ? [{
+                    uid: '1',
+                    name: 'cover',
+                    url: coverPhotoUrl
+                  }] 
+                : []
+            }
+          >
+            <div className="flex flex-col items-center justify-center">
+              <IconUpload />
+              <div className="mt-2">Upload Cover Photo</div>
+            </div>
+          </Upload>
+        </FormItem>
+      </Col>
+    </Row>
+  );
+  
   return (
     <div className="student-portfolio" style={{ padding: '24px' }}>
       <Card>
@@ -143,43 +338,43 @@ const StudentPortfolio: React.FC = () => {
           style={{ maxWidth: 1200 }}
         >
           {/* Personal Information Section */}
-          <Card title="Personal Information" bordered={false}>
+         <Card title="Personal Information" bordered={false}>
             <Row gutter={[16, 16]}>
               <Col span={12}>
-                <FormItem 
-                  label="Full Name" 
-                  field="personalInfo.fullName" 
+                <FormItem
+                  label="Full Name"
+                  field="personalInfo.fullName"
                   rules={[{ required: true, message: 'Please enter your full name' }]}
                 >
-                  <Input placeholder="Enter your full name" />
+                  <Input readOnly placeholder="Enter your full name" />
                 </FormItem>
               </Col>
               <Col span={12}>
-                <FormItem 
-                  label="Email" 
-                  field="personalInfo.email" 
+                <FormItem
+                  label="Email"
+                  field="personalInfo.email"
                   rules={[
                     { required: true, message: 'Please enter your email' },
                     { type: 'email', message: 'Please enter a valid email' }
                   ]}
                 >
-                  <Input placeholder="Enter your email" />
+                  <Input readOnly placeholder="Enter your email" />
                 </FormItem>
               </Col>
             </Row>
             <Row gutter={[16, 16]}>
               <Col span={12}>
-                <FormItem 
-                  label="Phone" 
+                <FormItem
+                  label="Phone"
                   field="personalInfo.phone"
                   rules={[{ required: true, message: 'Please enter your phone number' }]}
                 >
-                  <Input placeholder="Enter your phone number" />
+                  <Input readOnly placeholder="Enter your phone number" />
                 </FormItem>
               </Col>
               <Col span={12}>
-                <FormItem 
-                  label="Location" 
+                <FormItem
+                  label="Location"
                   field="personalInfo.location"
                   rules={[{ required: true, message: 'Please enter your location' }]}
                 >
@@ -187,13 +382,16 @@ const StudentPortfolio: React.FC = () => {
                 </FormItem>
               </Col>
             </Row>
-            <FormItem 
-              label="Professional Summary" 
+            
+            {imageUploadSection}
+
+            <FormItem
+              label="Professional Summary"
               field="personalInfo.summary"
               rules={[{ required: true, message: 'Please enter your professional summary' }]}
             >
-              <TextArea 
-                placeholder="Write a brief professional summary about yourself" 
+              <TextArea
+                placeholder="Write a brief professional summary about yourself"
                 style={{ minHeight: 120 }}
               />
             </FormItem>
@@ -204,6 +402,11 @@ const StudentPortfolio: React.FC = () => {
             <Space direction="vertical" style={{ width: '100%' }}>
               <Row gutter={[16, 16]}>
                 <Col span={20}>
+                <FormItem 
+              label="Skills" 
+              field="skills"
+              rules={[{ required: true, message: 'Please enter your professional summary' }]}
+            >
                   <Input
                     value={newSkill}
                     onChange={setNewSkill}
@@ -213,6 +416,7 @@ const StudentPortfolio: React.FC = () => {
                       addSkill();
                     }}
                   />
+                  </FormItem>
                 </Col>
                 <Col span={4}>
                   <Button type="primary" icon={<IconPlus />} onClick={addSkill}>
