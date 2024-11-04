@@ -81,6 +81,7 @@ INSTALLED_APPS = [
     "safetymonitoring",
     "threads",
     "portfolio",
+    "qrcodegenerator",
 ]
 
 MIDDLEWARE = [

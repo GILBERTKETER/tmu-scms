@@ -1,19 +1,13 @@
 // components/ClassList.tsx
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Table, Button } from "@arco-design/web-react";
 import StudentCheckInDrawer from "./StudentCheckInDrawer";
 import { IconEdit } from "@arco-design/web-react/icon";
-
-const classData = [
-  { id: 1, name: "Mathematics", room: "101" },
-  { id: 2, name: "Biology", room: "102" },
-  { id: 3, name: "Chemistry", room: "103" },
-  // Add more classes as needed
-];
-
+import App from "@/app/(site)/api/api";
 const ClassList: React.FC = () => {
   const [visible, setVisible] = useState(false);
   const [selectedClass, setSelectedClass] = useState<any>(null);
+  const [classData, setClassData] = useState<any[]>([]);
 
   const openDrawer = (classItem: any) => {
     setSelectedClass(classItem);
@@ -26,8 +20,16 @@ const ClassList: React.FC = () => {
   };
 
   const columns = [
-    { title: "Class Name", dataIndex: "name" },
-    { title: "Room", dataIndex: "room" },
+    { title: "Course Name", dataIndex: "course_name" },
+    { title: "Course Code", dataIndex: "course_code" },
+    { title: "Program Name", dataIndex: "program_name" },
+    { title: "Instructor Name", dataIndex: "instructor_name" },
+    { title: "Hall Name", dataIndex: "hall_name" },
+    { title: "Hall Number", dataIndex: "hall_number" },
+    { title: "Date", dataIndex: "date" },
+    { title: "Start Time", dataIndex: "time_start" },
+    { title: "End Time", dataIndex: "time_end" },
+    { title: "Recurring Days", dataIndex: "recurring_days" },
     {
       title: "Actions",
       render: (text: string, record: any) => (
@@ -38,10 +40,28 @@ const ClassList: React.FC = () => {
     },
   ];
 
+  useEffect(() => {
+    const fetchClasses = async () => {
+      try {
+        const response = await App.get('/api/get-scheduled-classes/'); 
+        
+        if (response.data.success) {
+          setClassData(response.data.classes);
+        } else {
+          console.error('Failed to fetch classes:', response.data.message);
+        }
+      } catch (error) {
+        console.error('Error fetching class data:', error);
+      }
+    };
+
+    fetchClasses();
+  }, []);
+
   return (
     <div>
       <Table
-        style={{ width:"100%"}}
+        style={{ width: "100%" }}
         columns={columns}
         data={classData}
         pagination={false}

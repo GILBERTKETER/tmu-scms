@@ -3,6 +3,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from .models import Schedule
 from academics.models import Enrollment
+from .models import Attendance
 from django.contrib.auth.models import User
 from django.utils.dateparse import parse_date, parse_time
 from academics.models import Instructor
@@ -127,4 +128,23 @@ def update_class_details(request):
             return JsonResponse({"success":False, "message":"Invalid request method."},status=400)
     else:
         return JsonResponse({"success":False, "message":"You are not authenticated."},status=403)
+
+
+
+
+@csrf_exempt
+def get_attendance_logs(request):
+    if request.method == 'GET':
+        attendance_logs = Attendance.objects.all().values('marked_date', 'status', 'check_in_method')
+        logs = [
+            {
+                'date': log['marked_date'].strftime('%Y-%m-%d'),
+                'status': log['status'].capitalize(),
+                'method': log['check_in_method'].capitalize(),
+            }
+            for log in attendance_logs
+        ]
+        return JsonResponse({'success':False},logs, safe=False)
+    return JsonResponse({'success':False,'message': 'Invalid request method'}, status=400)
+
 

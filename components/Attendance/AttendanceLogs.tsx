@@ -1,11 +1,9 @@
-import { Table, } from '@arco-design/web-react';
+import React, { useEffect, useState } from 'react';
+import { Table } from '@arco-design/web-react';
+import App from '@/app/(site)/api/api';
+const AttendanceLogs = () => {
+  const [data, setData] = useState([]);
 
-const data = [
-  { key: '1', date: '2024-10-01', status: 'Present', method: 'RFID' },
-  { key: '2', date: '2024-10-02', status: 'Absent', method: 'Manual' },
-];
-
-const AttendanceLogs: React.FC = () => {
   const columns = [
     {
       title: 'Date',
@@ -22,8 +20,22 @@ const AttendanceLogs: React.FC = () => {
       dataIndex: 'method',
       key: 'method',
     },
-   
   ];
+
+  useEffect(() => {
+    // Fetch attendance logs from Django API
+    const fetchAttendanceLogs = async () => {
+      try {
+        const response = await App.get('/api/attendance-logs/');
+        
+        setData(response.data);
+      } catch (error) {
+        console.error('Error fetching attendance logs:', error);
+      }
+    };
+
+    fetchAttendanceLogs();
+  }, []);
 
   return (
     <div className="bg-white shadow-md p-6 rounded-lg">
