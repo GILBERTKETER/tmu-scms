@@ -5,6 +5,12 @@ const AttendanceLogs = () => {
   const [data, setData] = useState([]);
 
   const columns = [
+
+    {
+      title: 'Course',
+      dataIndex: 'course',
+      key: 'course',
+    },
     {
       title: 'Date',
       dataIndex: 'date',

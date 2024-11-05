@@ -29,7 +29,6 @@ urlpatterns = [
     path("api/", include('safetymonitoring.urls')),
     path("api/", include('threads.urls')),
     path("api/", include('portfolio.urls')),
-    path("api/", include('qrcodegenerator.urls')),
 ]
 
 if settings.DEBUG:

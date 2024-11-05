@@ -9,6 +9,15 @@ from django.utils.dateparse import parse_date, parse_time
 from academics.models import Instructor
 import json
 from Halls.models import Hall
+from datetime import datetime
+import qrcode
+from django.utils import timezone
+import random
+import string
+from datetime import timedelta
+from django.utils import timezone
+
+
 @csrf_exempt
 def get_scheduled_classes(request):
     if request.method == 'GET':
@@ -19,7 +28,7 @@ def get_scheduled_classes(request):
             schedule_data = []
             for schedule in schedules:
                 try:
-                    hall = Hall.objects.get(id=schedule.hall)  # Fetch hall details by ID
+                    hall = Hall.objects.get(id=schedule.hall)  
                     hall_name = hall.hall_name
                     hall_number = hall.hall_number
                 except Hall.DoesNotExist:
@@ -28,11 +37,13 @@ def get_scheduled_classes(request):
 
                 schedule_data.append({
                     'id':schedule.id,
+                    'course_id':schedule.enrollment.course_id,
                     'course_name': schedule.enrollment.course_name,
                     'course_code': schedule.enrollment.course_code,
                     'program_name': schedule.enrollment.course.program.name,
                     'instructor_name': schedule.instructor.user.first_name,
                     'hall_name': hall_name,
+                    "hallId":hall.id,
                     'hall_number': hall_number,
                     'date': schedule.date,
                     'time_start': schedule.time_start.strftime("%H:%M:%S"),
@@ -129,22 +140,267 @@ def update_class_details(request):
     else:
         return JsonResponse({"success":False, "message":"You are not authenticated."},status=403)
 
+@csrf_exempt
+def check_in_students(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
 
+        # Extract data from payload
+        student_ids = data.get("student_ids", [])
+        class_id = data.get("class_id")
+        course_name = data.get("course_name")
+        course_code = data.get("course_code")
+        hall_number = data.get("hallId")
+        day = data.get("day")[0]  
+        start_time = data.get("StartTime")
+        end_time = data.get("EndTime")
+        schedule_id = data.get("ScheduleId")
+
+        if not student_ids or not class_id:
+            return JsonResponse({"success": False, "message": "Class ID and student IDs are required"}, status=400)
+
+        try:
+            # Retrieve the schedule object if needed
+            schedule = Schedule.objects.get(id=schedule_id)
+
+            for student_id in student_ids:
+                # Check if the user exists
+                try:
+                    user = User.objects.get(id=student_id)
+                except User.DoesNotExist:
+                    return JsonResponse({"success": False, "message": f"User with ID {student_id} does not exist"}, status=400)
+
+                # Create attendance record
+                Attendance.objects.create(
+                    user=user,
+                    schedule=schedule,
+                    course_code=course_code,
+                    course_name=course_name,
+                    course_hall=hall_number,
+                    day_of_class=day,
+                    status='present', 
+                    check_in_method='manual'
+                )
+
+            return JsonResponse({"success": True, "message": "Students checked in successfully"})
+        except Exception as e:
+            return JsonResponse({"success": False, "message": str(e)}, status=500)
+    else:
+        return JsonResponse({"success": False, "message": "Invalid request method"}, status=405)
 
 
 @csrf_exempt
 def get_attendance_logs(request):
     if request.method == 'GET':
-        attendance_logs = Attendance.objects.all().values('marked_date', 'status', 'check_in_method')
+        attendance_logs = Attendance.objects.all().values('course_code','course_name','marked_date', 'status', 'check_in_method')
         logs = [
             {
+                'course': log['course_name']+' '+ log['course_code'],
                 'date': log['marked_date'].strftime('%Y-%m-%d'),
                 'status': log['status'].capitalize(),
                 'method': log['check_in_method'].capitalize(),
             }
             for log in attendance_logs
         ]
-        return JsonResponse({'success':False},logs, safe=False)
+        return JsonResponse(logs, safe=False)
     return JsonResponse({'success':False,'message': 'Invalid request method'}, status=400)
 
 
+@csrf_exempt
+def verify_qrcode(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({"success": False, "message": "You are not authenticated."}, status=401)
+    
+    if request.method != 'POST':
+        return JsonResponse({"success": False, "message": "Invalid request method."}, status=405)
+    
+    try:
+        data = json.loads(request.body)
+        qr_data = data.get('qrData', {})
+        user_id = data.get('id')
+        
+        # Extract QR data
+        qrschedule_id = qr_data.get('schedule_id')
+        qrcourse_code = qr_data.get('course_code')
+        qrsemester = qr_data.get('semester')
+        qryear = qr_data.get('year')
+        session_key = qr_data.get('session')
+        day = qr_data.get('day')
+
+
+        checked_in = Attendance.objects.filter(user_id = user_id)
+        
+        if checked_in:
+            return JsonResponse({"success": False, "message": "You are already checked in."}, status=200)
+        # Fetch the scheduled class
+        try:
+            class_schedule = Schedule.objects.get(id=qrschedule_id)
+        except Schedule.DoesNotExist:
+            return JsonResponse({"success": False, "message": "Schedule not found."}, status=404)
+
+        # Check enrollment
+        try:
+            enrollment = Enrollment.objects.get(
+                user_id=user_id,
+                course_code=qrcourse_code,
+                year=qryear,
+                semester=qrsemester
+            )
+        except Enrollment.DoesNotExist:
+            return JsonResponse({"success": False, "message": "User is not enrolled in the specified course."}, status=400)
+
+        # Verify session key validity
+        if not class_schedule.is_session_valid():
+            return JsonResponse({"success": False, "message": "QR code has expired."}, status=400)
+
+        current_datetime = timezone.localtime(timezone.now())
+        current_time = current_datetime.time()  
+        current_date = current_datetime.date()
+        
+        # Check if the current time is within the schedule's time range
+        if current_time < class_schedule.time_start or current_time > class_schedule.time_end:
+            return JsonResponse({
+                "success": False, 
+                "message": f"Attendance can only be marked during scheduled class time. Current time: {current_time.strftime('%H:%M')}, Class time: {class_schedule.time_start.strftime('%H:%M')} - {class_schedule.time_end.strftime('%H:%M')}"
+            }, status=400)
+    
+        # Date validation logic
+        if class_schedule.date:
+            # If schedule has a specific date
+            if current_date != class_schedule.date:
+                return JsonResponse({
+                    "success": False, 
+                    "message": "Today is not the scheduled class date."
+                }, status=400)
+        elif class_schedule.recurring_days:
+            # If schedule has recurring days
+            current_day = current_datetime.strftime('%A').lower()  
+            if current_day not in class_schedule.recurring_days:
+                return JsonResponse({
+                    "success": False, 
+                    "message": "Today is not a scheduled class day."
+                }, status=400)
+        else:
+            return JsonResponse({
+                "success": False, 
+                "message": "Invalid schedule configuration: neither date nor recurring days specified."
+            }, status=400)
+
+        attended = Attendance.objects.create(
+            user_id=user_id,
+            schedule=class_schedule,
+            course_code=qrcourse_code,
+            course_name=class_schedule.enrollment.course_name,
+            course_hall=class_schedule.hall,
+            day_of_class=day,
+            status='present',
+            check_in_method='qrCode'
+            )
+        attended.save()
+        # If all checks pass, return success
+        return JsonResponse({
+            "success": True,
+            "message": "Attendance marked successfully.",
+            "data": {
+                "schedule_id": qrschedule_id,
+                "course_code": qrcourse_code,
+                "course_name": class_schedule.enrollment.course_name,
+                "instructor_id": class_schedule.instructor.id,
+                "room": class_schedule.hall,
+                "semester": qrsemester,
+                "year": qryear,
+            }
+        })
+
+    except json.JSONDecodeError:
+        return JsonResponse({"success": False, "message": "Invalid JSON format."}, status=400)
+    except Exception as e:
+        return JsonResponse({"success": False, "message": str(e)}, status=400)
+
+def generate_unique_session_key():
+    """Generate a random 16-character alphanumeric key for session."""
+    return ''.join(random.choices(string.ascii_letters + string.digits, k=16))
+
+
+@csrf_exempt
+def generate_qrcode(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({"success": False, "message": "You are not authenticated."}, status=401)
+    
+    if request.method != 'POST':
+        return JsonResponse({"success": False, "message": "Invalid request method."}, status=405)
+    
+    try:
+        data = json.loads(request.body)
+        qrschedule_id = data.get('id')
+
+        # Retrieve the class schedule and related data
+        class_schedule = Schedule.objects.get(id=qrschedule_id)
+        
+        # Check if a valid session already exists
+        if class_schedule.qr_session_key and class_schedule.is_session_valid():
+            # Store session details in the request session
+            request.session['qr_code_data'] = {
+                "session": class_schedule.qr_session_key,
+                "schedule_id": qrschedule_id,
+                "course_code": class_schedule.enrollment.course_code,
+                "course_name": class_schedule.enrollment.course_name,
+                "semester": class_schedule.enrollment.semester,
+                "year": class_schedule.enrollment.year,
+                "startTime": class_schedule.time_start.isoformat(),
+                "endTime": class_schedule.time_end.isoformat(),
+                "day": class_schedule.recurring_days,
+                "hallId": class_schedule.hall,
+                "instructorId": class_schedule.instructor.id,
+                "courseId": class_schedule.enrollment.id,
+                "generated_at": class_schedule.qr_generated_at.isoformat(),
+                "expires_at": class_schedule.qr_expires_at.isoformat()
+            }
+            # Return existing QR code session data
+            return JsonResponse({
+                "success": True,
+                "message": "QR code data retrieved successfully.",
+                "data": request.session['qr_code_data']
+            })
+
+        # Generate a new session key and expiration time
+        qr_session_key = f"qr_{generate_unique_session_key()}"
+        expiration_time = timezone.now() + timedelta(days=5)
+
+        # Update the schedule with the new QR session details
+        class_schedule.qr_session_key = qr_session_key
+        class_schedule.qr_generated_at = timezone.now()
+        class_schedule.qr_expires_at = expiration_time
+        class_schedule.save()
+
+        # Store new QR code session details in the request session
+        request.session['qr_code_data'] = {
+            "session": class_schedule.qr_session_key,
+            "schedule_id": qrschedule_id,
+            "course_code": class_schedule.enrollment.course_code,
+            "course_name": class_schedule.enrollment.course_name,
+            "semester": class_schedule.enrollment.semester,
+            "year": class_schedule.enrollment.year,
+            "startTime": class_schedule.time_start.isoformat(),
+            "endTime": class_schedule.time_end.isoformat(),
+            "day": class_schedule.recurring_days,
+            "hallId": class_schedule.hall,
+            "instructorId": class_schedule.instructor.id,
+            "courseId": class_schedule.enrollment.id,
+            "generated_at": class_schedule.qr_generated_at.isoformat(),
+            "expires_at": class_schedule.qr_expires_at.isoformat()
+        }
+
+        # Return the new QR code data
+        return JsonResponse({
+            "success": True,
+            "message": "QR code data generated successfully.",
+            "data": request.session['qr_code_data']
+        })
+    
+    except Schedule.DoesNotExist:
+        return JsonResponse({"success": False, "message": "Schedule not found."}, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({"success": False, "message": "Invalid JSON format."}, status=400)
+    except Exception as e:
+        return JsonResponse({"success": False, "message": str(e)}, status=400)

@@ -8,7 +8,8 @@ from .models import Enrollment
 from authentication.views import get_user
 from django.core import serializers
 from datetime import datetime
-
+from django.utils import timezone
+from courseschedules.models import Attendance
 @csrf_exempt  
 @require_http_methods(["GET"])
 def get_programs(request):
@@ -376,3 +377,47 @@ def update_activity(request):
             return JsonResponse({"success": False, "message": "Invalid request method."}, status=400)
     else:
         return JsonResponse({"success": False, "message": "You are not logged in."}, status=401)
+
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def get_enrollments_by_course(request):
+    try:
+        data = json.loads(request.body).get('params')
+        course_id = data.get("course_id")
+        schedule_id = data.get('scheduleId')
+        if not course_id:
+            return JsonResponse({"success": False, "message": "Course ID is required"}, status=400)
+
+        today = timezone.now().date()
+        print("today:", today)
+
+        present_student_ids = Attendance.objects.filter(
+        schedule_id=schedule_id,
+        marked_date=today, 
+        status='present'
+        ).values_list('user_id', flat=True)
+
+        
+        print("present:", present_student_ids)
+
+        enrollments = Enrollment.objects.filter(course_id=course_id).select_related('user', 'course').exclude(user_id__in=present_student_ids)
+
+        enrollment_data = [
+            {
+                "user_id": enrollment.user.id,
+                "first_name": enrollment.user.first_name,
+                "course_id": enrollment.course.id,
+                "course_name": enrollment.course_name,
+            }
+            for enrollment in enrollments
+        ]
+        
+        return JsonResponse({"success": True, "enrollments": enrollment_data}, status=200)
+
+    except json.JSONDecodeError:
+        return JsonResponse({"success": False, "message": "Invalid JSON data"}, status=400)
+
+    except Exception as e:
+        return JsonResponse({"success": False, "message": str(e)}, status=500)

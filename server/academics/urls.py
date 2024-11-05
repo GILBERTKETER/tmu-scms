@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import get_programs, add_course, add_program, fetch_courses, enroll_student, get_enrolled_courses, discard_course, get_unscheduled_courses,get_instructors, add_activity, get_activities, delete_activity, update_activity, get_program_details
+from .views import get_programs, add_course, add_program, fetch_courses, enroll_student, get_enrolled_courses, discard_course, get_unscheduled_courses,get_instructors, add_activity, get_activities, delete_activity, update_activity, get_program_details, get_enrollments_by_course
 
 urlpatterns = [
     path('programs/', get_programs, name='program-list'),
@@ -16,5 +16,6 @@ urlpatterns = [
     path('delete-activity/', delete_activity, name='Delete activities'),
     path('update-activity/', update_activity, name='Update activities'),
     path('program-details/', get_program_details, name='get_program_details'),
+    path('get-enrollments-by-course/', get_enrollments_by_course, name='get_enrollments_by_course'),
 
 ]

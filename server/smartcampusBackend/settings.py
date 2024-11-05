@@ -81,7 +81,6 @@ INSTALLED_APPS = [
     "safetymonitoring",
     "threads",
     "portfolio",
-    "qrcodegenerator",
 ]
 
 MIDDLEWARE = [
@@ -174,7 +173,8 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = 'Africa/Nairobi'  # East African Time (EAT)
+USE_TZ = True
 
 USE_I18N = True
 

@@ -49,7 +49,7 @@ function AddIncidentModal() {
             "There was a problem adding the incident to the monitoring system!",
         });
       }
-    } catch (error) {
+    } catch (error: any) {
       // Check if error response is available for better error handling
       const errorMessage =
         error.response?.data?.error ||
