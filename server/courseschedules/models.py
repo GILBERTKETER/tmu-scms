@@ -14,6 +14,7 @@ class Schedule(models.Model):
     time_end = models.TimeField()
     recurring_days = models.JSONField(blank=True, null=True)
     
+
     qr_session_key = models.CharField(max_length=64, unique=True, null=True, blank=True)
     qr_generated_at = models.DateTimeField(null=True, blank=True)
     qr_expires_at = models.DateTimeField(null=True, blank=True)

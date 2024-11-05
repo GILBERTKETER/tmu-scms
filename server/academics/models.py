@@ -35,6 +35,8 @@ class Enrollment(models.Model):
     course_code = models.CharField(max_length=100, blank=True, null=True)
     course_name = models.CharField(max_length=200, blank=True, null=True)
     scheduled = models.CharField(default=1, max_length=50, blank=True, null=True)
+    rfid = models.CharField(max_length=255, blank=True, null=True)
+
     class Meta:
         unique_together = ('user', 'course', 'year', 'semester')  # Prevent duplicate enrollments
 

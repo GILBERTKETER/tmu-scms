@@ -16,7 +16,7 @@ import random
 import string
 from datetime import timedelta
 from django.utils import timezone
-
+from django.views.decorators.http import require_http_methods
 
 @csrf_exempt
 def get_scheduled_classes(request):
@@ -404,3 +404,54 @@ def generate_qrcode(request):
         return JsonResponse({"success": False, "message": "Invalid JSON format."}, status=400)
     except Exception as e:
         return JsonResponse({"success": False, "message": str(e)}, status=400)
+    
+    
+    
+@csrf_exempt
+@require_http_methods(["POST"])
+def check_in_students_rfid(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        rfid = data.get("rfid")
+        schedule_id = data.get("schedule_id")
+        user_id = data.get("user_id")
+        course_code = data.get("course_code")
+        hall_id = data.get("hall_id")
+        course_name = data.get("course_name")
+        recurring_days = data.get("recurring_days")
+
+        # Check if required data is provided
+        if not rfid or not schedule_id or not user_id:
+            return JsonResponse({"success": False, "message": "RFID, Schedule ID, and User ID are required"}, status=400)
+
+        try:
+            # Check if the user has already checked in for this schedule
+            if Attendance.objects.filter(schedule_id=schedule_id, user_id=user_id).exists():
+                return JsonResponse({"success": False, "message": "You are already checked in."}, status=400)
+
+            # Verify RFID matches the one on record for the user
+            enrolled_user = Enrollment.objects.get(user_id=user_id)
+            if enrolled_user.rfid != rfid:
+                return JsonResponse({"success": False, "message": "Invalid RFID"}, status=400)
+
+            # Create a new attendance record
+            attendance = Attendance.objects.create(
+                user_id=user_id,
+                schedule_id=schedule_id,
+                course_name=course_name,
+                day_of_class=recurring_days,
+                status="present",
+                course_code=course_code,
+                course_hall=hall_id,
+                check_in_method = "Rfid"
+            )
+
+            return JsonResponse({"success": True, "message": "Check-in successful"}, status=200)
+
+        except Enrollment.DoesNotExist:
+            return JsonResponse({"success": False, "message": "Enrollment record not found for this user"}, status=404)
+
+        except Exception as e:
+            return JsonResponse({"success": False, "message": f"An error occurred: {str(e)}"}, status=500)
+    
+    return JsonResponse({"success": False, "message": "Invalid request method"}, status=405)
