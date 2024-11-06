@@ -17,12 +17,16 @@ import App from "@/app/(site)/api/api";
 import Swal from "sweetalert2";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+
 interface Event {
   id: number;
   title: string;
   description: string;
-  start: string;
-  end: string;
+  startTime: string;
+  endTime: string;
+  date: string;
+  start_time: string;
+  end_time: string;
 }
 
 interface TransformedEvent {
@@ -31,10 +35,11 @@ interface TransformedEvent {
   description: string;
   start: string;
   end: string;
+  date: string;
   isAllDay?: boolean;
 }
 
-function CalenderComponent() {
+function CalendarComponent() {
   const [rawEvents, setRawEvents] = useState<Event[]>([]);
   const [transformedEvents, setTransformedEvents] = useState<TransformedEvent[]>([]);
   const [loading, setLoading] = useState(true);
@@ -48,59 +53,47 @@ function CalenderComponent() {
       createViewWeek(),
       createViewMonthAgenda(),
     ],
-    defaultView: 'month-grid',
+    defaultView: "month-grid",
     events: [],
     selectedDate: currentDate,
     plugins: [createEventModalPlugin(), createDragAndDropPlugin()],
-    dateFormat: {
-      weekday: 'short',
-      month: 'numeric',
-      day: 'numeric',
-      year: 'numeric',
-    },
+    isDark: false,
   });
 
-  // Function to transform events into Schedule-X format
   const transformEvents = (events: Event[]): TransformedEvent[] => {
-    return events.map(event => {
-      // Ensure dates are valid
-      const startDate = new Date(event.start);
-      const endDate = new Date(event.end);
+    const transformed = events.map((event) => {
+      const startDateTime = new Date(`${event.date} ${event.start_time}`);
+      const endDateTime = new Date(`${event.date} ${event.end_time}`);
 
       return {
         id: event.id,
         title: event.title,
         description: event.description,
-        start: startDate.toISOString(),
-        end: endDate.toISOString(),
+        start: startDateTime.toISOString(),
+        end: endDateTime.toISOString(),
         isAllDay: false,
       };
-    }).filter(event => {
-      // Filter out events with invalid dates
-      return !isNaN(new Date(event.start).getTime()) && !isNaN(new Date(event.end).getTime());
     });
+    console.log("Transformed events:", transformed); // Add this line
+    return transformed;
   };
 
   // Fetch and process events
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const response = await App.get('/api/get-events/');
-        console.log('Raw API response:', response.data);
-
+        const response = await App.get("/api/get-events/");
         const fetchedEvents = response.data;
-        setRawEvents(fetchedEvents); // Store raw events for UpcomingEvents
+        console.log("Fetched events:", fetchedEvents); // Add this line
+        setRawEvents(fetchedEvents);
 
         const processed = transformEvents(fetchedEvents);
-        console.log('Transformed events:', processed);
-        
+        console.log("Transformed events:", processed);
+
         setTransformedEvents(processed);
-        calendar.setEvents(processed);
-        
-        console.log('Calendar events set:', calendar.getEvents());
         setLoading(false);
       } catch (error) {
-        console.error('Error fetching events:', error);
+        console.error("Error fetching events:", error);
         setLoading(false);
       }
     };
@@ -108,46 +101,88 @@ function CalenderComponent() {
     fetchEvents();
   }, []);
 
-  const handleEdit = (eventId: number) => {
+  const handleEdit = async (eventId: number) => {
     console.log("Edit event with ID:", eventId);
+
+    try {
+      const response = await App.put("/api/edit-calendar-events/", { event: eventId });
+      if (response.data.success) {
+        toast.success(response.data.message || "Event updated successfully.");
+        Swal.fire({
+          icon: "success",
+          title: "Event updated successfully.",
+          text: response.data.message || "The event has been updated successfully.",
+        });
+      } else {
+        toast.error(response.data.message || "An error occurred while updating.");
+        Swal.fire({
+          icon: "error",
+          title: "Update Failed",
+          text: response.data.message || "There was a problem updating your event. Please try again.",
+        });
+      }
+    } catch (error: any) {
+      toast.error(error.message || "An unknown error occurred during update.");
+      Swal.fire({
+        icon: "error",
+        title: "Update Failed",
+        text: error.message || "An unknown error occurred during update. Please try again.",
+      });
+    }
   };
 
   const handleDelete = async (eventId: number) => {
     try {
-      // Update both raw and transformed events
-      const updatedRawEvents = rawEvents.filter(event => event.id !== eventId);
-      setRawEvents(updatedRawEvents);
+      const response = await App.delete("/api/delete-calendar-events/", {
+        data: { eventId },
+      });
 
-      const updatedTransformed = transformEvents(updatedRawEvents);
-      setTransformedEvents(updatedTransformed);
-      calendar.setEvents(updatedTransformed);
-
-      // Optional: Delete from backend
-      // await App.delete(`/api/events/${eventId}`);
-    } catch (error) {
-      console.error('Error deleting event:', error);
+      if (response.data.success) {
+        toast.success(response.data.message || "Event deleted successfully.");
+        Swal.fire({
+          icon: "success",
+          title: "Event deleted successfully.",
+          text: response.data.message || "The event has been deleted successfully.",
+        });
+      } else {
+        toast.error(response.data.message || "An error occurred while deleting.");
+        Swal.fire({
+          icon: "error",
+          title: "Deletion Failed",
+          text: response.data.message || "There was a problem deleting your event. Please try again.",
+        });
+      }
+    } catch (error: any) {
+      toast.error(error.message || "An unknown error occurred during deletion.");
+      Swal.fire({
+        icon: "error",
+        title: "Deletion Failed",
+        text: error.message || "An unknown error occurred during deletion. Please try again.",
+      });
     }
   };
 
-  // Function to add new event
   const handleAddEvent = async (newEvent: Event) => {
     try {
-      setRawEvents(prev => [...prev, newEvent]);
+      setRawEvents((prev) => [...prev, newEvent]);
       const updatedTransformed = transformEvents([...rawEvents, newEvent]);
       setTransformedEvents(updatedTransformed);
-      calendar.setEvents(updatedTransformed);
     } catch (error) {
-      console.error('Error adding event:', error);
+      console.error("Error adding event:", error);
     }
   };
 
   if (loading) {
-    return <div className="flex items-center justify-center p-4">Loading calendar...</div>;
+    return (
+      <div className="flex items-center justify-center p-4">
+        Loading calendar...
+      </div>
+    );
   }
 
   return (
     <>
-    <ToastContainer/>
+      <ToastContainer />
       <div className="flex h-auto w-full items-center justify-end py-4">
         <EventManagement />
       </div>
@@ -157,17 +192,17 @@ function CalenderComponent() {
       <div className="flex flex-col gap-6 lg:flex-row">
         <div className="w-[100%] lg:w-[50%]">
           <UpcomingEventsComponent
-            events={rawEvents} // Pass raw events to UpcomingEvents
+            events={rawEvents}
             onEdit={handleEdit}
             onDelete={handleDelete}
           />
         </div>
-        <div className="w-[100%] overflow-hidden rounded-lg bg-white shadow-lg lg:w-[50%] h-[auto]">
-          <ScheduleXCalendar calendarApp={calendar} />
+        <div className="h-[auto] w-[100%] overflow-hidden rounded-lg bg-white shadow-lg lg:w-[50%]">
+          <ScheduleXCalendar calendarApp={calendar} events={transformedEvents} />
         </div>
       </div>
     </>
   );
 }
 
-export default CalenderComponent;
+export default CalendarComponent;

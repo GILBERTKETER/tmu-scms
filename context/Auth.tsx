@@ -11,6 +11,8 @@ interface User {
   last_name: string;
   phone_number: string;
   admission: string;
+  profile_image: string;
+  cover_image:string;
 }
 
 export const useAuth = () => {

@@ -119,7 +119,7 @@ TEMPLATES = [
         },
     },
 ]
-RESEND_API_KEY = 're_JLfprdsM_FUg9ZERkcp5D3zhwZ5sMzViw'
+RESEND_API_KEY = "re_7NTdX12j_BEBuasWwELRx7DFa9JppYao9"
 WSGI_APPLICATION = "smartcampusBackend.wsgi.application"
 
 

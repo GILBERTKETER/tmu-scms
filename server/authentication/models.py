@@ -11,8 +11,11 @@ class UserProfile(models.Model):
     year_of_study = models.CharField(max_length=10, blank=True, null=True)
     semester = models.CharField(max_length=10, blank=True, null=True)
     program = models.CharField(max_length=200, blank=True, null=True)
+    program_id = models.CharField(max_length=200, blank=True, null=True)
     role = models.CharField(max_length=100, default="student", null=True, blank=True)
     email = models.CharField(max_length=50, blank=True, null=True)
+    profile_image = models.CharField(max_length=50, default="img-profile.png")
+    cover_image = models.CharField(max_length=50, default="img-cover.png")
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:

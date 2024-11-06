@@ -35,7 +35,6 @@ def user_registration(request):
     if request.method == 'POST':
         data = json.loads(request.body)
 
-        # Required fields
         first_name = data.get('firstName', "")
         last_name = data.get('lastName', "")
         admission = data.get('admission')
@@ -45,19 +44,16 @@ def user_registration(request):
         cpassword = data.get('cpassword')
         role = data.get('role', None)
 
-        # Optional fields
         yos = data.get('yos', None)
         semester = data.get('semester', None)
         program = data.get('program', None)
         full_name = f"{first_name} {last_name}".strip()
 
-        # Check for required fields
         if not all([first_name, last_name, admission, phone_number, password, cpassword, email]):
             return JsonResponse({"success":False,"message": "All required fields are missing."}, status=400)
 
         try:
             with transaction.atomic():
-                # Check if the user with email, phone, or admission already exists
                 if User.objects.filter(email=email).exists():
                     return JsonResponse({"success":False,"message": "Email is already registered."}, status=400)
                 if password != cpassword:
@@ -67,7 +63,6 @@ def user_registration(request):
                 if UserProfile.objects.filter(admission=admission).exists():
                     return JsonResponse({"success":False,"message": "Admission number is already registered."}, status=400)
 
-                # Create the user and user profile
                 user = User.objects.create_user(
                     username=email,
                     password=password,
@@ -76,7 +71,6 @@ def user_registration(request):
                     last_name=last_name
                 )
 
-                # Assign profile details, handling optional fields
                 user.userprofile.phone_number = phone_number
                 user.userprofile.admission = admission
                 user.userprofile.year_of_study = yos
@@ -88,7 +82,6 @@ def user_registration(request):
                 
                 user.userprofile.save()
 
-                # Log the user in and send welcome email
                 login(request, user)
                 html_content = render_to_string('signup.html', {'firstName': first_name})
 
@@ -101,68 +94,7 @@ def user_registration(request):
             return JsonResponse({"success":False,"message": str(e)}, status=400)
 
     return JsonResponse({"success":False,"message": "Invalid request method."}, status=405)
-# def user_registration(request):
-#     if request.method == 'POST':
-#         data = json.loads(request.body)
 
-#         first_name = data.get('firstName')
-#         last_name = data.get('lastName')
-#         admission = data.get('admission')
-#         phone_number = data.get('phone')
-#         password = data.get('password')
-#         email = data.get('email')
-#         cpassword = data.get('cpassword')
-#         role = data.get('role')
-        
-#         yos = data.get('yos')
-#         semester = data.get('semester')
-#         program = data.get('program')
-#         full_name = first_name + last_name
-
-#         if not all([first_name, last_name, admission, phone_number, password,cpassword, email]):
-#             return JsonResponse({"message": "All fields are required."}, status=400)
-
-#         try:
-#             with transaction.atomic():
-#                 if User.objects.filter(email=email).exists():
-#                     return JsonResponse({"message": "Email is already registered."}, status=400)
-#                 if password != cpassword: return JsonResponse({"message":"Passwords don't match. Please try again."}, status=401)
-#                 if UserProfile.objects.filter(phone_number=phone_number).exists():
-#                     return JsonResponse({"message": "Phone number is already registered."}, status=400)
-
-#                 if UserProfile.objects.filter(admission=admission).exists():
-#                     return JsonResponse({"message": "Admission number is already registered."}, status=400)
-
-#                 user = User.objects.create_user(
-#                     username=email,
-#                     password=password,
-#                     email=email,
-#                     first_name=first_name,
-#                     last_name=last_name
-#                 )
-
-#                 user.userprofile.phone_number = phone_number
-#                 user.userprofile.admission = admission
-#                 user.userprofile.year_of_study = yos
-#                 user.userprofile.semester = semester
-#                 user.userprofile.program = program
-#                 user.userprofile.full_name = full_name
-#                 user.userprofile.role = role
-                
-#                 user.userprofile.save()
-
-#                 login(request, user)
-#                 html_content = render_to_string('signup.html',{'firstName': first_name})
-
-#                 subject = 'Welcome to Tom Mboya Smart Campus Management System'
-#                 send_email(subject, email, html_content)
-                
-#             return JsonResponse({"message": "You are successfully registered."}, status=201)
-
-#         except Exception as e:
-#             return JsonResponse({"message": str(e)}, status=400)
-
-#     return JsonResponse({"message": "Invalid request method."}, status=405)
 
 @csrf_exempt
 @require_http_methods(["POST"])
@@ -225,7 +157,9 @@ def get_user(request):
             "full_name":user.userprofile.full_name,
             "semester": user.userprofile.semester,
             "year_of_study": user.userprofile.year_of_study,
-            "program":user.userprofile.program
+            "program":user.userprofile.program,
+            'profile_image':user.userprofile.profile_image,
+            'cover_image':user.userprofile.cover_image,
         }
         return JsonResponse({"success":True,"user": user_data})
     else:
@@ -323,26 +257,22 @@ def get_all_users(request):
 def get_all_admins(request):
     user = request.user
     if user.is_authenticated:
-        # Filter for users with the role "admin"
         admins = UserProfile.objects.filter(role="admin").values()
         return JsonResponse({"success": True, "message": "These are the details", "data": list(admins)}, status=200)
     else:
         return JsonResponse({"success": False, "message": "You are not authenticated"}, status=403)
     
-@csrf_exempt  # Use this for testing, but consider proper CSRF handling in production
+@csrf_exempt  
 def update_user(request):
     if request.method == 'PUT':
         try:
-            # Decode the JSON data from the request body
             data = json.loads(request.body)
             email = data.get('email')
             role = data.get('role')
             
-            # Fetch the user based on email
             user = User.objects.get(email=email)
             profile = UserProfile.objects.get(email=email)
-            # Update the user's role and save
-            user.email = email  # Adjust this if your User model has a different field for role
+            user.email = email  
             user.save()
             profile.email = email
             profile.role = role

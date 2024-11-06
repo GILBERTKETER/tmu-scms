@@ -20,43 +20,74 @@ from django.views.decorators.http import require_http_methods
 
 @csrf_exempt
 def get_scheduled_classes(request):
+    user = request.user
     if request.method == 'GET':
         try:
-            schedules = Schedule.objects.all()
+            enrollments = Enrollment.objects.filter(
+                user=user,
+                scheduled='0'
+            ).values_list('id', flat=True)
 
-            # Serialize the schedule data
+            schedules = Schedule.objects.filter(
+                enrollment_id__in=enrollments
+            ).select_related(
+                'enrollment',
+                'enrollment__course',
+                'enrollment__course__program',
+                'instructor',
+                'instructor__user'
+            )
+
             schedule_data = []
             for schedule in schedules:
                 try:
-                    hall = Hall.objects.get(id=schedule.hall)  
+                    # Get hall information
+                    hall = Hall.objects.get(id=schedule.hall)
                     hall_name = hall.hall_name
                     hall_number = hall.hall_number
+                    hall_id = hall.id
                 except Hall.DoesNotExist:
                     hall_name = "Unknown"
                     hall_number = "N/A"
-
-                schedule_data.append({
-                    'id':schedule.id,
-                    'course_id':schedule.enrollment.course_id,
+                    hall_id = None
+                
+                # Format the schedule data
+                schedule_info = {
+                    'id': schedule.id,
+                    'course_id': schedule.enrollment.course_id,
                     'course_name': schedule.enrollment.course_name,
                     'course_code': schedule.enrollment.course_code,
                     'program_name': schedule.enrollment.course.program.name,
                     'instructor_name': schedule.instructor.user.first_name,
                     'hall_name': hall_name,
-                    "hallId":hall.id,
+                    'hallId': hall_id,
                     'hall_number': hall_number,
                     'date': schedule.date,
-                    'time_start': schedule.time_start.strftime("%H:%M:%S"),
-                    'time_end': schedule.time_end.strftime("%H:%M:%S"),
+                    'time_start': schedule.time_start.strftime("%H:%M:%S") if schedule.time_start else None,
+                    'time_end': schedule.time_end.strftime("%H:%M:%S") if schedule.time_end else None,
                     'recurring_days': schedule.recurring_days
-                })
-           
-            return JsonResponse({'success': True, 'classes': schedule_data}, status=200)
+                }
+                schedule_data.append(schedule_info)
+            
+            return JsonResponse({
+                'success': True,
+                'classes': schedule_data,
+                'total_classes': len(schedule_data)
+            }, status=200)
 
         except Exception as e:
-            return JsonResponse({'success': False, 'message': str(e)}, status=400)
+            import traceback
+            error_details = traceback.format_exc()
+            return JsonResponse({
+                'success': False,
+                'message': str(e),
+                'error_details': error_details
+            }, status=400)
 
-    return JsonResponse({'success': False, 'message': 'Invalid request method.'}, status=405)
+    return JsonResponse({
+        'success': False,
+        'message': 'Invalid request method.'
+    }, status=405)
 
 @csrf_exempt
 def create_schedule(request):

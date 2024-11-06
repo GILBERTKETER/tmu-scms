@@ -36,7 +36,6 @@ const UpcomingEventsComponent: React.FC<UpcomingEventsComponentProps> = ({
 
   const displayedEvents = showMore ? events : events.slice(0, 5);
 
-  // Update isOnline state when the form value changes
   useEffect(() => {
     if (editingEvent) {
       setIsOnline(editingEvent.is_online);
@@ -76,7 +75,6 @@ const UpcomingEventsComponent: React.FC<UpcomingEventsComponentProps> = ({
   const handleSwitchChange = (checked: boolean) => {
     setIsOnline(checked);
     form.setFieldValue('is_online', checked);
-    // Clear the opposite field when switching
     if (checked) {
       form.setFieldValue('address', '');
     } else {
@@ -107,9 +105,7 @@ const UpcomingEventsComponent: React.FC<UpcomingEventsComponentProps> = ({
       content="Are you sure you want to delete this event?"
       onOk={() => {
         onDelete(event.id);
-        Message.success({
-          content: "Event deleted successfully",
-        });
+      
       }}
       onCancel={() => {
         Message.error({
@@ -168,7 +164,7 @@ const UpcomingEventsComponent: React.FC<UpcomingEventsComponentProps> = ({
         <Form
           form={form}
           layout="vertical"
-          initialValues={editingEvent}
+          initialValues={editingEvent || undefined}
         >
           <FormItem label="Title" field="title" rules={[{ required: true }]}>
             <Input placeholder="Event title" />

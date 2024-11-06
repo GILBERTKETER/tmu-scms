@@ -45,7 +45,7 @@ def incident_list(request):
         incident = Incident.objects.create(
             author=data.get('author'),
             content=data.get('content'),
-            avatar="https://github.com/gilbertketer.png"
+            avatar=data.get('profile')
         )
         
         # Include the id explicitly in response
@@ -77,7 +77,7 @@ def reply_incident(request):
                 incident=incident,
                 author=data.get('author'),
                 content=data.get('content'),
-                avatar="https://github.com/gilbertketer.png"
+                avatar= data.get('profile')
             )
             
             # Include the id explicitly in response

@@ -5,7 +5,7 @@ def send_email(subject, to, html_content):
     resend.api_key = settings.RESEND_API_KEY
 
     params = {
-        "from": "Tom Mboya University SCMS <delivered@resend.dev>",
+        "from": "Tom Mboya University SCMS <no-reply@engineerketer.dev>",
         "to": to,
         "subject": subject,
         "html": html_content,

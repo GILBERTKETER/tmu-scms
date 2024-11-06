@@ -1,5 +1,4 @@
 import React from "react";
-import CourseModal from "./coursesModal";
 interface CardTypes {
   title: string;
   semester: number;
@@ -20,7 +19,6 @@ const YearCards: React.FC<CardTypes> = ({
           <p className="mb-1 font-medium">
             Year: <strong className="text-secondary">{title}</strong>
           </p>
-          <CourseModal />
         </div>
         <div className="flex items-center rounded-md border border-gray-200 bg-white px-4 py-3 shadow-sm">
           <div className="flex w-full flex-col">

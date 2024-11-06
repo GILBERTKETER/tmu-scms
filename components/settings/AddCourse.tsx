@@ -31,7 +31,7 @@ function AddCourse() {
         }
 
         setPrograms(response.data);
-      } catch (error) {
+      } catch (error:any) {
         toast.error(
           error.message || "An error occurred while fetching programs.",
         );
@@ -53,6 +53,7 @@ function AddCourse() {
         description: values.description,
         program: values.program,
         semester: values.semester,
+        year: values.year
       };
 
       const response = await App.post("/api/add-course/", courseData);
@@ -78,7 +79,7 @@ function AddCourse() {
         });
         throw new Error("Failed to add course");
       }
-    } catch (error) {
+    } catch (error:any) {
       toast.error(
         error.message || "An error occurred while adding the course.",
       );
@@ -142,7 +143,7 @@ function AddCourse() {
             field="name"
             rules={[{ required: true }]}
           >
-            <Input placeholder="Enter course name" />
+            <Input placeholder="Enter course name eg CCS, MMA" />
           </FormItem>
           <FormItem label="Description" field="description">
             <Input.TextArea placeholder="Enter course description" rows={3} />
@@ -160,6 +161,13 @@ function AddCourse() {
                 label: program.name, 
               }))}
             />
+          </FormItem>
+          <FormItem
+            label="Year"
+            field="year"
+            rules={[{ required: true }]}
+          >
+            <Input placeholder="Enter course year eg 1,2,3,4" />
           </FormItem>
           <FormItem
             label="Semester"

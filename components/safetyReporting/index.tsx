@@ -37,6 +37,8 @@ interface Post {
   created_at: string;
 }
 
+import { useAuth } from '@/context/Auth';
+import { profile } from 'console';
 const TextArea = Input.TextArea;
 
 const IncidentReporting: React.FC = () => {
@@ -47,6 +49,7 @@ const IncidentReporting: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
   const [replySubmitting, setReplySubmitting] = useState<{ [key: string]: boolean }>({});
 
+  const {user} = useAuth()
   useEffect(() => {
     fetchIncidents();
   }, []);
@@ -70,8 +73,9 @@ const IncidentReporting: React.FC = () => {
     try {
       setSubmitting(true);
       const post = {
-        author: 'John Doe', // Replace with actual user data
+        author: user?.first_name, 
         content: newPost,
+        profile: user?.profile_image
       };
       const response = await App.post('/api/incidents/', post);
       setPosts([response.data, ...posts]);
@@ -92,8 +96,9 @@ const IncidentReporting: React.FC = () => {
         setReplySubmitting(prev => ({ ...prev, [postId]: true }));
         const reply = {
             incident_id: postId,  // Changed from 'incident' to 'incident_id'
-            author: 'Jane Doe',
+            author: user?.first_name,
             content: newReply[postId],
+            profile: user?.profile_image
         };
         const response = await App.post('/api/reply-incident/', reply);
         setPosts(posts.map(post => {
@@ -172,7 +177,7 @@ const IncidentReporting: React.FC = () => {
               datetime={formatDate(post.created_at)}
               avatar={
                 <Avatar size={40}>
-                  <img alt={post.author} src="https://github.com/gilbertketer.png" />
+                  <img alt={post.author} src={`http://127.0.0.1:8000/media/${post.avatar}`} />
                 </Avatar>
               }
             />
@@ -200,7 +205,7 @@ const IncidentReporting: React.FC = () => {
                       datetime={formatDate(reply.created_at)}
                       avatar={
                         <Avatar size={32}>
-                          <img alt={reply.author} src="https://github.com/gilbertketer.png" />
+                          <img alt={reply.author} src={`http://127.0.0.1:8000/media/${reply.avatar}`} />
                         </Avatar>
                       }
                     />

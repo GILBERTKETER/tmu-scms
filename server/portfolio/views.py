@@ -7,7 +7,7 @@ from .models import PersonalInfo, Skill, Experience, Education, Project, SocialM
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from django.conf import settings
-
+from authentication.models import UserProfile
 
 @login_required
 @csrf_exempt
@@ -107,6 +107,7 @@ def upload_image(request):
         
         try:
             profile_user = PersonalInfo.objects.get(user_id=user_id)
+            userprofile = UserProfile.objects.get(id=user_id)
         except PersonalInfo.DoesNotExist:
             return JsonResponse({'message': 'User not found'}, status=404)
         
@@ -118,12 +119,18 @@ def upload_image(request):
         
         if file_type == 'profile':
             profile_user.profile_image = saved_file_path
+            userprofile.profile_image = saved_file_path
+            userprofile.save()
+
         elif file_type == 'cover':
             profile_user.cover_image = saved_file_path
+            userprofile.cover_image = saved_file_path
+            userprofile.save()
         else:
             return JsonResponse({'message': 'Invalid file type'}, status=400)
 
         profile_user.save() 
+        userprofile.save()
 
         file_url = f"{settings.MEDIA_URL}{saved_file_path}"
         return JsonResponse({'message': 'File uploaded successfully', 'file_url': file_url}, status=200)

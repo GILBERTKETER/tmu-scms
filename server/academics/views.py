@@ -10,6 +10,8 @@ from django.core import serializers
 from datetime import datetime
 from django.utils import timezone
 from courseschedules.models import Attendance
+
+from authentication.models import UserProfile
 @csrf_exempt  
 @require_http_methods(["GET"])
 def get_programs(request):
@@ -27,10 +29,15 @@ def add_course(request):
         description = data.get("description", "")
         program_id = data.get("program")
         semester = data.get("semester")
+        year = data.get('year')
 
         # Validate required fields
         if not all([course_code, course_name, program_id, semester]):
-            return JsonResponse({"success": False, "error": "All fields are required."}, status=400)
+            return JsonResponse({"success": False, "message": "All fields are required."}, status=400)
+        existing_code = Course.objects.filter(code=course_code, year=year, semester=semester).exists()
+
+        if existing_code:
+            return JsonResponse({"success": False, "message": "The course is already registered."}, status=400)
 
         # Create the course
         course = Course(
@@ -38,7 +45,8 @@ def add_course(request):
             name=course_name,
             description=description,
             program_id=program_id,
-            semester=semester
+            semester=semester,
+            year = year
         )
         course.save()
 
@@ -81,12 +89,30 @@ def add_program(request):
 @csrf_exempt
 @require_http_methods(["GET"])
 def fetch_courses(request):
+    user = request.user
+    if not user.is_authenticated:
+        return JsonResponse({"success": False, "message": "You are not authenticated."}, status=401)
+    
     try:
-        courses = Course.objects.all().values('id', 'code', 'name', 'description', 'program__name', 'semester')
-        course_list = list(courses)
+        user_id = user.id
+        _student = UserProfile.objects.get(id=user_id)
+        
+        program_id_of_student = _student.program_id
+        year_of_student = _student.year_of_study
+        semester_of_student = _student.semester
+
+        eligible_courses = Course.objects.filter(
+            program_id=program_id_of_student,
+            year=year_of_student,
+            semester=semester_of_student
+        ).values('id', 'code', 'name', 'description', 'program__name', 'semester')
+        
+        course_list = list(eligible_courses)
 
         return JsonResponse({"success": True, "data": course_list}, status=200)
-    
+
+    except UserProfile.DoesNotExist:
+        return JsonResponse({"success": False, "message": "Student profile not found."}, status=404)
     except Exception as e:
         return JsonResponse({"success": False, "error": str(e)}, status=500)
 
@@ -94,18 +120,12 @@ def fetch_courses(request):
 @csrf_exempt
 @require_http_methods(["POST"])
 def enroll_student(request):
-    """
-    Enrolls an authenticated student in a specified course for a particular academic year and semester.
-    
-    Expects `course_id`, `year`, and `semester` in POST data.
-    """
+   
     try:
-        # Retrieve user from the request
         user = request.user
         if not user.is_authenticated:
             return JsonResponse({"success": False, "message": "User is not authenticated."}, status=401)
         data = json.loads(request.body)
-        # Retrieve data from request
         course_id = data.get("courseId")
         # year = int(request.POST.get("year")) 
         # semester = request.POST.get("semester")
@@ -141,10 +161,7 @@ def enroll_student(request):
 @csrf_exempt    
 @require_http_methods(["GET"])
 def get_enrolled_courses(request):
-    """
-    Fetches the list of enrolled courses for the authenticated user.
-    :return: JsonResponse with the list of courses and their details.
-    """
+   
     user = request.user
     if not user.is_authenticated:
         return JsonResponse({"success": False, "message": "User is not authenticated."}, status=401)
@@ -189,7 +206,13 @@ def discard_course(request):
 def get_unscheduled_courses(request):
     user = request.user
     if user.is_authenticated:
-        unscheduled_courses = Enrollment.objects.filter(scheduled=1).values()
+        user_id = user.id
+        _student = UserProfile.objects.get(id=user_id)
+        
+        year_of_student = _student.year_of_study
+        semester_of_student = _student.semester
+        
+        unscheduled_courses = Enrollment.objects.filter(year= year_of_student, semester= semester_of_student, user_id = user_id, scheduled=1).values()
         return JsonResponse({"success": True, "message": "Enrolled courses fetched.", "data": list(unscheduled_courses)}, status=200)
     else:
         return JsonResponse({"success": False, "message": "You are not authenticated."}, status=401)
@@ -384,6 +407,11 @@ def update_activity(request):
 @require_http_methods(["POST"])
 def get_enrollments_by_course(request):
     try:
+        user = request.user
+        userDetails = UserProfile.objects.get(id=user.id)
+        year = userDetails.year_of_study
+        semester = userDetails.semester
+        
         data = json.loads(request.body).get('params')
         course_id = data.get("course_id")
         schedule_id = data.get('scheduleId')
@@ -402,7 +430,7 @@ def get_enrollments_by_course(request):
         
         print("present:", present_student_ids)
 
-        enrollments = Enrollment.objects.filter(course_id=course_id).select_related('user', 'course').exclude(user_id__in=present_student_ids)
+        enrollments = Enrollment.objects.filter(year=year,semester=semester,course_id=course_id).select_related('user', 'course').exclude(user_id__in=present_student_ids)
 
         enrollment_data = [
             {
