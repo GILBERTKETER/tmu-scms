@@ -163,11 +163,15 @@ def enroll_student(request):
 def get_enrolled_courses(request):
    
     user = request.user
+    user_profile = UserProfile.objects.get(user_id = user.id)
+    user_year = user_profile.year_of_study
+    user_sem = user_profile.semester
+    user_prog = user_profile.program_id
     if not user.is_authenticated:
         return JsonResponse({"success": False, "message": "User is not authenticated."}, status=401)
 
     try:
-        enrollments = Enrollment.objects.filter(user=user).select_related('course').values(
+        enrollments = Enrollment.objects.filter(user=user, semester = user_sem, year = user_year).select_related('course').values(
             'course__name', 'course__code', 'year', 'semester'
         )
         
@@ -255,8 +259,9 @@ def add_activity(request):
             start_time = data.get('activity_start_time')
             end_time = data.get('activity_end_time')
             activity_location = data.get('activity_location')
+            course_id = data.get('course_id')
             
-            if not all([activity_name, activity_description, activity_date, start_time, end_time, activity_location]):
+            if not all([activity_name, activity_description, activity_date, start_time, end_time, activity_location, course_id]):
                 return JsonResponse({"success": False, "message": "All fields are required. Please fill in all fields."}, status=400)
             
             activity = Activities(
@@ -266,7 +271,8 @@ def add_activity(request):
                 activity_date=activity_date,
                 activity_start_time=start_time,
                 activity_end_time=end_time,
-                activity_location=activity_location
+                activity_location=activity_location,
+                course_id = course_id,
             )
             activity.save()
             
@@ -281,12 +287,37 @@ def get_activities(request):
     user = request.user
     if user.is_authenticated:
         if request.method == 'GET':
-            activities = Activities.objects.all().values()
-            return JsonResponse({"success":True, "message":"Success", "data":list(activities)}, status = 200)
+            try:
+                # Retrieve the user's profile details
+                user_profile = UserProfile.objects.get(user_id=user.id)
+                user_year = user_profile.year_of_study
+                user_semester = user_profile.semester
+
+                # Get the courses the user is enrolled in for the current year and semester
+                enrolled_courses = Enrollment.objects.filter(
+                    user_id=user.id,
+                    semester=user_semester,
+                    year=user_year
+                ).values_list('course_id', flat=True)  # Retrieve only course IDs
+
+                # Filter activities based on enrolled courses and upcoming dates
+                current_date = timezone.now().date()
+                activities = Activities.objects.filter(
+                    course_id__in=enrolled_courses,  # Only activities related to enrolled courses
+                    activity_date__gte=current_date  # Only activities that are not in the past
+                ).values()
+
+                return JsonResponse({
+                    "success": True,
+                    "message": "Success",
+                    "data": list(activities)
+                }, status=200)
+            except UserProfile.DoesNotExist:
+                return JsonResponse({"success": False, "message": "User profile not found."}, status=404)
         else:
-            return JsonResponse({"success":False, "message":"Invalid request method."}, status=403)
+            return JsonResponse({"success": False, "message": "Invalid request method."}, status=403)
     else:
-        return JsonResponse({"success":False, "message":"You are not authenticated."}, status=401)
+        return JsonResponse({"success": False, "message": "You are not authenticated."}, status=401)
     
     
 @csrf_exempt

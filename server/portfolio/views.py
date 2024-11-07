@@ -7,7 +7,7 @@ from .models import PersonalInfo, Skill, Experience, Education, Project, SocialM
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from django.conf import settings
-from authentication.models import UserProfile
+from authentication.models import User, UserProfile
 
 @login_required
 @csrf_exempt
@@ -200,3 +200,76 @@ def get_portfolio(request):
             'status': 'error',
             'message': str(e)
         }, status=500)
+        
+
+def student_profile(request, admission):
+
+    try:
+        student = User.objects.get(username=admission)
+        
+        user = UserProfile.objects.get(user_id = student.id)
+        # Fetch all portfolio data
+        personal_info = PersonalInfo.objects.filter(user=student).first()
+        skills = Skill.objects.filter(user=student)
+        experiences = Experience.objects.filter(user=student)
+        education = Education.objects.filter(user=student)
+        projects = Project.objects.filter(user=student)
+        social_media = SocialMedia.objects.filter(user=student)
+        data = {
+                    "name": user.full_name,
+                    "admission": user.admission,
+                    "email": student.email,
+                }
+        # Format response
+        portfolio_data = {
+            'personalInfo': {
+                'fullName': personal_info.full_name if personal_info else '',
+                'email': personal_info.email if personal_info else '',
+                'phone': personal_info.phone if personal_info else '',
+                'location': personal_info.location if personal_info else '',
+                'summary': personal_info.summary if personal_info else '',
+                'profile_image': personal_info.profile_image if personal_info else '',
+                'cover_image': personal_info.cover_image if personal_info else '',
+            },
+            'skills': [skill.name for skill in skills],
+            'experiences': [{
+                'company': exp.company,
+                'position': exp.position,
+                'duration': exp.duration,
+                'description': exp.description
+            } for exp in experiences],
+            'education': [{
+                'institution': edu.institution,
+                'degree': edu.degree,
+                'year': edu.year,
+                'gpa': edu.gpa
+            } for edu in education],
+            'projects': [{
+                'name': proj.name,
+                'description': proj.description,
+                'technologies': proj.technologies,
+                'link': proj.link
+            } for proj in projects],
+            'socialMedia': [{
+                'platform': social.platform,
+                'username': social.username,
+                'url': social.url,
+                'description': social.description
+            } for social in social_media]
+        }
+
+        return JsonResponse({
+            "success":True,
+            'status': 'success',
+            'data': portfolio_data,
+            'user': data,
+        })
+
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': str(e)
+        }, status=500)
+        
+    except User.DoesNotExist:
+        return JsonResponse({"success":False,"message": "Student not found"}, status=404)

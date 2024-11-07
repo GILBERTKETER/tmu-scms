@@ -45,6 +45,8 @@ class Attendance(models.Model):
     course_hall = models.CharField(max_length=50)
     marked_date = models.DateField(auto_now_add=True)  
     day_of_class = models.CharField(max_length=20) 
+    year = models.CharField(max_length=20, blank=True, null=True)
+    semester = models.CharField(max_length=20, blank=True, null=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES)  
     check_in_method = models.CharField(max_length=15, choices=CHECK_IN_METHOD_CHOICES)
 

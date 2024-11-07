@@ -54,8 +54,10 @@ const CustomResizeHandle = forwardRef<HTMLSpanElement, { handleAxis: string }>(
   },
 );
 
-const ResizableTitle: React.FC<
-  ResizableTitleProps & React.HTMLAttributes<HTMLTableHeaderCellElement>
+const ResizableTitle: React.FC<{
+  width?: number;
+  onResize?: (e: React.SyntheticEvent, data: ResizeCallbackData) => void;
+} & React.HTMLAttributes<HTMLTableHeaderCellElement>
 > = ({ onResize, width, ...restProps }) => {
   if (!width) return <th {...restProps} />;
   return (
@@ -127,23 +129,27 @@ const IncidentTable: React.FC = () => {
       try {
         const response = await App.get("/api/get-all-incidents/");
         if (response.data && response.data.success) {
-          const incidents = response.data.data.map((incident: any) => ({
-            key: incident.id.toString(),
-            id: incident.id.toString(), // Add id here
-            title: incident.title,
-            status: incident.status,
-            date: incident.date,
-            severity: incident.severity,
-          }));
+          const incidents = response.data.data
+            .map((incident) => ({
+              key: incident.id.toString(),
+              id: incident.id.toString(),
+              title: incident.title,
+              status: incident.status,
+              date: incident.date,
+              severity: incident.severity,
+            }))
+            .sort((a, b) => new Date(b.date) - new Date(a.date)); // Sort by date
+  
           setData(incidents);
         }
       } catch (error) {
         console.error("Error fetching incidents:", error);
       }
     };
-
+  
     fetchIncidents();
   }, []);
+  
 
   const handleEdit = (incident: DataType) => {
     setEditedIncident(incident);
@@ -177,7 +183,7 @@ const IncidentTable: React.FC = () => {
           text: response.data.message || "There was a problem deleting the incident!",
         });
       }
-    } catch (error) {
+    } catch (error:any) {
       toast.error(error.message || "Incident failed to delete successfully!");
       Swal.fire({
         icon: "error",
@@ -228,7 +234,7 @@ const IncidentTable: React.FC = () => {
           text: response.data.message || "There was a problem editing the incident!",
         });
       }
-    } catch (error) {
+    } catch (error:any) {
       toast.error(error.message || "Failed to edit incident!");
       Swal.fire({
         icon: "error",

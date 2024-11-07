@@ -17,7 +17,7 @@ class Course(models.Model):
     description = models.TextField(blank=True)  
     program = models.ForeignKey(Program, related_name='courses', on_delete=models.CASCADE)  
     semester = models.CharField(max_length=100, blank=True) 
-    year = models.IntegerField(max_length=200) 
+    year = models.IntegerField() 
    
     created_at = models.DateTimeField(auto_now_add=True)  
     updated_at = models.DateTimeField(auto_now=True)  
@@ -62,4 +62,5 @@ class Activities(models.Model):
     activity_start_time = models.TimeField()
     activity_end_time = models.TimeField()
     activity_location = models.TextField()
+    course_id = models.CharField(max_length=20, blank=True, null=True)
     

@@ -15,28 +15,40 @@ const AttendanceCards: React.FC = () => {
   useEffect(() => {
     const fetchAttendanceLogs = async () => {
       try {
-        const response = await App.get('/api/attendance-logs/'); 
+        const response = await App.get('/api/attendance-logs/');
         
         if (response.data.success) {
-          const attendanceRecords = response.data;
-
-          const presentCount = attendanceRecords.filter(record => record.status === 'Present').length;
-          const totalClasses = 12; 
+          const attendanceRecords = response.data.logs;
+          const enrolled_classes = response.data.total_count_enrolled
+          // Get unique courses
+          // const uniqueCourses = new Set(attendanceRecords.map(record => record.course));
+          const totalClasses = enrolled_classes * 12; // Each course has 12 sessions
+  
+          // Calculate present count across all records
+          const presentCount = attendanceRecords.length;
           const missedCount = totalClasses - presentCount;
-
+  
+          // Calculate attendance percentage to 5 decimal places
+          const attendancePercentage = Number(((presentCount / totalClasses) * 100).toFixed(5));
+          console.log("Attendance percentage:", attendancePercentage)
           setTotalAttendance(presentCount);
           setMissedClasses(missedCount);
-          setAttendancePercentage(((presentCount / totalClasses) * 100).toFixed(2));
+          setAttendancePercentage(attendancePercentage);
+          console.log("Attendance percentage from state:", attendancePercentage)
+          console.log("Missed:", missedClasses)
+          console.log("Missed count from state:", missedCount)
+
         } else {
-          console.error('Failed to fetch attendance logs:', result.message);
+          console.error('Failed to fetch attendance logs:', response.data.message);
         }
       } catch (error) {
         console.error('Error fetching attendance logs:', error);
       }
     };
-
+  
     fetchAttendanceLogs();
   }, []);
+  
 
   return (
     <Row gutter={24} style={{ boxSizing: "border-box", overflow: "auto" }}>

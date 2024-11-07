@@ -4,7 +4,16 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 function Details() {
-  const [userData, setUserData] = useState(null);
+interface UserData {
+  admission: string;
+  full_name: string;
+  program: string;
+  year_of_study: number;
+  semester: number;
+  courses_enrolled:string;
+}
+
+const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true); 
 
   useEffect(() => {
@@ -17,7 +26,7 @@ function Details() {
         } else {
           toast.error(response.data.message || 'Failed to fetch user data.');
         }
-      } catch (error) {
+      } catch (error:any) {
         toast.error(error.message || 'An error occurred while fetching user data.');
       } finally {
         setLoading(false);
@@ -50,7 +59,7 @@ function Details() {
         {/* Number of Courses Enrolled */}
         <div className="flex justify-between items-center">
           <span className="text-gray-500 font-medium">Courses Enrolled:</span>
-          <span className="text-gray-800 font-semibold">5</span> {/* Replace this with actual data if available */}
+          <span className="text-gray-800 font-semibold">{userData.courses_enrolled}</span>
         </div>
         
         {/* Current Course */}

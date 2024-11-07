@@ -27,7 +27,7 @@ import os
 from django.conf import settings
 from .utils import send_email
 from .models import UserProfile
-
+from academics.models import Enrollment
 from django.contrib.auth.hashers import check_password, make_password
 
 @csrf_exempt
@@ -44,6 +44,7 @@ def user_registration(request):
         cpassword = data.get('cpassword')
         role = data.get('role', None)
 
+        username = admission.replace("/","")
         yos = data.get('yos', None)
         semester = data.get('semester', None)
         program = data.get('program', None)
@@ -64,7 +65,7 @@ def user_registration(request):
                     return JsonResponse({"success":False,"message": "Admission number is already registered."}, status=400)
 
                 user = User.objects.create_user(
-                    username=email,
+                    username=username,
                     password=password,
                     email=email,
                     first_name=first_name,
@@ -147,7 +148,16 @@ def user_logout(request):
 def get_user(request):
     user = request.user
     if user.is_authenticated:
+        
+        user_profile = UserProfile.objects.get(user_id = user.id)
+        user_year = user_profile.year_of_study
+        user_sem = user_profile.semester
+        user_prog = user_profile.program_id
+        
+        enrollments = Enrollment.objects.filter(user=user, semester = user_sem, year = user_year).count()
+        
         user_data = {
+            "courses_enrolled":enrollments,
             "id": user.id,
             "email": user.email,
             "first_name": user.first_name,

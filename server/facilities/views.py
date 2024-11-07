@@ -117,11 +117,9 @@ def book_facility(request):
         data = json.loads(request.body)
         facility_id = data.get('facility_id')
         title = data.get('title')
-        date = data.get('date')
-        start_time = data.get('start_time')
-        end_time = data.get('end_time')
+        activity_id = data.get('activity_id')
 
-        if not all([facility_id, title, date, start_time, end_time]):
+        if not all([facility_id, title, activity_id]):
             return JsonResponse({
                 'success': False,
                 'message': 'All fields are required.'
@@ -134,10 +132,9 @@ def book_facility(request):
                     booking = FacilityBooking.objects.create(
                         facility=facility,
                         title=title,
-                        booking_date=date,
-                        start_time=start_time,
-                        end_time=end_time,
+                        activity_id = activity_id
                     )
+                    booking.save()
                     facility.status = 'Occupied'
                     facility.save()
                     return JsonResponse({

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Drawer,
   Button,
@@ -7,6 +7,7 @@ import {
   DatePicker,
   TimePicker,
   Message,
+  Select,
 } from "@arco-design/web-react";
 import App from "@/app/(site)/api/api";
 import Swal from "sweetalert2";
@@ -53,7 +54,24 @@ function ActivityDrawer() {
       });
     }
   };
-
+  const { Option } = Select;
+  const [courses, setCourses] = useState([]);
+  interface coursesType {
+    course_id: string;
+    course_code: string;
+    course_name: string;
+  }
+  useEffect(() => {
+    const fetchCourses = async () => {
+      const response = await App.get("/api/get-scheduled-classes/");
+      if (response.data.success == true) {
+        setCourses(response.data.classes);
+      } else {
+        setCourses([]);
+      }
+    };
+    fetchCourses();
+  }, []);
   return (
     <div>
       <ToastContainer />
@@ -68,6 +86,20 @@ function ActivityDrawer() {
         onCancel={() => setVisible(false)}
       >
         <Form form={form} layout="vertical">
+          <FormItem
+            label="Associated Course"
+            field="course_id"
+            rules={[{ required: true, message: "Please select the course." }]}
+          >
+            <Select>
+              {courses.map((course: coursesType) => (
+                <Option key={course.course_id} value={course.course_id}>
+                  {`${course.course_name}  ${course.course_code}`}
+                </Option>
+              ))}
+            </Select>
+          </FormItem>
+
           <FormItem
             label="Activity Name"
             field="activity_name"

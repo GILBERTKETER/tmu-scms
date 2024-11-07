@@ -1,6 +1,6 @@
 
 from django.db import models
-
+from academics.models import Activities
 class Facilities(models.Model):
     facility_name = models.CharField(max_length=200)
     capacity = models.IntegerField()
@@ -10,10 +10,8 @@ class Facilities(models.Model):
 
 class FacilityBooking(models.Model):
     facility = models.ForeignKey(Facilities, on_delete=models.CASCADE, related_name='bookings')
+    activity_id = models.IntegerField(blank=True, null=True)
     title = models.CharField(max_length=255)
-    booking_date = models.DateField()
-    start_time = models.TimeField()
-    end_time = models.TimeField()
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

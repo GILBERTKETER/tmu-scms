@@ -17,14 +17,20 @@ import string
 from datetime import timedelta
 from django.utils import timezone
 from django.views.decorators.http import require_http_methods
-
+from authentication.models import UserProfile
 @csrf_exempt
 def get_scheduled_classes(request):
     user = request.user
     if request.method == 'GET':
         try:
+            userprofile = UserProfile.objects.get(user_id = user.id)
+            user_year = userprofile.year_of_study
+            user_sem = userprofile.semester
+            
             enrollments = Enrollment.objects.filter(
                 user=user,
+                semester=user_sem,
+                year=user_year,
                 scheduled='0'
             ).values_list('id', flat=True)
 
@@ -101,7 +107,7 @@ def create_schedule(request):
             date = data.get("date")
             time_start = data.get("time_start")
             time_end = data.get("time_end")
-            recurring_days = data.get("recurring_days")
+            recurring_days = data.get("recurring_days").lower()
 
             # Retrieve enrollment and instructor
             enrollment = Enrollment.objects.get(course_id=course_id)
@@ -205,6 +211,8 @@ def check_in_students(request):
                 Attendance.objects.create(
                     user=user,
                     schedule=schedule,
+                    year = schedule.enrollment.year,
+                    semester = schedule.enrollment.semester,
                     course_code=course_code,
                     course_name=course_name,
                     course_hall=hall_number,
@@ -222,10 +230,15 @@ def check_in_students(request):
 
 @csrf_exempt
 def get_attendance_logs(request):
+    user = request.user
     if request.method == 'GET':
-        attendance_logs = Attendance.objects.all().values('course_code','course_name','marked_date', 'status', 'check_in_method')
-        logs = [
-            {
+        userprofile = UserProfile.objects.get(user_id = user.id)
+        user_year = userprofile.year_of_study
+        user_sem = userprofile.semester
+        enrollments = Enrollment.objects.filter(year=user_year, semester = user_sem, user_id = user.id).count()
+        
+        attendance_logs = Attendance.objects.filter(year = user_year, semester = user_sem,user_id = user.id).values('course_code','course_name','marked_date', 'status', 'check_in_method')
+        logs = [{
                 'course': log['course_name']+' '+ log['course_code'],
                 'date': log['marked_date'].strftime('%Y-%m-%d'),
                 'status': log['status'].capitalize(),
@@ -233,7 +246,7 @@ def get_attendance_logs(request):
             }
             for log in attendance_logs
         ]
-        return JsonResponse(logs, safe=False)
+        return JsonResponse({"success": True, "message": "Fetched", "total_count_enrolled":enrollments,"logs": logs}, safe=False)
     return JsonResponse({'success':False,'message': 'Invalid request method'}, status=400)
 
 
@@ -324,6 +337,9 @@ def verify_qrcode(request):
             course_name=class_schedule.enrollment.course_name,
             course_hall=class_schedule.hall,
             day_of_class=day,
+            year=class_schedule.enrollment.year,
+            semester = class_schedule.enrollment.semester,
+            
             status='present',
             check_in_method='qrCode'
             )
@@ -450,12 +466,28 @@ def check_in_students_rfid(request):
         hall_id = data.get("hall_id")
         course_name = data.get("course_name")
         recurring_days = data.get("recurring_days")
-
+        user = request.user
         # Check if required data is provided
         if not rfid or not schedule_id or not user_id:
             return JsonResponse({"success": False, "message": "RFID, Schedule ID, and User ID are required"}, status=400)
-
         try:
+            class_schedule = Schedule.objects.get(id=schedule_id)
+        except Schedule.DoesNotExist:
+            return JsonResponse({"success": False, "message": "Schedule not found."}, status=404)
+        try:
+            enrollment = Enrollment.objects.get(
+                user_id=user_id,
+                course_code=course_code,
+                year=user.userprofile.year_of_study,
+                semester=user.userprofile.semester
+            )
+        except Enrollment.DoesNotExist:
+            return JsonResponse({"success": False, "message": "User is not enrolled in the specified course."}, status=400)
+        try:
+            current_datetime = timezone.localtime(timezone.now())
+            current_time = current_datetime.time()  
+            current_date = current_datetime.date()
+            
             # Check if the user has already checked in for this schedule
             if Attendance.objects.filter(schedule_id=schedule_id, user_id=user_id).exists():
                 return JsonResponse({"success": False, "message": "You are already checked in."}, status=400)
@@ -465,13 +497,45 @@ def check_in_students_rfid(request):
             if enrolled_user.rfid != rfid:
                 return JsonResponse({"success": False, "message": "Invalid RFID"}, status=400)
 
+            # Check if the current time is within the schedule's time range
+            if current_time < class_schedule.time_start or current_time > class_schedule.time_end:
+                return JsonResponse({
+                    "success": False, 
+                    "message": f"Attendance can only be marked during scheduled class time. Current time: {current_time.strftime('%H:%M')}, Class time: {class_schedule.time_start.strftime('%H:%M')} - {class_schedule.time_end.strftime('%H:%M')}"
+                }, status=400)
+        
+            # Date validation logic
+            if class_schedule.date:
+                # If schedule has a specific date
+                if current_date != class_schedule.date:
+                    return JsonResponse({
+                        "success": False, 
+                        "message": "Today is not the scheduled class date."
+                    }, status=400)
+            elif class_schedule.recurring_days:
+                # If schedule has recurring days
+                current_day = current_datetime.strftime('%A').lower() 
+                print("current day:", current_day) 
+                if current_day not in class_schedule.recurring_days:
+                    return JsonResponse({
+                        "success": False, 
+                        "message": "Today is not a scheduled class day."
+                    }, status=400)
+            else:
+                return JsonResponse({
+                    "success": False, 
+                    "message": "Invalid schedule configuration: neither date nor recurring days specified."
+                }, status=400)
+
             # Create a new attendance record
             attendance = Attendance.objects.create(
                 user_id=user_id,
                 schedule_id=schedule_id,
                 course_name=course_name,
-                day_of_class=recurring_days,
+                day_of_class=current_day,
                 status="present",
+                year = class_schedule.enrollment.year,
+                semester = class_schedule.enrollment.semester,
                 course_code=course_code,
                 course_hall=hall_id,
                 check_in_method = "Rfid"

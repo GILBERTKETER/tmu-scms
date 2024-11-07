@@ -3,12 +3,9 @@ import {
   Table,
   Tag,
   Modal,
-  Button,
   Select,
   Input,
-  DatePicker,
   Form,
-  Time,
   TimePicker,
 } from "@arco-design/web-react";
 import { IconInfoCircle, IconSearch } from "@arco-design/web-react/icon";
@@ -25,6 +22,8 @@ const FacilityList: React.FC = () => {
   const [facilities, setFacilities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [form] = Form.useForm();
+  const [activities, setActivities] = useState({});
+  const { Option } = Select;
 
   const columns = [
     {
@@ -35,6 +34,11 @@ const FacilityList: React.FC = () => {
     {
       title: "Capacity",
       dataIndex: "capacity",
+      sorter: true,
+    },
+    {
+      title: "Type",
+      dataIndex: "facility_type",
       sorter: true,
     },
     {
@@ -61,9 +65,7 @@ const FacilityList: React.FC = () => {
     const bookingData = {
       facility_id: selectedFacility.id,
       title: values.title,
-      date: values.date,
-      start_time: values.time[0],
-      end_time: values.time[1],
+      activity_id: values.activity
     };
 
     try {
@@ -80,7 +82,8 @@ const FacilityList: React.FC = () => {
         Swal.fire({
           icon: "error",
           title: "Booking Failed",
-          text: response.data.message || "There was a problem with the booking.",
+          text:
+            response.data.message || "There was a problem with the booking.",
         });
         toast.error(response.data.message || "Error occurred while booking!");
       }
@@ -90,9 +93,22 @@ const FacilityList: React.FC = () => {
         title: "Booking Failed",
         text: "An error occurred while processing your booking. Please try again.",
       });
-      toast.error("An error occurred while processing your booking. Please try again.");
+      toast.error(
+        "An error occurred while processing your booking. Please try again.",
+      );
     }
   };
+
+  useEffect(() => {
+    //fetching the activities
+    const get_activities = async () => {
+      const response = await App.get("/api/get-activities/");
+      if (response.data.success == true) {
+        setActivities(response.data.data);
+      }
+    };
+    get_activities();
+  }, []);
 
   useEffect(() => {
     const fetchFacilities = async () => {
@@ -167,7 +183,6 @@ const FacilityList: React.FC = () => {
       >
         {selectedFacility && (
           <Form form={form} onSubmit={handleBookingSubmit}>
-          
             <Form.Item
               label="Facility Name"
               initialValue={selectedFacility.facility_name}
@@ -192,24 +207,26 @@ const FacilityList: React.FC = () => {
             <Form.Item
               label="Booking Title"
               field="title"
-              rules={[{ required: true, message: 'Please enter a booking title' }]}
+              rules={[
+                { required: true, message: "Please enter a booking title" },
+              ]}
             >
               <Input />
             </Form.Item>
+
             <Form.Item
-              label="Booking Date"
-              field="date"
-              rules={[{ required: true, message: 'Please select a booking date' }]}
+              label="Activity"
+              field="activity"
+              rules={[{ required: true, message: "Please select a facility." }]}
             >
-              <DatePicker />
+              <Select>
+                {activities.map((activity) => (
+                  <Option key={activity.id} value={activity.id}>
+                    {activity.activity_name}
+                  </Option>
+                ))}
+              </Select>
             </Form.Item>
-            <Form.Item
-              label="Time Range"
-              field="time"
-              rules={[{ required: true, message: 'Please select a time range' }]}
-            >
-      <TimePicker.RangePicker prefix={<IconInfoCircle/>} style={{ width: 250, }} />
-      </Form.Item>
           </Form>
         )}
       </Modal>

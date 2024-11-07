@@ -34,7 +34,7 @@ const AttendanceLogs = () => {
       try {
         const response = await App.get('/api/attendance-logs/');
         
-        setData(response.data);
+        setData(response.data.logs);
       } catch (error) {
         console.error('Error fetching attendance logs:', error);
       }

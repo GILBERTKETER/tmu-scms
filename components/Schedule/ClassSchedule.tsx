@@ -7,6 +7,7 @@ import Swal from "sweetalert2";
 import "react-toastify/dist/ReactToastify.css";
 
 interface ClassItem {
+  id:string;
   title: string;
   course_name: string;
   course_code: string;
@@ -34,8 +35,8 @@ const ClassSchedule: React.FC = () => {
         } else {
           toast.error(response.data.message);
         }
-      } catch (error) {
-        toast.error("Error fetching classes:", error as string);
+      } catch (error:any) {
+        toast.error("Error fetching classes:", error);
       }
     };
 
@@ -56,8 +57,8 @@ const ClassSchedule: React.FC = () => {
       } else {
         toast.error(response.data.message);
       }
-    } catch (error) {
-      toast.error("Error deleting class:", error as string);
+    } catch (error:any) {
+      toast.error("Error deleting class:", error);
     }
   };
 
@@ -84,8 +85,8 @@ const ClassSchedule: React.FC = () => {
           toast.error(response.data.message);
         }
       }
-    } catch (error) {
-      toast.error("Error saving class:", error as string);
+    } catch (error:any) {
+      toast.error("Error saving class:", error);
     } finally {
       setEditingClass(null);      // Clear the editing class after save
       setModalVisible(false);     // Hide the modal after saving
@@ -126,6 +127,7 @@ const ClassSchedule: React.FC = () => {
             end_time={editingClass?.time_end || ""}
             hall={(editingClass?.hall_name && editingClass?.hall_number) ? `${editingClass.hall_name} ${editingClass.hall_number}` : ""}
             recurring_days={editingClass?.recurring_days || []}
+            date={editingClass?.date || ""}
           />
         )}
       </div>
