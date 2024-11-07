@@ -1,15 +1,10 @@
 "use client";
+
 import React, { useState, useEffect } from "react";
-import { ScheduleXCalendar, useCalendarApp } from "@schedule-x/react";
-import {
-  createViewDay,
-  createViewWeek,
-  createViewMonthGrid,
-  createViewMonthAgenda,
-} from "@schedule-x/calendar";
-import "@schedule-x/theme-default/dist/calendar.css";
-import { createEventModalPlugin } from "@schedule-x/event-modal";
-import { createDragAndDropPlugin } from "@schedule-x/drag-and-drop";
+import Calendar from "@fullcalendar/react";
+import dayGridPlugin from "@fullcalendar/daygrid";
+import timeGridPlugin from "@fullcalendar/timegrid";
+import interactionPlugin from "@fullcalendar/interaction";
 import UpcomingEventsComponent from "./UpcomingEventsComponent";
 import EventManagement from "./AddEvents";
 import Timelines from "./Timline";
@@ -43,25 +38,13 @@ function CalendarComponent() {
   const [rawEvents, setRawEvents] = useState<Event[]>([]);
   const [transformedEvents, setTransformedEvents] = useState<TransformedEvent[]>([]);
   const [loading, setLoading] = useState(true);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [currentEvent, setCurrentEvent] = useState<TransformedEvent | null>(null);
+
   const currentDate = new Date().toISOString().split("T")[0];
 
-  // Create calendar configuration with monthly view as default
-  const calendar = useCalendarApp({
-    views: [
-      createViewMonthGrid(),
-      createViewDay(),
-      createViewWeek(),
-      createViewMonthAgenda(),
-    ],
-    defaultView: "month-grid",
-    events: [],
-    selectedDate: currentDate,
-    plugins: [createEventModalPlugin(), createDragAndDropPlugin()],
-    isDark: false,
-  });
-
   const transformEvents = (events: Event[]): TransformedEvent[] => {
-    const transformed = events.map((event) => {
+    return events.map((event) => {
       const startDateTime = new Date(`${event.date} ${event.start_time}`);
       const endDateTime = new Date(`${event.date} ${event.end_time}`);
 
@@ -74,22 +57,16 @@ function CalendarComponent() {
         isAllDay: false,
       };
     });
-    console.log("Transformed events:", transformed); // Add this line
-    return transformed;
   };
 
-  // Fetch and process events
   useEffect(() => {
     const fetchEvents = async () => {
       try {
         const response = await App.get("/api/get-events/");
         const fetchedEvents = response.data;
-        console.log("Fetched events:", fetchedEvents); // Add this line
         setRawEvents(fetchedEvents);
 
         const processed = transformEvents(fetchedEvents);
-        console.log("Transformed events:", processed);
-
         setTransformedEvents(processed);
         setLoading(false);
       } catch (error) {
@@ -102,8 +79,6 @@ function CalendarComponent() {
   }, []);
 
   const handleEdit = async (eventId: number) => {
-    console.log("Edit event with ID:", eventId);
-
     try {
       const response = await App.put("/api/edit-calendar-events/", { event: eventId });
       if (response.data.success) {
@@ -162,13 +137,11 @@ function CalendarComponent() {
     }
   };
 
-  const handleAddEvent = async (newEvent: Event) => {
-    try {
-      setRawEvents((prev) => [...prev, newEvent]);
-      const updatedTransformed = transformEvents([...rawEvents, newEvent]);
-      setTransformedEvents(updatedTransformed);
-    } catch (error) {
-      console.error("Error adding event:", error);
+  const handleEventClick = (info: any) => {
+    const event = transformedEvents.find((event) => event.id === info.event.id);
+    if (event) {
+      setCurrentEvent(event); 
+     
     }
   };
 
@@ -198,9 +171,18 @@ function CalendarComponent() {
           />
         </div>
         <div className="h-[auto] w-[100%] overflow-hidden rounded-lg bg-white shadow-lg lg:w-[50%]">
-          <ScheduleXCalendar calendarApp={calendar} events={transformedEvents} />
+          <Calendar
+            plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+            initialView="dayGridMonth"
+            events={transformedEvents}
+            editable={true}
+            droppable={true}
+            eventClick={handleEventClick}
+          />
         </div>
       </div>
+
+     
     </>
   );
 }

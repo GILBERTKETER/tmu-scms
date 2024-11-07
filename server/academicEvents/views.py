@@ -50,8 +50,27 @@ def add_event(request):
 
 @csrf_exempt
 def get_events(request):
-    events = AcademicCalendar.objects.all().values('id','title', 'date', 'start_time','event_type','is_online','link','address', 'end_time','description')
-    return JsonResponse(list(events), safe=False)
+    events = AcademicCalendar.objects.all().values()
+
+    events_data = [
+        {
+            'id': event['id'],
+            'title': event['title'],
+            'date': event['date'],
+            'start': event['start_time'],
+            'start_time': event['start_time'],
+            'end': event['end_time'],
+            'end_time': event['end_time'],
+            'event_type': event['event_type'],
+            'link': event['link'],
+            'address': event['address'],
+            'description': event['description'],
+            'is_online': event['is_online'],
+        }
+        for event in events
+    ]
+
+    return JsonResponse(events_data, safe=False)
 
 @csrf_exempt
 def delete_event(request):

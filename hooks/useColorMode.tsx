@@ -8,9 +8,13 @@ const useColorMode = () => {
     const className = "dark";
     const bodyClass = window.document.body.classList;
 
-    colorMode === "dark"
-      ? bodyClass.add(className)
-      : bodyClass.remove(className);
+    if (colorMode === "dark") {
+      bodyClass.add(className);
+      document.body.setAttribute('arco-theme', 'dark');
+    } else {
+      bodyClass.remove(className);
+      document.body.removeAttribute('arco-theme');
+    }
   }, [colorMode]);
 
   return [colorMode, setColorMode];
