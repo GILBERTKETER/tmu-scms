@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import Dashboard from "@/components/Dashboard";
+import Dashboard from "@/components/Dashboard/index";
 export const metadata: Metadata = {
   title: "Dashboard - Smart Campus",
   description: "Access your personalized dashboard with a quick overview of your classes, assignments, and campus notifications.",

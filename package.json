@@ -64,7 +64,7 @@
     "react-table": "^7.8.0",
     "react-three-fiber": "^6.0.13",
     "react-toastify": "^10.0.5",
-    "recharts": "^2.12.7",
+    "recharts": "^2.13.3",
     "rehype-raw": "^7.0.0",
     "remark-gfm": "^4.0.0",
     "smartcampus": "file:",

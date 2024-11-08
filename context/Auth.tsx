@@ -13,6 +13,7 @@ interface User {
   admission: string;
   profile_image: string;
   cover_image:string;
+  role:string
 }
 
 export const useAuth = () => {

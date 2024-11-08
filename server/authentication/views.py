@@ -162,6 +162,7 @@ def get_user(request):
             "email": user.email,
             "first_name": user.first_name,
             "last_name": user.last_name,
+            "role":user.userprofile.role,
             "phone_number": user.userprofile.phone_number,
             "admission": user.userprofile.admission,
             "full_name":user.userprofile.full_name,
