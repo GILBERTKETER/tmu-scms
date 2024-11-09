@@ -1,12 +1,12 @@
 "use client"
 import React from 'react'
-import ClassList from './ClassList'
 import AttendanceDashboard from './AttendanceDashboard'
+import AttendanceLogs from './AttendanceLogs'
 function Attendance() {
   return (
     <div>
       <AttendanceDashboard/>
-      <ClassList />
+      <AttendanceLogs />
     </div>
   )
 }

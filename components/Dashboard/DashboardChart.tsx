@@ -51,7 +51,7 @@ const DashboardBarChart = () => {
   return (
     <div className="flex h-full w-full flex-col">
      
-
+    
       <Card title="Monthly Attendance Statistics" className="h-full w-full" extra={ <Select
         placeholder="Select a Course"
         value={selectedCourse}

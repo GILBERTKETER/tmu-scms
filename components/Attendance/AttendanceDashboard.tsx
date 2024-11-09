@@ -1,5 +1,5 @@
 import AttendanceCards from './AttendanceCards';
-import AttendanceLogs from './AttendanceLogs';
+import ClassList from './ClassList'
 import CheckInModal from './CheckInModal';
 
 const AttendanceDashboard: React.FC = () => {
@@ -10,11 +10,11 @@ const AttendanceDashboard: React.FC = () => {
       {/* Attendance Overview Cards */}
       <AttendanceCards />
 
-      {/* Attendance Logs */}
-      <AttendanceLogs />
-
       {/* Check-In Modals for RFID/QR/Fingerprint */}
       <CheckInModal />
+      {/* Class list*/}
+      <ClassList />
+
     </div>
   );
 };

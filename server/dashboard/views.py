@@ -23,6 +23,7 @@ from reportlab.lib import colors
 from reportlab.lib.units import inch
 from reportlab.platypus import Table, TableStyle, Image
 from reportlab.lib.colors import Color
+from django.db.models import Q
 
 import os
 from academics.models import Course
@@ -243,7 +244,9 @@ def AdminDashboardView(request):
         return JsonResponse({"success": False, "message": "Authentication and admin rights required"}, status=401)
 
     # Get the count of students, lecturers, and admins based on roles
-    student_count = UserProfile.objects.filter(role='student').count()
+    student_count = UserProfile.objects.filter(
+    Q(role='student') | Q(role='classrep')
+).count()
     lecturer_count = UserProfile.objects.filter(role='lecturer').count()
     admin_count = UserProfile.objects.filter(role='admin').count()
 
@@ -354,7 +357,7 @@ def get_attendance_data(request):
         # Ensure the lecturer teaches the course
         if not schedules.exists():
             return JsonResponse({"success": False, "message": "You are not authorized to view attendance for this course"}, status=403)
-    elif user_type == 'student' or user_type == 'Student':
+    elif user_type == 'student' or user_type == 'Student' or user_type == 'classrep' or user_type == 'Classrep':
         # Student fetches attendance data based on their enrollment
         enrollments = Enrollment.objects.filter(user_id=user.id, course__code=course_code)
         # Ensure the student is enrolled in the course
@@ -399,7 +402,7 @@ def get_courses(request):
         course_data = [{"course_code": schedule["enrollment__course__code"], "name": schedule["enrollment__course__name"]} for schedule in schedules]
         return JsonResponse({"courses": course_data})
     
-    elif user_type == 'student' or user_type == 'Student':
+    elif user_type == 'student' or user_type == 'Student' or user_type == 'classrep' or user_type == 'Classrep':
         # Student fetches courses they are enrolled in (Enrollment model)
         enrollments = Enrollment.objects.filter(user_id=user.id).values('course__code', 'course__name')
         course_data = [{"course_code": enrollment["course__code"], "name": enrollment["course__name"]} for enrollment in enrollments]
@@ -456,7 +459,7 @@ def get_classes(request):
         }
         return JsonResponse({"success": True, "data": response_data})
 
-    elif user_type == 'student' or user_type == 'Student':
+    elif user_type == 'student' or user_type == 'Student' or user_type == 'classrep' or user_type == 'Classrep':
         # For students: Fetch the courses they are enrolled in based on enrollments and schedules
         enrollments = Enrollment.objects.filter(user=user, year=current_year, semester=current_semester)
         schedules = Schedule.objects.filter(enrollment__in=enrollments)
@@ -518,7 +521,7 @@ def get_latest_log(request):
         # If admin, return an empty response (as you specified)
         return JsonResponse({"success": True, "data": None})
 
-    elif user.userprofile.role in ['student', 'Student']:
+    elif user.userprofile.role in ['student', 'Student', 'classrep', 'Classrep']:
         # For students and lecturers, fetch the latest log
         latest_log = Attendance.objects.filter(user_id=user.id).order_by('-marked_date').first()
         
@@ -611,19 +614,23 @@ def download_attendance_pdf(request):
         y_position -= 30  # Additional space before the table
 
         # Table headers and data
-        data = [["No.", "Student Name", "Admission Number", "Present", "Absent"]]
+        data = [["No.", "Student Name", "Admission Number", "Present", "Absent", "Percentage"]]
 
-        # Populate student attendance data with a count for each student
+        # Populate student attendance data with a count and percentage for each student
+        total_days = 12  # Total days for attendance calculation
         for idx, enrollment in enumerate(enrolled_students, start=1):
             student = enrollment.user.userprofile
             present_count = Attendance.objects.filter(course_id=course_id, user_id=enrollment.user_id, status="present").count()
-            absent_count = 12 - present_count
+            absent_count = total_days - present_count
+            attendance_percentage = (present_count / total_days) * 100  # Calculate percentage
+
             data.append([
                 idx,
                 student.full_name,
                 student.admission,
                 present_count,
-                absent_count
+                absent_count,
+                f"{attendance_percentage:.1f}%"  # Format as a percentage with one decimal place
             ])
 
         # Define custom color for the header background using #22409a
@@ -632,7 +639,7 @@ def download_attendance_pdf(request):
         row_bg_color = Color(0.95, 0.95, 0.9)  # Light beige color for rows
 
         # Define table and apply styling with custom colors
-        table = Table(data, colWidths=[0.5*inch, 2*inch, 1.5*inch, 1*inch, 1*inch])
+        table = Table(data, colWidths=[0.5*inch, 2*inch, 1.5*inch, 1*inch, 1*inch, 1*inch])
         table.setStyle(TableStyle([
             ('BACKGROUND', (0, 0), (-1, 0), header_bg_color),  # Apply #22409a to header
             ('TEXTCOLOR', (0, 0), (-1, 0), header_text_color),

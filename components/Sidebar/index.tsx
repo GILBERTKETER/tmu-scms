@@ -7,12 +7,25 @@ import Image from "next/image";
 import SidebarItem from "@/components/Sidebar/SidebarItem";
 import ClickOutside from "../ClickOutside";
 import useLocalStorage from "@/hooks/useLocalStorage";
-
+import { useAuth } from "@/context/Auth";
 interface SidebarProps {
   sidebarOpen: boolean;
   setSidebarOpen: (arg: boolean) => void;
 }
 
+
+
+const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
+  const {user} = useAuth()
+  
+  const isStudent = user?.role === "student";
+  const isClassRep = user?.role === "classrep";
+  const isLecturer = user?.role === "lecturer";
+  const isAdmin = user?.role === "admin";
+
+
+  const pathname = usePathname();
+  const [pageName, setPageName] = useLocalStorage("selectedMenu", "dashboard");
 const menuGroups = [
   {
     name: "Main",
@@ -83,6 +96,8 @@ const menuGroups = [
         ),
         label: "Dashboard",
         route: "/smartcampus/dashboard",
+        requiredRole:"student, lecturer, classrep, admin",
+
       },
       {
         icon: (
@@ -106,6 +121,8 @@ const menuGroups = [
         ),
         label: "Events calender",
         route: "/smartcampus/calendar",
+        requiredRole:"student, lecturer, classrep, admin",
+
       },
       {
         icon: (
@@ -138,6 +155,8 @@ const menuGroups = [
         ),
         label: "Campus Map",
         route: "/smartcampus/campus-map",
+        requiredRole:"student, lecturer, classrep, admin",
+
       },
     ],
   },
@@ -175,6 +194,8 @@ const menuGroups = [
         ),
         label: "Course Management",
         route: "/smartcampus/course-management",
+        requiredRole:"student, lecturer, classrep",
+
       },
       {
         icon: (
@@ -237,6 +258,8 @@ const menuGroups = [
         ),
         label: "Schedule Activities",
         route: "/smartcampus/schedule",
+        requiredRole:"student, lecturer, classrep, admin",
+
       },
       {
         icon: (
@@ -269,6 +292,8 @@ const menuGroups = [
         ),
         label: "Attendance",
         route: "/smartcampus/attendance",
+        requiredRole:"student, lecturer, classrep",
+
       },
       {
         icon: (
@@ -293,6 +318,8 @@ const menuGroups = [
         ),
         label: "Hall Management",
         route: "/smartcampus/halls",
+        requiredRole:"lecturer, classrep, admin",
+
       },
     ],
   },
@@ -351,6 +378,8 @@ const menuGroups = [
         ),
         label: "User Management",
         route: "/smartcampus/user-management",
+        requiredRole:"admin",
+
       },
       {
         icon: (
@@ -374,6 +403,8 @@ const menuGroups = [
         ),
         label: "Facility Booking",
         route: "/smartcampus/facilities",
+        requiredRole:"lecturer, classrep, admin",
+
       },
     ],
   },
@@ -408,6 +439,8 @@ const menuGroups = [
         ),
         label: "Safety Monitoring",
         route: "/smartcampus/safety-monitoring",
+        requiredRole:"student, lecturer, classrep, admin",
+
       },
       {
         icon: (
@@ -440,6 +473,8 @@ const menuGroups = [
         ),
         label: "Incident Reporting",
         route: "/smartcampus/incident-reporting",
+        requiredRole:"student, lecturer, classrep, admin",
+
       },
     ],
   },
@@ -473,84 +508,97 @@ const menuGroups = [
         ),
         label: "System Settings",
         route: "/smartcampus/system-settings",
+        requiredRole:"student, lecturer, classrep, admin",
+
       },
     ],
   },
 ];
 
-const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
-  const pathname = usePathname();
-  const [pageName, setPageName] = useLocalStorage("selectedMenu", "dashboard");
-
   return (
     <ClickOutside onClick={() => setSidebarOpen(false)}>
-      <aside
-        id="sidebar"
-        className={`z-9999999 w-72.5 fixed left-0 top-0 flex h-screen flex-col overflow-y-hidden bg-light duration-300 ease-linear dark:bg-boxdark lg:relative lg:translate-x-0 ${
-          sidebarOpen ? " translate-x-0" : "-translate-x-full"
-        }`}
-      >
-        {/* <!-- SIDEBAR HEADER --> */}
-        <div className="flex items-center justify-between gap-2 px-6 py-5.5 lg:py-6.5">
-          <Link href="/" className="rounded">
-            <Image
-              width={176}
-              height={32}
-              src={"/images/logo/logo.png"}
-              alt="Logo"
-              priority
-            />
-          </Link>
-
-          <button
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            aria-controls="sidebar"
-            className="block lg:hidden"
-            aria-label="Toggle sidebar"
+    <aside
+      id="sidebar"
+      className={`z-9999999 w-72.5 fixed left-0 top-0 flex h-screen flex-col overflow-y-hidden bg-light duration-300 ease-linear dark:bg-boxdark lg:relative lg:translate-x-0 ${
+        sidebarOpen ? " translate-x-0" : "-translate-x-full"
+      }`}
+    >
+      {/* <!-- SIDEBAR HEADER --> */}
+      <div className="flex items-center justify-between gap-2 px-6 py-5.5 lg:py-6.5">
+        <Link href="/" className="rounded">
+          <Image
+            width={176}
+            height={32}
+            src={"/images/logo/logo.png"}
+            alt="Logo"
+            priority
+          />
+        </Link>
+  
+        <button
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          aria-controls="sidebar"
+          className="block lg:hidden"
+          aria-label="Toggle sidebar"
+        >
+          <svg
+            className="fill-current"
+            width="20"
+            height="18"
+            viewBox="0 0 20 18"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
           >
-            <svg
-              className="fill-current"
-              width="20"
-              height="18"
-              viewBox="0 0 20 18"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M19 8.175H2.98748L9.36248 1.6875C9.69998 1.35 9.69998 0.825 9.36248 0.4875C9.02498 0.15 8.49998 0.15 8.16248 0.4875L0.399976 8.3625C0.0624756 8.7 0.0624756 9.225 0.399976 9.5625L8.16248 17.4375C8.31248 17.5875 8.53748 17.7 8.76248 17.7C8.98748 17.7 9.17498 17.625 9.36248 17.475C9.69998 17.1375 9.69998 16.6125 9.36248 16.275L3.02498 9.8625H19C19.45 9.8625 19.825 9.4875 19.825 9.0375C19.825 8.55 19.45 8.175 19 8.175Z"
-                fill=""
-              />
-            </svg>
-          </button>
-        </div>
-        {/* <!-- SIDEBAR HEADER --> */}
-
-        <div className="no-scrollbar flex flex-col overflow-y-auto duration-300 ease-linear">
-          {/* <!-- Sidebar Menu --> */}
-          <nav className="mt-5 px-4 py-4 lg:mt-9 lg:px-6">
-            {menuGroups.map((group, groupIndex) => (
+            <path
+              d="M19 8.175H2.98748L9.36248 1.6875C9.69998 1.35 9.69998 0.825 9.36248 0.4875C9.02498 0.15 8.49998 0.15 8.16248 0.4875L0.399976 8.3625C0.0624756 8.7 0.0624756 9.225 0.399976 9.5625L8.16248 17.4375C8.31248 17.5875 8.53748 17.7 8.76248 17.7C8.98748 17.7 9.17498 17.625 9.36248 17.475C9.69998 17.1375 9.69998 16.6125 9.36248 16.275L3.02498 9.8625H19C19.45 9.8625 19.825 9.4875 19.825 9.0375C19.825 8.55 19.45 8.175 19 8.175Z"
+              fill=""
+            />
+          </svg>
+        </button>
+      </div>
+      {/* <!-- SIDEBAR HEADER --> */}
+  
+      <div className="no-scrollbar flex flex-col overflow-y-auto duration-300 ease-linear">
+        {/* <!-- Sidebar Menu --> */}
+        <nav className="mt-5 px-4 py-4 lg:mt-9 lg:px-6">
+          {menuGroups
+            .filter(group => {
+              // Filter the group based on whether it has any menuItems for the current user's role
+              const visibleItems = group.menuItems.filter(menuItem => {
+                const allowedRoles = menuItem.requiredRole.split(",").map(role => role.trim());
+                return allowedRoles.includes(user?.role);
+              });
+              return visibleItems.length > 0; // Only keep the group if it has visible items
+            })
+            .map((group, groupIndex) => (
               <div key={groupIndex}>
                 <h3 className="text-bodydark2 mb-4 ml-4 text-sm font-semibold">
                   {group.name}
                 </h3>
-
+  
                 <ul className="mb-6 flex flex-col gap-1.5">
-                  {group.menuItems.map((menuItem, menuIndex) => (
-                    <SidebarItem
-                      key={menuIndex}
-                      item={menuItem}
-                      pageName={pageName}
-                      setPageName={setPageName}
-                    />
-                  ))}
+                  {group.menuItems
+                    .filter(menuItem => {
+                      const allowedRoles = menuItem.requiredRole.split(",").map(role => role.trim());
+                      return allowedRoles.includes(user?.role);
+                    })
+                    .map((menuItem, menuIndex) => (
+                      <SidebarItem
+                        key={menuIndex}
+                        item={menuItem}
+                        pageName={pageName}
+                        setPageName={setPageName}
+                      />
+                    ))}
                 </ul>
               </div>
             ))}
-          </nav>
-          {/* <!-- Sidebar Menu --> */}
-        </div>
-      </aside>
-    </ClickOutside>
+        </nav>
+        {/* <!-- Sidebar Menu --> */}
+      </div>
+    </aside>
+  </ClickOutside>
+  
   );
 };
 

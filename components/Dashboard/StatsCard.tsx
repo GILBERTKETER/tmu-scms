@@ -9,7 +9,12 @@ const DashboardCard = () => {
     console.log("useEffect is triggered");
     const getStats = async () => {
       console.log("Fetching data...");
-      if (user?.role === "student" || user?.role === "Student") {
+      if (
+        user?.role === "student" ||
+        user?.role === "Student" ||
+        user?.role === "classrep" ||
+        user?.role === "Classrep"
+      ) {
         const response = await App.get("/api/student/statscards/");
         console.log("Response:", response);
         if (response.data.success) {
@@ -43,7 +48,8 @@ const DashboardCard = () => {
           <span className="text-sm font-medium">
             {user?.role?.toLowerCase() === "admin" ? (
               <p>{userStats?.student_count + " students"}</p>
-            ) : user?.role?.toLowerCase() === "student" ? (
+            ) : user?.role?.toLowerCase() === "student" ||
+              user?.role?.toLowerCase() === "classrep" ? (
               userStats?.upcoming_class ? (
                 <div className="flex items-center justify-start gap-4 pt-2">
                   <p className="text-primary">
@@ -131,34 +137,19 @@ const DashboardCard = () => {
               </g>
             </svg>
           )}
-          {/* <span>
-            <svg height={36} width={36}
-              className="h-12 w-12 text-gray-300"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="#22409a"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              ></path>
-            </svg>
-          </span> */}
         </div>
       </div>
 
       <div className="flex h-full items-center justify-between rounded-md bg-light p-4 shadow">
         <div>
-          <h6 className="text-lg font-medium uppercase leading-none tracking-wider text-gray-500 text-secondary">
+          <h6 className="text-lg font-semibold uppercase leading-none tracking-wider text-gray-500 text-secondary">
             {userStats?.title2}
           </h6>
           <span className="text-sm font-medium text-primary">
             {user?.role?.toLowerCase() === "admin" ? (
               <p>{userStats?.lecturer_count + " lecturers"}</p>
-            ) : user?.role?.toLowerCase() === "student" ? (
+            ) : user?.role?.toLowerCase() === "student" ||
+              user?.role?.toLowerCase() === "classrep" ? (
               <p>{"Attended" + " " + userStats?.attendance_percentage + "%"}</p>
             ) : user?.role?.toLowerCase() === "lecturer" ? (
               <p>{"Attended" + " " + userStats?.attendance_percentage + "%"}</p>
@@ -238,13 +229,14 @@ const DashboardCard = () => {
 
       <div className="flex h-full items-center justify-between rounded-md bg-light p-4 shadow">
         <div>
-          <h6 className="text-lg font-medium uppercase leading-none tracking-wider text-gray-500 text-secondary">
+          <h6 className="text-lg font-semibold uppercase leading-none tracking-wider text-gray-500 text-secondary">
             {userStats?.title3}
           </h6>
           <span className="text-sm font-medium text-primary">
             {user?.role?.toLowerCase() === "admin" ? (
               <p>{userStats?.admin_count + " Administrators"}</p>
-            ) : user?.role?.toLowerCase() === "student" ? (
+            ) : user?.role?.toLowerCase() === "student" ||
+              user?.role?.toLowerCase() === "classrep" ? (
               <p>{userStats?.enrolled_courses_count + " courses enrolled."}</p>
             ) : user?.role?.toLowerCase() === "lecturer" ? (
               <p>{userStats?.scheduled_classes_count + " classes."}</p>
@@ -325,13 +317,14 @@ const DashboardCard = () => {
 
       <div className="flex h-full items-center justify-between rounded-md bg-light p-4 shadow">
         <div>
-          <h6 className="text-lg font-medium uppercase leading-none tracking-wider text-gray-500 text-secondary">
+          <h6 className="text-lg font-semibold uppercase leading-none tracking-wider text-gray-500 text-secondary">
             {userStats?.title4}
           </h6>
           <div className="text-sm font-medium text-primary">
             {user?.role?.toLowerCase() === "admin" ||
             user?.role?.toLowerCase() === "student" ||
-            user?.role?.toLowerCase() === "lecturer" ? (
+            user?.role?.toLowerCase() === "lecturer" ||
+            user?.role?.toLowerCase() === "classrep" ? (
               userStats?.upcoming_event ? (
                 <div>
                   <p>{"Title: " + userStats?.upcoming_event?.event_name}</p>

@@ -1,9 +1,11 @@
 import { Metadata } from "next";
-import UserManagement from "@/components/user-management";
+import UserManagement from "./index";
 export const metadata: Metadata = {
-  title: "Dashboard - Smart Campus",
-  description: "Access your personalized dashboard with a quick overview of your classes, assignments, and campus notifications.",
+  title: "User Management - Smart Campus",
+  description:
+    "Manage users, roles, and permissions within the Smart Campus system. Easily add, update, and remove users to ensure smooth campus operations.",
 };
+
 
 
 export default function Management() {

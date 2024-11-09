@@ -22,6 +22,7 @@ const ClasAndAnnouncements = () => {
           setAdminDetails(data);
         } else if (
           user?.role.toLowerCase() === "student" ||
+          user?.role.toLowerCase() === "classrep" ||
           user?.role.toLowerCase() === "lecturer"
         ) {
           setClasses(data);

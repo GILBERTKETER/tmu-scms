@@ -1,10 +1,11 @@
 import { Metadata } from "next";
-import CourseManagement from "@/components/CourseManagement/index";
+import CourseManagement from "./index";
 export const metadata: Metadata = {
-  title: "Dashboard - Smart Campus",
+  title: "Course Management - Smart Campus",
   description:
-    "Access your personalized dashboard with a quick overview of your classes, assignments, and campus notifications.",
+    "Manage your courses efficiently. Add, update, and organize your courses and assignments, all in one place.",
 };
+
 
 export default function Courses() {
   return (

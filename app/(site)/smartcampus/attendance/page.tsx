@@ -1,15 +1,14 @@
 import { Metadata } from "next";
-import Attendance from "@/components/Attendance";
+import Attendance from "./index"
 export const metadata: Metadata = {
-  title: "Dashboard - Smart Campus",
-  description: "Access your personalized dashboard with a quick overview of your classes, assignments, and campus notifications.",
+  title: "Attendance - Smart Campus",
+  description: "Track your attendance and manage your class participation.",
 };
-
 
 export default function AttendancePage() {
   return (
     <>
-      <Attendance/>
+      <Attendance />
     </>
   );
 }

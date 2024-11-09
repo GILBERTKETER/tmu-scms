@@ -48,7 +48,7 @@ const InfoAndChart = () => {
     };
 
     // Only fetch latest log if the user is a student or lecturer
-    if (user?.role === "student" || user?.role === "lecturer") {
+    if (user?.role === "student" || user?.role === "classrep") {
       fetchLatestLog();
     }
   }, [user]);
@@ -96,7 +96,7 @@ const InfoAndChart = () => {
 
   return (
     <div className="flex h-full w-full flex-col gap-10 lg:flex-row">
-      <div className="flex h-full w-full flex-row gap-4 sm:flex-col lg:w-1/4">
+      <div className="flex h-full w-full flex-col gap-4 lg:w-1/4">
         <Card
           title="Latest Active Incident"
           extra={<Link href="/smartcampus/safety-monitoring">Learn more</Link>}
