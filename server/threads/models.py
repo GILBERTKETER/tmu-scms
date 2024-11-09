@@ -5,7 +5,7 @@ class Incident(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     author = models.CharField(max_length=255)
     content = models.TextField()
-    avatar = models.CharField(max_length=255, default="https://github.com/gilbertketer.png")
+    avatar = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

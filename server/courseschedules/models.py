@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from academics.models import Enrollment, Instructor
 from academics.models import Course
 from django.utils import timezone
+from academics.models import Course
 
 class Schedule(models.Model):
     enrollment = models.ForeignKey(Enrollment, on_delete=models.CASCADE, related_name="schedules")
@@ -39,6 +40,7 @@ class Attendance(models.Model):
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='attendance_records')
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, default=1)
     schedule = models.ForeignKey(Schedule, on_delete=models.CASCADE, related_name="attendances")
     course_code = models.CharField(max_length=50)
     course_name = models.CharField(max_length=50)
