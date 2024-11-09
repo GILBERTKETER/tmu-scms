@@ -1,7 +1,7 @@
 import { Button, Message, Popconfirm } from "@arco-design/web-react";
 import { IconEdit, IconDelete } from "@arco-design/web-react/icon";
 import ProgressBar from "./ProgressBar";
-
+import { useAuth } from "@/context/Auth";
 interface ClassCardProps {
   title: string;
   description: string;
@@ -34,33 +34,36 @@ const ClassCard: React.FC<ClassCardProps> = ({
   date,
   recurring_days,
 }) => {
+  const { user } = useAuth();
   return (
     <div className="rounded-lg bg-white p-4 shadow-md">
       <div className="flex justify-between">
         <h3 className="text-lg font-semibold">Program: {programName}</h3>
-        <div className="flex space-x-2">
-          <Button shape="circle" icon={<IconEdit />} onClick={onEdit} />
-          <Popconfirm
-            focusLock
-            title="Confirm"
-            content="Are you sure you want to delete?"
-            onOk={onDelete}
-            onCancel={() => {
-              Message.error({
-                content: "Cancel",
-              });
-            }}
-          >
-            <Button shape="circle" icon={<IconDelete />} />
-          </Popconfirm>
-        </div>
+        {user?.role == "student" ? null : (
+          <div className="flex space-x-2">
+            <Button shape="circle" icon={<IconEdit />} onClick={onEdit} />
+            <Popconfirm
+              focusLock
+              title="Confirm"
+              content="Are you sure you want to delete?"
+              onOk={onDelete}
+              onCancel={() => {
+                Message.error({
+                  content: "Cancel",
+                });
+              }}
+            >
+              <Button shape="circle" icon={<IconDelete />} />
+            </Popconfirm>
+          </div>
+        )}
       </div>
       <p className="mt-2 text-gray-500">{course_name + " " + course_code}</p>
       <div className="flex items-center justify-between">
         <p className="text-gray-400">{start_time + "-" + end_time}</p>
-          <p className="text-gray-500">
-            {date ? `On: ${date}` : `Every: ${recurring_days}`}
-          </p>
+        <p className="text-gray-500">
+          {date ? `On: ${date}` : `Every: ${recurring_days}`}
+        </p>
       </div>
       <p className="text-gray-500">
         Hall: {hallName} ({hallNumber})

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { List, Avatar, Popconfirm, Message, Modal, Input, Button, Form, Switch, Select } from "@arco-design/web-react";
 import { IconEdit, IconDelete, IconDown } from "@arco-design/web-react/icon";
+import { useAuth } from "@/context/Auth";
 
 interface Event {
   id: number;
@@ -33,7 +34,7 @@ const UpcomingEventsComponent: React.FC<UpcomingEventsComponentProps> = ({
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
   const [isOnline, setIsOnline] = useState(false);
   const [form] = Form.useForm();
-
+  const { user } = useAuth();
   const displayedEvents = showMore ? events : events.slice(0, 5);
 
   useEffect(() => {
@@ -82,42 +83,44 @@ const UpcomingEventsComponent: React.FC<UpcomingEventsComponentProps> = ({
     }
   };
 
-  const render = (actions: React.ReactNode[], item: Event, index: number) => (
-    <List.Item key={item.id} actions={actions}>
+  const isAuthorized = () => {
+    if (!user || !user.role) return false;
+    const role = user.role.toLowerCase();
+    return role === "admin" || role === "lecturer";
+  };
+
+  const actions = (event: Event) => {
+    if (isAuthorized()) {
+      return [
+        <Button
+          key="edit"
+          type="text"
+          icon={<IconEdit />}
+          onClick={() => handleEditClick(event)}
+        />,
+        <Popconfirm
+          key="delete"
+          focusLock
+          title="Confirm Delete"
+          content="Are you sure you want to delete this event?"
+          onOk={() => onDelete(event.id)}
+          onCancel={() => Message.error({ content: "Delete canceled" })}
+        >
+          <Button type="text" icon={<IconDelete />} />
+        </Popconfirm>
+      ];
+    }
+    return [];
+  };
+
+  const render = (item: Event, index: number) => (
+    <List.Item key={item.id} actions={actions(item)}>
       <List.Item.Meta
         title={item.title}
         description={`${item.description} on ${item.date} as from ${item.start_time} to ${item.end_time} at ${item.address || item.link}`}
       />
     </List.Item>
   );
-
-  const actions = (event: Event) => [
-    <span
-      className="list-demo-actions-icon"
-      onClick={() => handleEditClick(event)}
-      key="edit"
-    >
-      <IconEdit />
-    </span>,
-    <Popconfirm
-      focusLock
-      title="Confirm Delete"
-      content="Are you sure you want to delete this event?"
-      onOk={() => {
-        onDelete(event.id);
-      
-      }}
-      onCancel={() => {
-        Message.error({
-          content: "Delete canceled",
-        });
-      }}
-    >
-      <span className="list-demo-actions-icon">
-        <IconDelete />
-      </span>
-    </Popconfirm>,
-  ];
 
   const footer = events.length > 5 ? (
     <div
@@ -142,7 +145,7 @@ const UpcomingEventsComponent: React.FC<UpcomingEventsComponentProps> = ({
         className="list-demo-actions"
         style={{ width: "100%" }}
         dataSource={displayedEvents}
-        render={(item, index) => render(actions(item), item, index)}
+        render={render}
         footer={footer}
       />
 

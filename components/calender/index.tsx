@@ -1,5 +1,5 @@
 "use client";
-
+import { useAuth } from "@/context/Auth";
 import React, { useState, useEffect } from "react";
 import Calendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -12,7 +12,6 @@ import App from "@/app/(site)/api/api";
 import Swal from "sweetalert2";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
 interface Event {
   id: number;
   title: string;
@@ -35,11 +34,16 @@ interface TransformedEvent {
 }
 
 function CalendarComponent() {
+  const { user } = useAuth();
   const [rawEvents, setRawEvents] = useState<Event[]>([]);
-  const [transformedEvents, setTransformedEvents] = useState<TransformedEvent[]>([]);
+  const [transformedEvents, setTransformedEvents] = useState<
+    TransformedEvent[]
+  >([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
-  const [currentEvent, setCurrentEvent] = useState<TransformedEvent | null>(null);
+  const [currentEvent, setCurrentEvent] = useState<TransformedEvent | null>(
+    null,
+  );
 
   const currentDate = new Date().toISOString().split("T")[0];
 
@@ -80,20 +84,27 @@ function CalendarComponent() {
 
   const handleEdit = async (eventId: number) => {
     try {
-      const response = await App.put("/api/edit-calendar-events/", { event: eventId });
+      const response = await App.put("/api/edit-calendar-events/", {
+        event: eventId,
+      });
       if (response.data.success) {
         toast.success(response.data.message || "Event updated successfully.");
         Swal.fire({
           icon: "success",
           title: "Event updated successfully.",
-          text: response.data.message || "The event has been updated successfully.",
+          text:
+            response.data.message || "The event has been updated successfully.",
         });
       } else {
-        toast.error(response.data.message || "An error occurred while updating.");
+        toast.error(
+          response.data.message || "An error occurred while updating.",
+        );
         Swal.fire({
           icon: "error",
           title: "Update Failed",
-          text: response.data.message || "There was a problem updating your event. Please try again.",
+          text:
+            response.data.message ||
+            "There was a problem updating your event. Please try again.",
         });
       }
     } catch (error: any) {
@@ -101,7 +112,9 @@ function CalendarComponent() {
       Swal.fire({
         icon: "error",
         title: "Update Failed",
-        text: error.message || "An unknown error occurred during update. Please try again.",
+        text:
+          error.message ||
+          "An unknown error occurred during update. Please try again.",
       });
     }
   };
@@ -117,22 +130,31 @@ function CalendarComponent() {
         Swal.fire({
           icon: "success",
           title: "Event deleted successfully.",
-          text: response.data.message || "The event has been deleted successfully.",
+          text:
+            response.data.message || "The event has been deleted successfully.",
         });
       } else {
-        toast.error(response.data.message || "An error occurred while deleting.");
+        toast.error(
+          response.data.message || "An error occurred while deleting.",
+        );
         Swal.fire({
           icon: "error",
           title: "Deletion Failed",
-          text: response.data.message || "There was a problem deleting your event. Please try again.",
+          text:
+            response.data.message ||
+            "There was a problem deleting your event. Please try again.",
         });
       }
     } catch (error: any) {
-      toast.error(error.message || "An unknown error occurred during deletion.");
+      toast.error(
+        error.message || "An unknown error occurred during deletion.",
+      );
       Swal.fire({
         icon: "error",
         title: "Deletion Failed",
-        text: error.message || "An unknown error occurred during deletion. Please try again.",
+        text:
+          error.message ||
+          "An unknown error occurred during deletion. Please try again.",
       });
     }
   };
@@ -140,8 +162,7 @@ function CalendarComponent() {
   const handleEventClick = (info: any) => {
     const event = transformedEvents.find((event) => event.id === info.event.id);
     if (event) {
-      setCurrentEvent(event); 
-     
+      setCurrentEvent(event);
     }
   };
 
@@ -156,9 +177,15 @@ function CalendarComponent() {
   return (
     <>
       <ToastContainer />
-      <div className="flex h-auto w-full items-center justify-end py-4">
-        <EventManagement />
-      </div>
+      {user?.role === "admin" ||
+      user?.role === "Admin" ||
+      user?.role === "lecturer" ||
+      user?.role === "Lecturer" ? (
+        <div className="flex h-auto w-full items-center justify-end py-4">
+          <EventManagement />
+        </div>
+      ) : null}
+
       <div className="flex w-full items-center justify-start overflow-auto">
         <Timelines />
       </div>
@@ -181,8 +208,6 @@ function CalendarComponent() {
           />
         </div>
       </div>
-
-     
     </>
   );
 }

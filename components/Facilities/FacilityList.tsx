@@ -8,7 +8,7 @@ import {
   Form,
   TimePicker,
 } from "@arco-design/web-react";
-import { IconInfoCircle, IconSearch } from "@arco-design/web-react/icon";
+import {  IconSearch } from "@arco-design/web-react/icon";
 import App from "@/app/(site)/api/api";
 import Swal from "sweetalert2";
 import { toast, ToastContainer } from "react-toastify";

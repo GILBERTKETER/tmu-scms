@@ -14,7 +14,7 @@ import App from "@/app/(site)/api/api";
 import Swal from "sweetalert2";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+import { useAuth } from "@/context/Auth";
 const FormItem = Form.Item;
 
 interface Hall {
@@ -29,7 +29,7 @@ const HallManagement: React.FC = () => {
   const [halls, setHalls] = useState<Hall[]>([]);
   const [visible, setVisible] = useState(false);
   const [form] = Form.useForm();
-
+  const { user } = useAuth();
   // Fetch halls from backend API
   useEffect(() => {
     const fetchHalls = async () => {
@@ -80,23 +80,27 @@ const HallManagement: React.FC = () => {
       title: "Action",
       render: (_, record: Hall) => (
         <div className="flex items-center justify-between gap-10">
-          <IconEdit
-            className="cursor-pointer text-primary"
-            onClick={() => showModal(record)}
-          />
-          <Popconfirm
-            focusLock
-            title="Confirm"
-            content="Are you sure you want to delete?"
-            onOk={() => deleteHall(record.id)}
-            onCancel={() => {
-              Message.error({
-                content: "Deletion Canceled",
-              });
-            }}
-          >
-            <IconDelete className="cursor-pointer text-primary" />
-          </Popconfirm>
+          {user?.role == "student" || user?.role == "classrep" ? null : (
+            <>
+              <IconEdit
+                className="cursor-pointer text-primary"
+                onClick={() => showModal(record)}
+              />
+              <Popconfirm
+                focusLock
+                title="Confirm"
+                content="Are you sure you want to delete?"
+                onOk={() => deleteHall(record.id)}
+                onCancel={() => {
+                  Message.error({
+                    content: "Deletion Canceled",
+                  });
+                }}
+              >
+                <IconDelete className="cursor-pointer text-primary" />
+              </Popconfirm>
+            </>
+          )}
         </div>
       ),
     },

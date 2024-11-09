@@ -6,11 +6,10 @@ const Timeline: React.FC = () => {
     const [events, setEvents] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
-    // Fetch events from the server
     useEffect(() => {
         const fetchEvents = async () => {
             try {
-                const response = await App.get('/api/get-events/');  // Adjust the endpoint as per your API
+                const response = await App.get('/api/get-events/'); 
                 setEvents(response.data);
                 setLoading(false);
             } catch (error) {
@@ -22,7 +21,6 @@ const Timeline: React.FC = () => {
         fetchEvents();
     }, []);
 
-    // Map the fetched events to the format required by Chrono
     const items = events.map(event => {
         const formattedTime = new Date(`1970-01-01T${event.start_time}`).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         const formattedDate = new Date(event.date).toLocaleDateString();
@@ -35,7 +33,6 @@ const Timeline: React.FC = () => {
         };
     });
 
-    // Show loading spinner while fetching data
     if (loading) {
         return <div>Loading events...</div>;
     }

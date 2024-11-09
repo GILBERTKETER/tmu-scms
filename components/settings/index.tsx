@@ -5,33 +5,48 @@ import AccountSettings from './AccountSettings';
 import ProfileSettings from './ProfileSettings';
 import AdminSettings from './AdminSettings';
 import EditProfile from "./EditProfile"
+import { useAuth } from '@/context/Auth';
+
 const TabPane = Tabs.TabPane;
 
-const initTabs = [
-    {
+function App() {
+  const { user } = useAuth();
+  const [activeTab, setActiveTab] = useState("key1");
+
+  const isAdmin = () => {
+    if (!user?.role) return false;
+    return user.role.toLowerCase() === 'admin';
+  };
+
+  const getTabs = () => {
+    const baseTabs = [
+      {
         key: "key1",
         title: "Account",
         content: <AccountSettings/>
-    },
-    {
+      },
+      {
         key: "key2",
         title: "Profile",
         content: <ProfileSettings/>
-    },
-    {
+      },
+      {
         key: "key3",
         title: "Edit Profile",
         content: <EditProfile/>
-    },
-    {
+      }
+    ];
+
+    if (isAdmin()) {
+      baseTabs.push({
         key: "key4",
         title: "Admin",
         content: <AdminSettings/>
-    },
-    
-]
-function App() {
-  const [activeTab, setActiveTab] = useState("key1");
+      });
+    }
+
+    return baseTabs;
+  };
 
   return (
     <Tabs
@@ -39,12 +54,20 @@ function App() {
       activeTab={activeTab}
       onChange={setActiveTab}
     >
-      {initTabs.map((x) => (
-        <TabPane destroyOnHide key={x.key} title={x.title}>
+      {getTabs().map((tab) => (
+        <TabPane 
+          destroyOnHide 
+          key={tab.key} 
+          title={tab.title}
+        >
           <Typography.Paragraph
-            style={{ textAlign: 'left',
-                marginTop: 20,}}
-          >{x.content}</Typography.Paragraph>
+            style={{ 
+              textAlign: 'left',
+              marginTop: 20,
+            }}
+          >
+            {tab.content}
+          </Typography.Paragraph>
         </TabPane>
       ))}
     </Tabs>

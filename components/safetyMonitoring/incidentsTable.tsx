@@ -16,7 +16,7 @@ import App from "@/app/(site)/api/api";
 import { toast, ToastContainer } from "react-toastify";
 import Swal from "sweetalert2";
 import "react-toastify/dist/ReactToastify.css";
-
+import { useAuth } from "@/context/Auth";
 interface ColumnType {
   title: string;
   dataIndex: string;
@@ -54,10 +54,11 @@ const CustomResizeHandle = forwardRef<HTMLSpanElement, { handleAxis: string }>(
   },
 );
 
-const ResizableTitle: React.FC<{
-  width?: number;
-  onResize?: (e: React.SyntheticEvent, data: ResizeCallbackData) => void;
-} & React.HTMLAttributes<HTMLTableHeaderCellElement>
+const ResizableTitle: React.FC<
+  {
+    width?: number;
+    onResize?: (e: React.SyntheticEvent, data: ResizeCallbackData) => void;
+  } & React.HTMLAttributes<HTMLTableHeaderCellElement>
 > = ({ onResize, width, ...restProps }) => {
   if (!width) return <th {...restProps} />;
   return (
@@ -73,6 +74,14 @@ const ResizableTitle: React.FC<{
 };
 
 const IncidentTable: React.FC = () => {
+  const { user } = useAuth();
+
+  const isAuthorized = () => {
+    if (!user?.role) return false;
+    const role = user.role.toLowerCase();
+    return !["student", "classrep"].includes(role);
+  };
+
   const [columns, setColumns] = useState(
     originColumns.map((column, index) => ({
       ...column,
@@ -93,20 +102,26 @@ const IncidentTable: React.FC = () => {
             )
           : column.dataIndex === "actions"
             ? (text: any, record: DataType) => (
-                <div className="flex space-x-2">
-                  <IconEdit onClick={() => handleEdit(record)} />
-                  <Popconfirm
-                    title="Are you sure you want to delete this incident?"
-                    onOk={() => handleDelete(record.id)}
-                  >
-                    <IconDelete />
-                  </Popconfirm>
-                </div>
+                <>
+                  {isAuthorized() && (
+                    <div className="flex space-x-2">
+                      <IconEdit 
+                        className="cursor-pointer"
+                        onClick={() => handleEdit(record)} 
+                      />
+                      <Popconfirm
+                        title="Are you sure you want to delete this incident?"
+                        onOk={() => handleDelete(record.id)}
+                      >
+                        <IconDelete className="cursor-pointer" />
+                      </Popconfirm>
+                    </div>
+                  )}
+                </>
               )
             : undefined,
     })),
   );
-
   const [data, setData] = useState<DataType[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [editedIncident, setEditedIncident] = useState<DataType | null>(null);
@@ -139,17 +154,16 @@ const IncidentTable: React.FC = () => {
               severity: incident.severity,
             }))
             .sort((a, b) => new Date(b.date) - new Date(a.date)); // Sort by date
-  
+
           setData(incidents);
         }
       } catch (error) {
         console.error("Error fetching incidents:", error);
       }
     };
-  
+
     fetchIncidents();
   }, []);
-  
 
   const handleEdit = (incident: DataType) => {
     setEditedIncident(incident);
@@ -169,21 +183,29 @@ const IncidentTable: React.FC = () => {
       });
       if (response.data.success) {
         setData((prevData) => prevData.filter((item) => item.id !== id));
-        toast.success(response.data.message || "Incident deleted successfully!");
+        toast.success(
+          response.data.message || "Incident deleted successfully!",
+        );
         Swal.fire({
           icon: "success",
           title: "Incident deleted",
-          text: response.data.message || "The incident has been successfully deleted!",
+          text:
+            response.data.message ||
+            "The incident has been successfully deleted!",
         });
       } else {
-        toast.error(response.data.message || "Incident failed to delete successfully!");
+        toast.error(
+          response.data.message || "Incident failed to delete successfully!",
+        );
         Swal.fire({
           icon: "error",
           title: "Failed to delete incident.",
-          text: response.data.message || "There was a problem deleting the incident!",
+          text:
+            response.data.message ||
+            "There was a problem deleting the incident!",
         });
       }
-    } catch (error:any) {
+    } catch (error: any) {
       toast.error(error.message || "Incident failed to delete successfully!");
       Swal.fire({
         icon: "error",
@@ -220,7 +242,9 @@ const IncidentTable: React.FC = () => {
         Swal.fire({
           icon: "success",
           title: "Incident Updated",
-          text: response.data.message || "The incident has been successfully updated!",
+          text:
+            response.data.message ||
+            "The incident has been successfully updated!",
         });
 
         setModalVisible(false);
@@ -231,10 +255,12 @@ const IncidentTable: React.FC = () => {
         Swal.fire({
           icon: "error",
           title: "Failed to edit incident",
-          text: response.data.message || "There was a problem editing the incident!",
+          text:
+            response.data.message ||
+            "There was a problem editing the incident!",
         });
       }
-    } catch (error:any) {
+    } catch (error: any) {
       toast.error(error.message || "Failed to edit incident!");
       Swal.fire({
         icon: "error",

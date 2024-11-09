@@ -2,11 +2,15 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import { Table, Button, Modal, Spin } from "@arco-design/web-react";
-import { IconEdit, IconDownload, IconQrcode } from "@arco-design/web-react/icon";
+import {
+  IconEdit,
+  IconDownload,
+  IconQrcode,
+} from "@arco-design/web-react/icon";
 import QRCode from "react-qr-code";
 import App from "@/app/(site)/api/api";
 import StudentCheckInDrawer from "./StudentCheckInDrawer";
-
+import { useAuth } from "@/context/Auth";
 const ClassList: React.FC = () => {
   const [visible, setVisible] = useState(false);
   const [qrVisible, setQrVisible] = useState(false);
@@ -15,7 +19,7 @@ const ClassList: React.FC = () => {
   const [classData, setClassData] = useState<any[]>([]);
   const [selectedClass, setSelectedClass] = useState<any | null>(null); // State to hold selected class details
   const qrCodeRef = useRef<HTMLDivElement>(null); // Ref to hold QR code container
-
+  const { user } = useAuth();
   const fetchQrCode = async (classId: number) => {
     setLoading(true);
     try {
@@ -72,7 +76,9 @@ const ClassList: React.FC = () => {
       const svg = qrCodeRef.current.querySelector("svg");
       if (svg) {
         const svgData = new XMLSerializer().serializeToString(svg);
-        const svgBlob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
+        const svgBlob = new Blob([svgData], {
+          type: "image/svg+xml;charset=utf-8",
+        });
         const url = URL.createObjectURL(svgBlob);
 
         const downloadLink = document.createElement("a");
@@ -100,10 +106,14 @@ const ClassList: React.FC = () => {
       title: "Actions",
       render: (text: string, record: any) => (
         <>
-          <Button type="text" onClick={() => fetchQrCode(record.id)}>
-            <IconQrcode /> Generate QR
-          </Button>
-            <IconEdit onClick={() => handleEdit(record)} />
+          {user?.role == "student" ? null : (
+            <>
+              <Button type="text" onClick={() => fetchQrCode(record.id)}>
+                <IconQrcode /> Generate QR
+              </Button>
+              <IconEdit onClick={() => handleEdit(record)} />
+            </>
+          )}
         </>
       ),
     },
@@ -135,7 +145,11 @@ const ClassList: React.FC = () => {
         title="Generated QR Code"
         onCancel={() => setQrVisible(false)}
         footer={
-          <Button type="primary" icon={<IconDownload />} onClick={handleDownload}>
+          <Button
+            type="primary"
+            icon={<IconDownload />}
+            onClick={handleDownload}
+          >
             Download QR Code
           </Button>
         }
@@ -145,7 +159,11 @@ const ClassList: React.FC = () => {
         ) : qrData ? (
           <div
             ref={qrCodeRef}
-            style={{ background: "white", padding: "16px", textAlign: "center" }}
+            style={{
+              background: "white",
+              padding: "16px",
+              textAlign: "center",
+            }}
           >
             <QRCode
               size={256}

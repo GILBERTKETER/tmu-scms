@@ -6,10 +6,11 @@ import App from "@/app/(site)/api/api";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Swal from "sweetalert2";
-import EditActivityModal from "./EditActivityModal"
+import EditActivityModal from "./EditActivityModal";
+import { useAuth } from "@/context/Auth";
 const ScheduledActivities: React.FC = () => {
   const [activities, setActivities] = useState<any[]>([]);
-
+  const { user } = useAuth();
   useEffect(() => {
     const fetchActivities = async () => {
       try {
@@ -20,7 +21,9 @@ const ScheduledActivities: React.FC = () => {
           toast.warn("No activities found.");
         }
       } catch (error) {
-        toast.error(error.message || "An error occurred while fetching activities.");
+        toast.error(
+          error.message || "An error occurred while fetching activities.",
+        );
       }
     };
 
@@ -30,12 +33,12 @@ const ScheduledActivities: React.FC = () => {
   const handleDelete = async (id: number) => {
     try {
       const response = await App.delete("/api/delete-activity/", {
-        data: { id }, 
+        data: { id },
       });
-  
+
       if (response.data && response.data.success) {
         setActivities((prevActivities) =>
-          prevActivities.filter((activity) => activity.id !== id)
+          prevActivities.filter((activity) => activity.id !== id),
         );
         toast.success("Activity deleted successfully.");
         Swal.fire({
@@ -48,11 +51,15 @@ const ScheduledActivities: React.FC = () => {
         Swal.fire({
           icon: "error",
           title: "Deletion Failed",
-          text: response.data.message || "There was a problem deleting the activity. Please try again.",
+          text:
+            response.data.message ||
+            "There was a problem deleting the activity. Please try again.",
         });
       }
     } catch (error) {
-      toast.error(error.message || "An error occurred while deleting the activity.");
+      toast.error(
+        error.message || "An error occurred while deleting the activity.",
+      );
       Swal.fire({
         icon: "error",
         title: "Deletion Failed",
@@ -60,7 +67,7 @@ const ScheduledActivities: React.FC = () => {
       });
     }
   };
-  
+
   const columns = [
     {
       title: "Activity Name",
@@ -85,21 +92,33 @@ const ScheduledActivities: React.FC = () => {
     {
       title: "Action",
       key: "action",
+
       render: (_, record) => (
-        <Space size="middle" className="cursor-pointer">
-          <EditActivityModal activity_date={record.activity_date} activity_end_time={record.activity_end_time} activity_location={record.activity_location} activity_name={record.activity_name} activity_start_time={record.activity_start_time} id={record.id}/>
-          <Popconfirm
-            focusLock
-            title="Confirm"
-            content="Are you sure you want to delete?"
-            onOk={() => handleDelete(record.id)}
-            onCancel={() => {
-              toast.error("Cancel");
-            }}
-          >
-            <IconDelete className="cursor-pointer" />
-          </Popconfirm>
-        </Space>
+        <>
+          {user?.role == "student" ? null : (
+            <Space size="middle" className="cursor-pointer">
+              <EditActivityModal
+                activity_date={record.activity_date}
+                activity_end_time={record.activity_end_time}
+                activity_location={record.activity_location}
+                activity_name={record.activity_name}
+                activity_start_time={record.activity_start_time}
+                id={record.id}
+              />
+              <Popconfirm
+                focusLock
+                title="Confirm"
+                content="Are you sure you want to delete?"
+                onOk={() => handleDelete(record.id)}
+                onCancel={() => {
+                  toast.error("Cancel");
+                }}
+              >
+                <IconDelete className="cursor-pointer" />
+              </Popconfirm>
+            </Space>
+          )}
+        </>
       ),
     },
   ];
@@ -109,7 +128,7 @@ const ScheduledActivities: React.FC = () => {
       <div className="rounded-lg bg-white p-6 shadow-md">
         <div className="flex items-center justify-between">
           <h2 className="mb-4 text-xl font-semibold">Scheduled Activities</h2>
-          <ScheduleActivityModal />
+          {user?.role == "student" ? null : <ScheduleActivityModal />}
         </div>
         <Table data={activities} columns={columns} pagination={false} />
       </div>

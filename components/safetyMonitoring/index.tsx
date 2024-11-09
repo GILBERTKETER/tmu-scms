@@ -7,7 +7,9 @@ import IncidentsTable from "./incidentsTable";
 import Alerts from "./alerts";
 import App from "@/app/(site)/api/api";
 import Card from "./card";
+import { useAuth } from "@/context/Auth";
 const SafetyPage = () => {
+  const { user } = useAuth();
   interface CardData {
     title: string;
     content: string | number;
@@ -90,7 +92,9 @@ const SafetyPage = () => {
         <h1 className="mb-6 text-center text-3xl font-bold text-blue-600">
           Safety Monitoring Dashboard
         </h1>
-        <AddIncidentModal />
+        {user?.role == "student" || user?.role == "classrep" ? null : (
+          <AddIncidentModal />
+        )}
       </div>
 
       <Space
