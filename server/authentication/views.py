@@ -29,7 +29,7 @@ from .utils import send_email
 from .models import UserProfile
 from academics.models import Enrollment
 from django.contrib.auth.hashers import check_password, make_password
-
+from academics.models import Program
 @csrf_exempt
 def user_registration(request):
     if request.method == 'POST':
@@ -119,7 +119,8 @@ def user_login(request):
             "first_name": user.first_name,
             "last_name": user.last_name,
             "phone_number": user.userprofile.phone_number,
-            "admission": user.userprofile.admission
+            "admission": user.userprofile.admission,
+            "programId": user.userprofile.program_id,
         }
         
         response = JsonResponse({
@@ -154,7 +155,15 @@ def get_user(request):
         user_sem = user_profile.semester
         user_prog = user_profile.program_id
         
-        enrollments = Enrollment.objects.filter(user=user, semester = user_sem, year = user_year).count()
+        if user_year and user_sem and user_prog:
+            enrollments = Enrollment.objects.filter(
+            user=user, 
+            semester=user_sem, 
+            year=user_year, 
+            # program_id=user_prog
+        ).count()
+        else:
+            enrollments = 0
         
         user_data = {
             "courses_enrolled":enrollments,
@@ -168,7 +177,7 @@ def get_user(request):
             "full_name":user.userprofile.full_name,
             "semester": user.userprofile.semester,
             "year_of_study": user.userprofile.year_of_study,
-            "program":user.userprofile.program,
+            "program":user.userprofile.program_id,
             'profile_image':user.userprofile.profile_image,
             'cover_image':user.userprofile.cover_image,
         }
@@ -397,3 +406,35 @@ def change_phone(request):
             return JsonResponse({"success":False, "message":"Invalid request method."}, status=405)
     else:
         return JsonResponse({"success":False, "message":"You are not aauthenticated."}, status=403)
+    
+
+
+
+
+@csrf_exempt
+def complete_user_details(request):
+    user = request.user
+    if not user.is_authenticated:
+        return JsonResponse({"success": False, "message": "You are not authenticated."}, status=401)
+    
+    if request.method != 'POST':
+        return JsonResponse({"success": False, "message": "Invalid request method."}, status=405)
+
+    user_profile = UserProfile.objects.get(user_id=user.id)
+    data = json.loads(request.body)
+    program_id = data.get('program')
+    semester = data.get('semester')
+    year = data.get('yearOfStudy')
+
+    # Check if all required fields are provided
+    if not all([program_id, semester, year]):
+        return JsonResponse({"success": False, "message": "All fields are required."}, status=400)
+
+    # Update the user profile fields
+    user_profile.program_id = program_id
+    user_profile.year_of_study = year
+    user_profile.semester = semester
+    user_profile.program = Program.objects.get(id = program_id).name
+    user_profile.save()  # Save the updates
+
+    return JsonResponse({"success": True, "message": "Profile updated successfully."}, status=200)

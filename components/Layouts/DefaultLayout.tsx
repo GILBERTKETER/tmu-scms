@@ -3,6 +3,7 @@ import React, { useState, ReactNode, useEffect } from "react";
 import Sidebar from "@/components/Sidebar";
 import Header from "@/components/DashboardHeader";
 import LoadingLayout from "./LoadingLayout";
+import AutoModal from "./AutoModal";
 export default function DefaultLayout({
   children,
 }: {
@@ -13,6 +14,7 @@ export default function DefaultLayout({
   return (
     <>
       <LoadingLayout>
+        <AutoModal/>
         <div className="flex h-[100vh]" style={{ overflow: "hidden" }}>
           <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
           <div

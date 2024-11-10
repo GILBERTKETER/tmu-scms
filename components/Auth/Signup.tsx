@@ -231,58 +231,58 @@ const Signup = () => {
                 />
               </div>
               {/* ======== */}
-              <div className="mb-7.5 flex flex-col gap-7.5 lg:mb-12.5 lg:flex-row lg:justify-between lg:gap-14">
-  <select
-    title="Program"
-    name="program"
-    value={data.program}
-    onChange={(e) =>
-      setData({ ...data, [e.target.name]: e.target.value })
-    }
-    className="w-full border-b border-stroke bg-transparent pb-3.5 focus:border-waterloo focus:placeholder:text-black focus-visible:outline-none dark:border-strokedark dark:focus:border-manatee dark:focus:placeholder:text-white lg:w-1/2"
-  >
-    <option value="">Select Program</option>
-    {programs.map((program) => (
-      <option key={program.value} value={program.value}>
-        {program.label}
-      </option>
-    ))}
-  </select>
+              {/* <div className="mb-7.5 flex flex-col gap-7.5 lg:mb-12.5 lg:flex-row lg:justify-between lg:gap-14">
+                <select
+                  title="Program"
+                  name="program"
+                  value={data.program}
+                  onChange={(e) =>
+                    setData({ ...data, [e.target.name]: e.target.value })
+                  }
+                  className="w-full border-b border-stroke bg-transparent pb-3.5 focus:border-waterloo focus:placeholder:text-black focus-visible:outline-none dark:border-strokedark dark:focus:border-manatee dark:focus:placeholder:text-white lg:w-1/2"
+                >
+                  <option value="">Select Program</option>
+                  {programs.map((program) => (
+                    <option key={program.value} value={program.value}>
+                      {program.label}
+                    </option>
+                  ))}
+                </select>
 
-  <select
-    title="Semester"
-    name="semester"
-    value={data.semester}
-    onChange={(e) =>
-      setData({ ...data, [e.target.name]: e.target.value })
-    }
-    className="w-full border-b border-stroke bg-transparent pb-3.5 focus:border-waterloo focus:placeholder:text-black focus-visible:outline-none dark:border-strokedark dark:focus:border-manatee dark:focus:placeholder:text-white lg:w-1/2"
-  >
-    <option value="">Select Semester</option>
-    {semesters.map((semester) => (
-      <option key={semester.value} value={semester.value}>
-        {semester.label}
-      </option>
-    ))}
-  </select>
+                <select
+                  title="Semester"
+                  name="semester"
+                  value={data.semester}
+                  onChange={(e) =>
+                    setData({ ...data, [e.target.name]: e.target.value })
+                  }
+                  className="w-full border-b border-stroke bg-transparent pb-3.5 focus:border-waterloo focus:placeholder:text-black focus-visible:outline-none dark:border-strokedark dark:focus:border-manatee dark:focus:placeholder:text-white lg:w-1/2"
+                >
+                  <option value="">Select Semester</option>
+                  {semesters.map((semester) => (
+                    <option key={semester.value} value={semester.value}>
+                      {semester.label}
+                    </option>
+                  ))}
+                </select>
 
-  <select
-    title="Year of Study"
-    name="year_of_study"
-    value={data.year_of_study}
-    onChange={(e) =>
-      setData({ ...data, [e.target.name]: e.target.value })
-    }
-    className="w-full border-b border-stroke bg-transparent pb-3.5 focus:border-waterloo focus:placeholder:text-black focus-visible:outline-none dark:border-strokedark dark:focus:border-manatee dark:focus:placeholder:text-white lg:w-1/2"
-  >
-    <option value="">Select Year</option>
-    {years.map((year) => (
-      <option key={year.value} value={year.value}>
-        {year.label}
-      </option>
-    ))}
-  </select>
-</div>
+                <select
+                  title="Year of Study"
+                  name="year_of_study"
+                  value={data.year_of_study}
+                  onChange={(e) =>
+                    setData({ ...data, [e.target.name]: e.target.value })
+                  }
+                  className="w-full border-b border-stroke bg-transparent pb-3.5 focus:border-waterloo focus:placeholder:text-black focus-visible:outline-none dark:border-strokedark dark:focus:border-manatee dark:focus:placeholder:text-white lg:w-1/2"
+                >
+                  <option value="">Select Year</option>
+                  {years.map((year) => (
+                    <option key={year.value} value={year.value}>
+                      {year.label}
+                    </option>
+                  ))}
+                </select>
+              </div> */}
               {/* ========= */}
               <div className="mb-7.5 flex flex-col gap-7.5 lg:mb-12.5 lg:flex-row lg:justify-between lg:gap-14">
                 <div className="relative lg:w-1/2">

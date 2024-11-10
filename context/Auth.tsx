@@ -14,6 +14,7 @@ interface User {
   profile_image: string;
   cover_image:string;
   role:string
+  program: number;
 }
 
 export const useAuth = () => {

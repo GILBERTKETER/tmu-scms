@@ -46,24 +46,32 @@ def StudentDashboardView( request):
     current_year = user_profile.year_of_study
     current_semester = user_profile.semester
         
+    if current_year and current_semester:
+        
         # 1. Number of enrolled courses this semester and year
-    enrolled_courses_count = Enrollment.objects.filter(
-            user_id=user_id,
-            semester=current_semester,
-            year=current_year
-        ).count()
+        enrolled_courses_count = Enrollment.objects.filter(
+                user_id=user_id,
+                semester=current_semester,
+                year=current_year
+            ).count()
+    else:
+        enrolled_courses_count = 0
         
          # 2. Attendance percentage calculation
         # Each enrolled course has 12 sessions
     total_classes = enrolled_courses_count * 12  # Total sessions for the semester
         
+    if current_year and current_semester:
+
         # Count attendance records for 'present' status for the user in the current semester and year
-    present_count = Attendance.objects.filter(
-            user_id=user_id,
-            semester=current_semester,
-            year=current_year,
-            status='present'
-        ).count()
+            present_count = Attendance.objects.filter(
+                    user_id=user_id,
+                    semester=current_semester,
+                    year=current_year,
+                    status='present'
+                ).count()
+    else:
+        present_count = 0
         
         # Calculate attendance percentage
     missed_count = total_classes - present_count
@@ -72,12 +80,18 @@ def StudentDashboardView( request):
         # 3. Upcoming class (based on current day and time)
     current_time = timezone.localtime()
     current_day = current_time.strftime('%A').lower()  # Get current day of the week
-    enrolled_courses = Enrollment.objects.filter(
-        user_id=user_id,
-        semester=current_semester,
-        year=current_year
-    )
-    upcoming_class_info = None
+    if current_year and current_semester:
+
+        enrolled_courses = Enrollment.objects.filter(
+            user_id=user_id,
+            semester=current_semester,
+            year=current_year
+        )
+        upcoming_class_info = None
+    else:
+        enrolled_courses = ''
+        upcoming_class_info = None
+
 
     for enrollment in enrolled_courses:
         upcoming_class = (
@@ -420,29 +434,43 @@ def get_classes(request):
     current_year = user.userprofile.year_of_study
     current_semester = user.userprofile.semester
 
-    if user_type == 'admin' or user_type == 'Admin':
-       # For admins: Fetch the least attended and highest attended course this semester and year
-        highest_attended = (
-            Attendance.objects
-            .filter(year=current_year, semester=current_semester, status="present")
-            .values('course_code')
-            .annotate(count=Count('id'))
-            .order_by('-count')  # Order by highest attendance count
-            .first()  # Get the course with highest attendance
-        )
+    highest_course = None
+    least_course = None
+    highest_attended = None
+    least_attended = None
+    
         
-        least_attended = (
-            Attendance.objects
-            .filter(year=current_year, semester=current_semester, status="present")
-            .values('course_code')
-            .annotate(count=Count('id'))
-            .order_by('count')  # Order by least attendance count
-            .first()  # Get the course with least attendance
-        )
+    if user_type == 'admin' or user_type == 'Admin':
+        if current_semester and current_year:
 
-        # Fetch the course details based on the course_code
-        highest_course = Course.objects.get(code=highest_attended['course_code']) if highest_attended else None
-        least_course = Course.objects.get(code=least_attended['course_code']) if least_attended else None
+        # For admins: Fetch the least attended and highest attended course this semester and year
+            highest_attended = (
+                Attendance.objects
+                .filter(year=current_year, semester=current_semester, status="present")
+                .values('course_code')
+                .annotate(count=Count('id'))
+                .order_by('-count')  # Order by highest attendance count
+                .first()  # Get the course with highest attendance
+            )
+            
+            least_attended = (
+                Attendance.objects
+                .filter(year=current_year, semester=current_semester, status="present")
+                .values('course_code')
+                .annotate(count=Count('id'))
+                .order_by('count')  # Order by least attendance count
+                .first()  # Get the course with least attendance
+            ) 
+            # Fetch the course details based on the course_code
+            highest_course = Course.objects.get(code=highest_attended['course_code']) if highest_attended else None
+            least_course = Course.objects.get(code=least_attended['course_code']) if least_attended else None
+        else:
+            highest_attended = None
+            least_attended = None
+            highest_course = None
+            least_course = None
+
+       
 
         # Prepare the response
         response_data = {
@@ -460,31 +488,38 @@ def get_classes(request):
         return JsonResponse({"success": True, "data": response_data})
 
     elif user_type == 'student' or user_type == 'Student' or user_type == 'classrep' or user_type == 'Classrep':
-        # For students: Fetch the courses they are enrolled in based on enrollments and schedules
-        enrollments = Enrollment.objects.filter(user=user, year=current_year, semester=current_semester)
-        schedules = Schedule.objects.filter(enrollment__in=enrollments)
+        if current_year and current_semester:
+            # For students: Fetch the courses they are enrolled in based on enrollments and schedules
+            enrollments = Enrollment.objects.filter(user=user, year=current_year, semester=current_semester)
+            schedules = Schedule.objects.filter(enrollment__in=enrollments)
 
-        # Prepare the response with course names and codes
-        course_data = [
-            {
-                "course_code": schedule.enrollment.course_code,
-                "course_name": schedule.enrollment.course_name,
-            }
-            for schedule in schedules
-        ]
+            # Prepare the response with course names and codes
+            course_data = [
+                {
+                    "course_code": schedule.enrollment.course_code,
+                    "course_name": schedule.enrollment.course_name,
+                }
+                for schedule in schedules
+            ]
+        else:
+            course_data = ""
 
     elif user_type == 'lecturer' or user_type == 'Lecturer':
-        # For lecturers: Fetch the schedules where the lecturer is the instructor
-        lec_schedules = Schedule.objects.filter(instructor_id=user.id, enrollment__year=current_year, enrollment__semester=current_semester)
+        if current_year and current_semester:
+            
+            # For lecturers: Fetch the schedules where the lecturer is the instructor
+            lec_schedules = Schedule.objects.filter(instructor_id=user.id, enrollment__year=current_year, enrollment__semester=current_semester)
 
-        # Prepare the response with course names and codes
-        course_data = [
-            {
-                "course_code": schedule.enrollment.course_code,
-                "course_name": schedule.enrollment.course_name,
-            }
-            for schedule in lec_schedules
-        ]
+            # Prepare the response with course names and codes
+            course_data = [
+                {
+                    "course_code": schedule.enrollment.course_code,
+                    "course_name": schedule.enrollment.course_name,
+                }
+                for schedule in lec_schedules
+            ]
+        else:
+            course_data = ""
 
     else:
         return JsonResponse({"success": False, "message": "Invalid user role"}, status=400)

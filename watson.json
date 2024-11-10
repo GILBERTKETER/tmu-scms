@@ -1,0 +1,264 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+      "description": "Production spec for commonly used features in watsonx.ai /generation API endpoint.",
+      "title": "watsonx.ai generation API",
+      "version": "1.1.0"
+    },
+    "servers": [
+      {
+        "url": "https://{region}.ml.cloud.ibm.com",
+        "description": "watsonx.ai v1",
+        "variables": {
+          "region": {
+            "enum": [
+              "us-south",
+              "eu-de",
+              "eu-gb",
+              "jp-tok"
+            ],
+            "default": "us-south",
+            "description": "The region where you want to access watsonx.ai"
+          }
+        }
+      }
+    ],
+    "security": [
+      {
+        "oauth2": []
+      }
+    ],
+    "paths": {
+      "/ml/v1/text/generation": {
+        "post": {
+          "description": "Generation",
+          "parameters": [
+            {
+              "name": "version",
+              "in": "query",
+              "description": "Release date of the version of the API you want to use. Specify dates in YYYY-MM-DD format. The current version is `2023-05-29`.",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TextGenRequest"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Default Response",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/TextGenResponse"
+                  }
+                }
+              }
+            },
+            "default": {
+              "description": "Unexpected error"
+            }
+          }
+        }
+      },
+      "/ml/v1/text/generation_stream": {
+        "post": {
+          "description": "Generation Stream",
+          "parameters": [
+            {
+              "name": "version",
+              "in": "query",
+              "description": "Release date of the version of the API you want to use. Specify dates in YYYY-MM-DD format. The current version is `2023-05-29`.",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TextGenRequest"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Default Response",
+              "content": {
+                "text/event-stream": {
+                  "schema": {
+                    "$ref": "#/components/schemas/TextGenResponse"
+                  }
+                }
+              }
+            },
+            "default": {
+              "description": "Unexpected error"
+            }
+          }
+        }
+      }
+    },
+    "components": {
+      "schemas": {
+        "TextGenRequest": {
+          "type": "object",
+          "required": [
+            "model_id",
+            "input",
+            "project_id"
+          ],
+          "properties": {
+            "model_id": {
+              "type": "string",
+              "description": "The ID of the model to be used for this request. Refer to the list of models at https://dataplatform.cloud.ibm.com/docs/content/wsj/analyze-data/fm-prompt-lab.html?context=wx",
+              "example": "meta-llama/llama-3-70b-instruct"
+            },
+            "input": {
+              "type": "string",
+              "description": "The input prompt to generate completions. The input is tokenized internally.",
+              "example": "Explain the theory of relativity."
+            },
+            "project_id": {
+              "type": "string",
+              "description": "ID for the associated watsonx project.",
+              "minLength": 1,
+              "maxLength": 255,
+              "pattern": "^[a-zA-Z0-9_-]*$",
+              "example": "4e533532-f043-4916-b9f3-cac2feafe48d"
+            },
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "decoding_method": {
+                  "type": "string",
+                  "description": "The strategy used for picking tokens during generation.",
+                  "example": "greedy"
+                },
+                "random_seed": {
+                  "type": "integer",
+                  "description": "Seed for random number generation, used in sampling mode for repeatability.",
+                  "example": 42
+                },
+                "time_limit": {
+                  "type": "integer",
+                  "description": "Time limit in milliseconds. If generation doesn't complete within this time, it will stop and return the generated text.",
+                  "example": 600000
+                },
+                "temperature": {
+                  "type": "number",
+                  "description": "Modulates next token probabilities. Range: 0.00 to 2.00. A value of 0.00 makes it deterministic.",
+                  "example": 0.7
+                },
+                "top_k": {
+                  "type": "integer",
+                  "description": "Number of highest probability tokens to keep for top-k-filtering. Used in sampling mode. Range: 1 to 100.",
+                  "example": 50
+                },
+                "top_p": {
+                  "type": "number",
+                  "description": "Probability threshold for tokens to consider. Range: 0.0 to 1.0. A value of 1.0 disables this feature.",
+                  "example": 0.9
+                },
+                "max_new_tokens": {
+                  "type": "number",
+                  "description": "Maximum number of new tokens to generate.",
+                  "example": 150
+                },
+                "min_new_tokens": {
+                  "type": "number",
+                  "description": "Minimum number of new tokens to generate.",
+                  "example": 50
+                },
+                "repetition_penalty": {
+                  "type": "number",
+                  "description": "Penalty for repeating tokens in the generated text.",
+                  "example": 1.1
+                },
+                "stop_sequences": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Strings that cause text generation to stop when produced. If encountered before min_new_tokens are generated, they are ignored.",
+                  "example": [
+                    "\n\n"
+                  ]
+                },
+                "include_stop_sequence": {
+                  "type": "boolean",
+                  "description": "If true, output will end with the stop sequence text when matched.",
+                  "example": true
+                }
+              }
+            }
+          }
+        },
+        "TextGenResponse": {
+          "type": "object",
+          "properties": {
+            "model_id": {
+              "description": "The ID of the model used for the request",
+              "type": "string"
+            },
+            "created_at": {
+              "description": "Date and time of the response",
+              "type": "string"
+            },
+            "results": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "generated_text": {
+                    "description": "The generated text",
+                    "type": "string"
+                  },
+                  "generated_token_count": {
+                    "description": "The number of tokens in the generated output",
+                    "type": "integer"
+                  },
+                  "input_token_count": {
+                    "description": "The number of tokens in the input",
+                    "type": "integer"
+                  },
+                  "stop_reason": {
+                    "description": "Reason for stopping. Possible values: NOT_FINISHED, MAX_TOKENS, EOS_TOKEN, CANCELLED, TIME_LIMIT, STOP_SEQUENCE, TOKEN_LIMIT, ERROR.",
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "securitySchemes": {
+        "oauth2": {
+          "type": "oauth2",
+          "flows": {
+            "x-apikey": {
+              "tokenUrl": "https://iam.cloud.ibm.com/identity/token",
+              "grantType": "urn:ibm:params:oauth:grant-type:apikey",
+              "secretKeys": [
+                "apikey"
+              ],
+              "paramKeys": [],
+              "scopes": {}
+            }
+          }
+        }
+      }
+    }
+  }
+  
