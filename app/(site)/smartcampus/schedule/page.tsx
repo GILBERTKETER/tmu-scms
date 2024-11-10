@@ -1,15 +1,11 @@
 import { Metadata } from "next";
-import Scheduler from "@/components/Schedule";
+import Scheduler from "./index";
 export const metadata: Metadata = {
-  title: "Dashboard - Smart Campus",
+  title: "Scheduling - Smart Campus",
   description:
-    "Access your personalized dashboard with a quick overview of your classes, assignments, and campus notifications.",
+    "Organize and manage your campus schedule, including classes, meetings, and events, all in one place.",
 };
 
 export default function ClassSchedule() {
-  return (
-    <>
-      <Scheduler />
-    </>
-  );
+  return <Scheduler />;
 }

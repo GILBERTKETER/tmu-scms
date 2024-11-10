@@ -1,19 +1,33 @@
-
 const Hero: React.FC = () => (
-    <div className="z-[-1] relative bg-gradient-to-r from-purple-600 to-blue-600 h-[80vh] text-white overflow-hidden">
+  <div className="relative z-[1] h-[80vh] overflow-hidden bg-gradient-to-r from-purple-600 to-blue-600 text-white">
     <div className="absolute inset-0">
-      <img src="https://img.freepik.com/free-vector/isometric-business-concept-man-thinking-crm-system-artificial-intelligence-robot-ai_39422-771.jpg?t=st=1727170161~exp=1727173761~hmac=cdab18d37b774ba07b7c040908832d393af2385f86825fbe3554305fc24d9231&w=1060" alt="Background Image" className="object-cover object-center w-full h-full" />
+      <img
+        height={400}
+        style={{ width: "100vw" }}
+        src="/images/advisor/bg.png"
+        alt="Background Image"
+        className="h-full w-full object-cover object-center"
+      />
       <div className="absolute inset-0 bg-black opacity-50"></div>
     </div>
-    
-    <div className="relative z-10 flex flex-col justify-center items-center h-full text-center">
-      <h1 className="text-5xl font-bold leading-tight mb-4">Your Personalized Career Advisor</h1>
-      <p className="text-lg text-gray-300 mb-8 lg:w-1/2">Welcome to your virtual career guide. I’m here to assist you in finding the right career path, preparing for opportunities, and offering tailored advice to help you succeed in your professional journey.</p>
-      <a href="#" className="bg-yellow-400 text-gray-900 hover:bg-yellow-300 py-2 px-6 rounded-full text-lg font-semibold transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg">Lets chat</a>
+
+    <div className="relative z-10 flex h-full flex-col items-center justify-center text-center">
+      <h1 className="mb-4 text-5xl font-bold leading-tight">
+        Your Personalized Career Advisor
+      </h1>
+      <p className="mb-8 text-lg text-gray-300 lg:w-1/2">
+        Welcome to your virtual career guide. I’m here to assist you in finding
+        the right career path, preparing for opportunities, and offering
+        tailored advice to help you succeed in your professional journey.
+      </p>
+      <a
+        href="#"
+        className="transform rounded-full bg-yellow-400 px-6 py-2 text-lg font-semibold text-gray-900 transition duration-300 ease-in-out hover:scale-105 hover:bg-yellow-300 hover:shadow-lg"
+      >
+        Lets chat
+      </a>
     </div>
   </div>
-  
-  );
-  
-  export default Hero;
-  
+);
+
+export default Hero;

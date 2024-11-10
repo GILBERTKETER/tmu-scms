@@ -1,16 +1,11 @@
 import { Metadata } from "next";
-import DefaultLayout from "@/components/Layouts/DefaultLayout";
-import SafetyMonitoring from "@/components/safetyMonitoring"
+import SafetyMonitoring from "./index";
 export const metadata: Metadata = {
-  title: "Dashboard - Smart Campus",
-  description: "Access your personalized dashboard with a quick overview of your classes, assignments, and campus notifications.",
+  title: "Safety Monitoring - Smart Campus",
+  description:
+    "Stay informed with real-time safety updates and monitor campus security for a safe and secure environment.",
 };
 
-
 export default function SaafetyMonitoring() {
-  return (
-    <>
-      <SafetyMonitoring/>
-    </>
-  );
+  return <SafetyMonitoring />;
 }

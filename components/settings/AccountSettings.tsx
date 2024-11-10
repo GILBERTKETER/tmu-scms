@@ -2,6 +2,7 @@ import React, { useState, useRef } from "react";
 import { useAuth } from "@/context/Auth";
 import ChangeEmail from "./ChangeEmail";
 import ChangePhone from "./ChangePhone"
+import LoadingLayout from "../Layouts/LoadingLayout";
 import {
   Form,
   Input,
@@ -58,7 +59,7 @@ const AccountSettings = () => {
             "An error occurred while changing the password",
         );
       }
-    } catch (err) {
+    } catch (err:any) {
       Swal.fire({
         icon: "error",
         title: "Error",
@@ -74,7 +75,7 @@ const AccountSettings = () => {
   };
 
   return (
-    <>
+    <LoadingLayout>
       <ToastContainer />
       <div className="min-h-screen w-full p-4 sm:mx-8 xl:mx-auto">
         <div className="grid grid-cols-8 pt-3 sm:grid-cols-10">
@@ -170,7 +171,7 @@ const AccountSettings = () => {
           </div>
         </div>
       </div>
-    </>
+    </LoadingLayout>
   );
 };
 

@@ -13,15 +13,31 @@ import {
 } from "recharts";
 import App from "@/app/(site)/api/api";
 
-const DashboardBarChart = () => {
-  const [courses, setCourses] = useState([]);
-  const [selectedCourse, setSelectedCourse] = useState("");
-  const [attendanceData, setAttendanceData] = useState([]);
+interface Course {
+  name: string;
+  course_code: string;
+}
+
+interface AttendanceData {
+  month: string;
+  count: number;
+}
+
+interface ApiResponse {
+  success: boolean;
+  data: AttendanceData[];
+  courses: Course[];
+}
+
+const DashboardBarChart: React.FC = () => {
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [selectedCourse, setSelectedCourse] = useState<string>("");
+  const [attendanceData, setAttendanceData] = useState<AttendanceData[]>([]);
 
   useEffect(() => {
-    const fetchCourses = async () => {
+    const fetchCourses = async (): Promise<void> => {
       try {
-        const response = await App.get("/api/courses");
+        const response = await App.get<ApiResponse>("/api/courses");
         setCourses(response.data.courses);
       } catch (error) {
         console.error("Error fetching courses:", error);
@@ -30,9 +46,9 @@ const DashboardBarChart = () => {
     fetchCourses();
   }, []);
 
-  const fetchAttendanceData = async (courseCode) => {
+  const fetchAttendanceData = async (courseCode: string): Promise<void> => {
     try {
-      const response = await App.post("/api/get-attendance-data/", {
+      const response = await App.post<ApiResponse>("/api/get-attendance-data/", {
         course_code: courseCode,
       });
       if (response.data.success) {
@@ -43,25 +59,29 @@ const DashboardBarChart = () => {
     }
   };
 
-  const handleCourseChange = (value) => {
+  const handleCourseChange = (value: string): void => {
     setSelectedCourse(value);
     fetchAttendanceData(value);
   };
 
   return (
     <div className="flex h-full w-full flex-col">
-     
-    
-      <Card title="Monthly Attendance Statistics" className="h-full w-full" extra={ <Select
-        placeholder="Select a Course"
-        value={selectedCourse}
-        onChange={handleCourseChange}
-        options={courses.map((course) => ({
-          label: course.name + ' '+ course.course_code,
-          value: course.course_code,
-        }))}
-        style={{ marginBottom: "20px", width: "200px" }}
-      />}>
+      <Card 
+        title="Monthly Attendance Statistics" 
+        className="h-full w-full" 
+        extra={
+          <Select
+            placeholder="Select a Course"
+            value={selectedCourse}
+            onChange={handleCourseChange}
+            options={courses.map((course) => ({
+              label: `${course.name} ${course.course_code}`,
+              value: course.course_code,
+            }))}
+            style={{ marginBottom: "20px", width: "200px" }}
+          />
+        }
+      >
         <div style={{ height: "100% !important" }} className="h-[350px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart

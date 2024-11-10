@@ -14,9 +14,9 @@ const featuresData: Feature[] = [
         <path d="M6 6h12v2H6V6zm0 4h12v2H6v-2zm0 4h12v2H6v-2z" fill="#FFF" />
       </svg>
     ),
-    title: "Personalized Student Dashboard",
-    description:
-      "Displays upcoming classes, exam schedules, and automated reminders for assignments and deadlines.",
+    title: "Personalized Student Dashboard - Smart Campus",
+  description:
+    "Access a customized dashboard with your class schedules, campus events, real-time notifications, and important academic updates.",
   },
   {
     id: 2,
@@ -126,9 +126,9 @@ const featuresData: Feature[] = [
         />
       </svg>
     ),
-    title: "Predictive Analytics",
+    title: "Whatsapp API - Class Broadcasts",
     description:
-      "Data-driven insights to optimize campus resource usage based on past trends.",
+      "Use WhatsApp API to broadcast class schedules, updates, and notifications directly to students for efficient communication.",
   },
   {
     id: 7,
@@ -148,9 +148,9 @@ const featuresData: Feature[] = [
         />
       </svg>
     ),
-    title: "Secure Document Management",
+    title: "Celery Integration - Task Management",
     description:
-      "Submission and feedback system for assignments and academic records management.",
+      "Leverage Celery for efficient background task processing, enabling smooth submission, feedback, and document management workflows.",
   },
   {
     id: 8,

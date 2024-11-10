@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { Card, Link, Tag } from "@arco-design/web-react";
+import { Button, Card, Empty, Link, Tag } from "@arco-design/web-react";
 import AddAnnouncements from "./AddAnnouncements";
 import App from "@/app/(site)/api/api";
 import { useAuth } from "@/context/Auth";
@@ -109,7 +109,10 @@ const ClasAndAnnouncements = () => {
                 </Tag>
               ))
             ) : (
-              <p>No classes available.</p>
+              <Empty
+                imgSrc="//p1-arco.byteimg.com/tos-cn-i-uwbnlip3yd/a0082b7754fbdb2d98a5c18d0b0edd25.png~tplv-uwbnlip3yd-webp.webp"
+                description={<Button onClick={()=>window.location.reload()} type="primary">Refresh</Button>}
+              />
             )}
           </div>
         )}
@@ -142,7 +145,10 @@ const ClasAndAnnouncements = () => {
             </p>
           </div>
         ) : (
-          <p>No announcements available.</p>
+          <Empty
+            imgSrc="//p1-arco.byteimg.com/tos-cn-i-uwbnlip3yd/a0082b7754fbdb2d98a5c18d0b0edd25.png~tplv-uwbnlip3yd-webp.webp"
+            description={<Button type="primary" onClick={()=>window.location.reload()}>Refresh</Button>}
+          />
         )}
       </Card>
     </div>

@@ -1,15 +1,11 @@
 import { Metadata } from "next";
-import Map from "@/components/campusMap/index";
+import Map from "./index";
 export const metadata: Metadata = {
-  title: "Dashboard - Smart Campus",
+  title: "Campus Map - Smart Campus",
   description:
-    "Access your personalized dashboard with a quick overview of your classes, assignments, and campus notifications.",
+    "Explore the Smart Campus map to find buildings, facilities, and navigate your way around campus easily.",
 };
 
 export default function CampusMap() {
-  return (
-    <>
-      <Map />
-    </>
-  );
+  return <Map />;
 }

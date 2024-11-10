@@ -1,15 +1,14 @@
 import { Metadata } from "next";
-import CalenderComponent from "@/components/calender";
+import CalendarApp from "./index";
+
 export const metadata: Metadata = {
-  title: "Dashboard - Smart Campus",
-  description: "Access your personalized dashboard with a quick overview of your classes, assignments, and campus notifications.",
+  title: "Academic Calendar - Smart Campus",
+  description: "View important academic calendar events, including class schedules, exams, holidays, and campus activities.",
 };
 
 
-export default function Calender() {
+export default function Calendar() {
   return (
-    <>
-     <CalenderComponent/>
-    </>
+    <CalendarApp />
   );
 }

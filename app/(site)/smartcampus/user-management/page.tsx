@@ -6,12 +6,6 @@ export const metadata: Metadata = {
     "Manage users, roles, and permissions within the Smart Campus system. Easily add, update, and remove users to ensure smooth campus operations.",
 };
 
-
-
 export default function Management() {
-  return (
-    <>
-      <UserManagement/>
-    </>
-  );
+  return <UserManagement />;
 }

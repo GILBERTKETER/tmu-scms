@@ -105,7 +105,7 @@ def StudentDashboardView( request):
     upcoming_event_info = {
         "event_name": upcoming_event.title if upcoming_event else None,
         "event_date": upcoming_event.date.strftime('%Y-%m-%d %H:%M') if upcoming_event else None,
-        "event_location": upcoming_event.address if upcoming_event else  upcoming_event.link,
+        "event_location": upcoming_event.address if upcoming_event and upcoming_event.address else (upcoming_event.link if upcoming_event else ''),
     }
 
         # 4. Semester and year

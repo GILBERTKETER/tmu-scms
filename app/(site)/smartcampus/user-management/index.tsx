@@ -2,7 +2,7 @@
 import UserManagement from "@/components/user-management";
 import { useAuth } from "@/context/Auth";
 import { useRouter } from "next/navigation";
-
+import LoadingLayout from "@/components/Layouts/LoadingLayout";
 export default function AttendancePage() {
   const { user } = useAuth();
   const router = useRouter();
@@ -13,8 +13,8 @@ export default function AttendancePage() {
   }
 
   return (
-    <>
+    <LoadingLayout>
       <UserManagement />
-    </>
+    </LoadingLayout>
   );
 }

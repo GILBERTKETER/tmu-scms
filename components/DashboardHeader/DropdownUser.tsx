@@ -34,12 +34,13 @@ const DropdownUser = () => {
             <Image
               width={112}
               height={112}
-              src={"/images/user/user-01.png"}
+              src={`http://localhost:8000/media/${user?.profile_image}`}
               style={{
                 width: "100%",
                 height: "100%",
               }}
               alt="User"
+              className="rounded-full"
             />
           </span>
 

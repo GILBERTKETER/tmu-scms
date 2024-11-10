@@ -36,7 +36,7 @@ const Header = () => {
     <>
       <LoadingBar loading={loading} />
       <header
-        className={`fixed left-0 top-0 z-10 w-full py-7 ${
+        className={`fixed left-0 top-0 z-10 w-full py-4 bg-white ${
           stickyMenu
             ? "bg-white !py-4 shadow transition duration-100 dark:bg-black"
             : ""

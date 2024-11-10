@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import Facilities from "./index"
+import Facilities from "./index";
 export const metadata: Metadata = {
   title: "Facilities Management - Smart Campus",
   description:
@@ -7,9 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function FacilitiesPage() {
-  return (
-    <>
-      <Facilities/>
-    </>
-  );
+  return <Facilities />;
 }

@@ -11,6 +11,8 @@ from Halls.models import Hall
 from django.db.models import Q
 
 
+from facilities.models import Facilities, FacilityBooking
+
 @shared_task
 def automatic_function():
     # Get current time and calculate time window
@@ -21,11 +23,6 @@ def automatic_function():
     expiry_time = current_time_date + timedelta(hours=24)
     current_weekday = today.strftime('%A').lower()
     
-    print("Current time:", current_time)
-    print("Next hour:", one_hour_later)
-    print("==================================")
-    print("Current day:", today)
-    print("==================================")
 
     # Create Event Notifications - events starting within the next hour
     upcoming_events = AcademicCalendar.objects.filter(
@@ -89,3 +86,53 @@ def automatic_function():
             location=activity.activity_location,
             expiry_date=expiry_time
         )
+        
+
+
+
+@shared_task
+def update_hall_and_facility_status():
+   
+    current_datetime = timezone.localtime(timezone.now())
+    current_time = current_datetime.time()
+    current_date = current_datetime.date()
+    current_weekday = current_datetime.strftime('%A').lower()  
+
+    # Get all schedules for today
+    today_schedules = Schedule.objects.filter(
+        Q(date=current_date) |  # One-time schedules for today
+        Q(recurring_days__contains=[current_weekday])  # Recurring schedules for this weekday
+    )
+
+    # Check each schedule
+    for schedule in today_schedules:
+        start_time = schedule.time_start
+        end_time = schedule.time_end
+
+        # If the current time falls within a scheduled period
+        if start_time <= current_time <= end_time:
+            # Update hall status
+            try:
+                hall = Hall.objects.get(hall_number=schedule.hall)
+                hall.booked = True
+                hall.save()
+            except Hall.DoesNotExist:
+                # Log error or handle case where hall doesn't exist
+                print(f"Hall {schedule.hall} not found")
+
+    # Update facility status based on FacilityBooking
+    facility_bookings = FacilityBooking.objects.filter(
+        created_at__date=current_date
+    )
+
+    # Update booked facilities
+    for booking in facility_bookings:
+        facility = booking.facility
+        facility.status = "Booked"
+        facility.save()
+
+    return {
+        'timestamp': current_datetime,
+        'halls_updated': Hall.objects.filter(booked=True).count(),
+        'facilities_updated': Facilities.objects.filter(status="Booked").count()
+    }

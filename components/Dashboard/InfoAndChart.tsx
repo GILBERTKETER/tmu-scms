@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { Card, Select, Button } from "@arco-design/web-react";
+import { Card, Select, Button, Empty } from "@arco-design/web-react";
 import DashboardBarChart from "./DashboardChart";
 import App from "@/app/(site)/api/api"; // Adjust based on your API configuration
 import { useAuth } from "@/context/Auth";
@@ -55,7 +55,12 @@ const InfoAndChart = () => {
 
   // Fetch courses for admins to download attendance
   useEffect(() => {
-    if (user?.role === "admin" || user?.role === "Admin" || user?.role === "lecturer" || user?.role === "Lecturer") {
+    if (
+      user?.role === "admin" ||
+      user?.role === "Admin" ||
+      user?.role === "lecturer" ||
+      user?.role === "Lecturer"
+    ) {
       const fetchCourses = async () => {
         try {
           const response = await App.get("/api/get-courses/admins/");
@@ -139,7 +144,10 @@ const InfoAndChart = () => {
               </p>
             </div>
           ) : (
-            <p>No active incidents at the moment.</p>
+            <Empty
+              imgSrc="//p1-arco.byteimg.com/tos-cn-i-uwbnlip3yd/a0082b7754fbdb2d98a5c18d0b0edd25.png~tplv-uwbnlip3yd-webp.webp"
+              description={<Button onClick={()=>window.location.reload()} type="primary">Refresh</Button>}
+            />
           )}
         </Card>
 
@@ -206,7 +214,10 @@ const InfoAndChart = () => {
               </p>
             </div>
           ) : (
-            <p>No logs available.</p>
+            <Empty
+              imgSrc="//p1-arco.byteimg.com/tos-cn-i-uwbnlip3yd/a0082b7754fbdb2d98a5c18d0b0edd25.png~tplv-uwbnlip3yd-webp.webp"
+              description={<Button onClick={()=>window.location.reload()} type="primary">Refresh</Button>}
+            />
           )}
         </Card>
       </div>

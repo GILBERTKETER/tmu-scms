@@ -22,7 +22,8 @@ import {
   IconGithub,
   IconLink,
   IconUpload
-} from '@arco-design/web-react/icon';;
+} from '@arco-design/web-react/icon';
+import LoadingLayout from '../Layouts/LoadingLayout';
 import App from "@/app/(site)/api/api"
 const FormItem = Form.Item;
 const { Row, Col } = Grid;
@@ -128,20 +129,6 @@ const StudentPortfolio: React.FC = () => {
   }, [user, form]);
 
   
-
-  // const handleSubmit = async (values: StudentPortfolioForm) => {
-  //   setLoading(true);
-  //   try {
-  //     const response = App.post("/api/portfolio/", values)
-  //     console.log('Form values:', values);
-  //     Message.success(response.data.message||'Portfolio saved successfully!');
-  //   } catch (error) {
-  //     Message.error('Failed to save portfolio');
-  //     console.error('Error saving portfolio:', error);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
   const handleSubmit = async (values: StudentPortfolioForm) => {
     setLoading(true);
     try {
@@ -316,7 +303,8 @@ const StudentPortfolio: React.FC = () => {
   );
   
   return (
-    <div className="student-portfolio" style={{ padding: '24px' }}>
+    <LoadingLayout>
+     <div className="student-portfolio" style={{ padding: '24px' }}>
       <Card>
         <Title heading={2} style={{ marginBottom: '24px' }}>
           Student Portfolio Builder
@@ -789,6 +777,8 @@ const StudentPortfolio: React.FC = () => {
         </Form>
       </Card>
     </div>
+    </LoadingLayout>
+   
   );
 };
 
