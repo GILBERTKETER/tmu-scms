@@ -1,6 +1,6 @@
 import Link from "next/link";
 import DarkModeSwitcher from "./DarkModeSwitcher";
-import DropdownMessage from "./DropdownMessage";
+// import DropdownMessage from "./DropdownMessage";
 import DropdownNotification from "./DropdownNotification";
 import DropdownUser from "./DropdownUser";
 import Image from "next/image";
@@ -77,7 +77,7 @@ const Header = (props: {
         </div>
 
         <div className="hidden sm:block">
-          <form action="https://formbold.com/s/unique_form_id" method="POST">
+          {/* <form action="https://formbold.com/s/unique_form_id" method="POST">
             <div className="relative">
               <button
                 aria-label="btn"
@@ -112,7 +112,7 @@ const Header = (props: {
                 className="xl:w-125 w-full bg-transparent pl-9 pr-4 font-medium focus:outline-none"
               />
             </div>
-          </form>
+          </form> */}
         </div>
 
         <div className="2xsm:gap-7 flex items-center gap-3">
@@ -121,7 +121,7 @@ const Header = (props: {
 
             <DropdownNotification />
 
-            <DropdownMessage />
+            {/* <DropdownMessage /> */}
           </ul>
 
           <DropdownUser />

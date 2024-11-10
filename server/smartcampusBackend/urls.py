@@ -30,6 +30,7 @@ urlpatterns = [
     path("api/", include('threads.urls')),
     path("api/", include('portfolio.urls')),
     path("api/", include('dashboard.urls')),
+    path("api/", include('notifications.urls')),
 ]
 
 if settings.DEBUG:

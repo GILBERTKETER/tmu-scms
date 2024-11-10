@@ -35,8 +35,8 @@ def user_registration(request):
     if request.method == 'POST':
         data = json.loads(request.body)
 
-        first_name = data.get('firstName', "")
-        last_name = data.get('lastName', "")
+        first_name = data.get('firstName')
+        last_name = data.get('lastName')
         admission = data.get('admission')
         phone_number = data.get('phone')
         password = data.get('password')

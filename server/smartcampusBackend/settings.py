@@ -22,6 +22,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = "django-insecure-s-sk--ft292qwerq*l&v^k-mh&(ouyt)gg*und18lsjx1ib#v*"
 
+REDIS_URL = 'redis://localhost:6379/0'
+
+#celery
+CELERY_BROKER_URL = REDIS_URL
+CELERY_RESULT_BACKEND = REDIS_URL
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'images')  
 MEDIA_URL = '/media/'
@@ -82,6 +90,7 @@ INSTALLED_APPS = [
     "threads",
     "portfolio",
     "dashboard",
+    "notifications",
 ]
 
 MIDDLEWARE = [

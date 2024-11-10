@@ -31,6 +31,7 @@
     "@yudiel/react-qr-scanner": "^2.0.8",
     "autoprefixer": "^10.4.16",
     "axios": "^1.7.7",
+    "date-fns": "^4.1.0",
     "eslint": "8.41.0",
     "eslint-config-next": "^14.2.14",
     "framer-motion": "^11.9.0",
