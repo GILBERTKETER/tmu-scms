@@ -42,10 +42,10 @@ def user_registration(request):
         password = data.get('password')
         email = data.get('email')
         cpassword = data.get('cpassword')
-        role = data.get('role', None)
+        role = data.get('role', "student")
 
-        username = admission.replace("/","")
-        yos = data.get('yos', None)
+        username = admission.replace("/","").lower()
+        yos = data.get('year_of_study', None)
         semester = data.get('semester', None)
         program = data.get('program', None)
         full_name = f"{first_name} {last_name}".strip()
@@ -101,14 +101,14 @@ def user_registration(request):
 @require_http_methods(["POST"])
 def user_login(request):
     data = json.loads(request.body)
-    username = data.get('email')
+    username = data.get('admission')
     password = data.get('password')
 
     if not username or not password:
         return JsonResponse({"message": "Username and password are required."}, status=400)
     
-    user = authenticate(username=username, password=password)
-    print("user:", user)
+    user = authenticate(username=username.lower(), password=password)
+    # print("user:", user)
     
     if user is not None:
         login(request, user)

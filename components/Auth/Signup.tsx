@@ -19,8 +19,32 @@ const Signup = () => {
     cpassword: "",
     phone: "",
     admission: "",
+    program: "",
+    semester: "",
+    year_of_study: "",
   });
-  const handleSubmit = async (e) => {
+
+  const programs = [
+    { value: "computer_science", label: "Computer Science" },
+    { value: "information_technology", label: "Information Technology" },
+    { value: "software_engineering", label: "Software Engineering" },
+    { value: "cyber_security", label: "Cyber Security" },
+    { value: "data_science", label: "Data Science" },
+  ];
+
+  const years = [
+    { value: 1, label: "Year 1" },
+    { value: 2, label: "Year 2" },
+    { value: 3, label: "Year 3" },
+    { value: 4, label: "Year 4" },
+  ];
+
+  const semesters = [
+    { value: 1, label: "Semester 1" },
+    { value: 2, label: "Semester 2" },
+  ];
+
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
 
     try {
@@ -30,7 +54,7 @@ const Signup = () => {
       } else {
         toast.error(response.data.message);
       }
-    } catch (error) {
+    } catch (error: any) {
       const errorMessage =
         error.response?.data?.message || "An error occurred. Please try again.";
       toast.error(errorMessage);
@@ -206,6 +230,60 @@ const Signup = () => {
                   className="w-full border-b border-stroke bg-transparent pb-3.5 focus:border-waterloo focus:placeholder:text-black focus-visible:outline-none dark:border-strokedark dark:focus:border-manatee dark:focus:placeholder:text-white lg:w-1/2"
                 />
               </div>
+              {/* ======== */}
+              <div className="mb-7.5 flex flex-col gap-7.5 lg:mb-12.5 lg:flex-row lg:justify-between lg:gap-14">
+  <select
+    title="Program"
+    name="program"
+    value={data.program}
+    onChange={(e) =>
+      setData({ ...data, [e.target.name]: e.target.value })
+    }
+    className="w-full border-b border-stroke bg-transparent pb-3.5 focus:border-waterloo focus:placeholder:text-black focus-visible:outline-none dark:border-strokedark dark:focus:border-manatee dark:focus:placeholder:text-white lg:w-1/2"
+  >
+    <option value="">Select Program</option>
+    {programs.map((program) => (
+      <option key={program.value} value={program.value}>
+        {program.label}
+      </option>
+    ))}
+  </select>
+
+  <select
+    title="Semester"
+    name="semester"
+    value={data.semester}
+    onChange={(e) =>
+      setData({ ...data, [e.target.name]: e.target.value })
+    }
+    className="w-full border-b border-stroke bg-transparent pb-3.5 focus:border-waterloo focus:placeholder:text-black focus-visible:outline-none dark:border-strokedark dark:focus:border-manatee dark:focus:placeholder:text-white lg:w-1/2"
+  >
+    <option value="">Select Semester</option>
+    {semesters.map((semester) => (
+      <option key={semester.value} value={semester.value}>
+        {semester.label}
+      </option>
+    ))}
+  </select>
+
+  <select
+    title="Year of Study"
+    name="year_of_study"
+    value={data.year_of_study}
+    onChange={(e) =>
+      setData({ ...data, [e.target.name]: e.target.value })
+    }
+    className="w-full border-b border-stroke bg-transparent pb-3.5 focus:border-waterloo focus:placeholder:text-black focus-visible:outline-none dark:border-strokedark dark:focus:border-manatee dark:focus:placeholder:text-white lg:w-1/2"
+  >
+    <option value="">Select Year</option>
+    {years.map((year) => (
+      <option key={year.value} value={year.value}>
+        {year.label}
+      </option>
+    ))}
+  </select>
+</div>
+              {/* ========= */}
               <div className="mb-7.5 flex flex-col gap-7.5 lg:mb-12.5 lg:flex-row lg:justify-between lg:gap-14">
                 <div className="relative lg:w-1/2">
                   <input

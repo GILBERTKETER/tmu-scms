@@ -14,7 +14,7 @@ const Signin: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   const [data, setData] = useState({
-    email: "",
+    admission: "",
     password: "",
   });
   const togglePasswordVisibility = () => {
@@ -23,9 +23,9 @@ const Signin: React.FC = () => {
   const router = useRouter();
   const { login, user, loading } = useAuth();
 
-  const handleLogin = async (e) => {
+  const handleLogin = async (e:any) => {
     e.preventDefault();
-    const result = await login(data.email, data.password);
+    const result = await login(data.admission, data.password);
     if (result == true) {
       router.push("/smartcampus/dashboard");
     }
@@ -151,10 +151,10 @@ const Signin: React.FC = () => {
               <div className="mb-7.5 flex flex-col gap-7.5 lg:mb-12.5 lg:flex-row lg:justify-between lg:gap-14">
                 <input
                   type="text"
-                  placeholder="Email"
-                  name="email"
-                  value={data.email}
-                  onChange={(e) => setData({ ...data, email: e.target.value })}
+                  placeholder="Admission without slashes"
+                  name="admission"
+                  value={data.admission}
+                  onChange={(e) => setData({ ...data, admission: e.target.value })}
                   className="w-full border-b border-stroke !bg-white pb-3.5 focus:border-waterloo focus:placeholder:text-black focus-visible:outline-none dark:border-strokedark dark:!bg-black dark:focus:border-manatee dark:focus:placeholder:text-white lg:w-1/2"
                 />
 
@@ -218,7 +218,7 @@ const Signin: React.FC = () => {
                 </div>
 
                 <button
-                  aria-label="login with email and password"
+                  aria-label="login with admission and password"
                   className="inline-flex items-center gap-2.5 rounded-full bg-black px-6 py-3 font-medium text-white duration-300 ease-in-out hover:bg-blackho dark:bg-btndark dark:hover:bg-blackho"
                 >
                   Log in

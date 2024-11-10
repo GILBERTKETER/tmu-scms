@@ -38,11 +38,11 @@ export const useAuth = () => {
 
     fetchUser();
   }, []);
-  const login = async (email: string, password: string) => {
+  const login = async (admission: string, password: string) => {
     try {
       const response = await App.post<{ message: string; user: User }>(
         "/api/auth/signin/",
-        { email, password },
+        { admission, password },
         { withCredentials: true },
       );
       setUser(response.data.user);

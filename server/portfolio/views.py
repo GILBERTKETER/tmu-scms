@@ -152,6 +152,7 @@ def get_portfolio(request):
         projects = Project.objects.filter(user=user)
         social_media = SocialMedia.objects.filter(user=user)
 
+
         # Format response
         portfolio_data = {
             'personalInfo': {
@@ -160,8 +161,8 @@ def get_portfolio(request):
                 'phone': personal_info.phone if personal_info else '',
                 'location': personal_info.location if personal_info else '',
                 'summary': personal_info.summary if personal_info else '',
-                'profile_image': personal_info.profile_image if personal_info else '',
-                'cover_image': personal_info.cover_image if personal_info else '',
+                'profile_image': personal_info.profile_image if personal_info else 'img-profile.png',
+                'cover_image': personal_info.cover_image if personal_info else 'img-cover.png',
             },
             'skills': [skill.name for skill in skills],
             'experiences': [{
@@ -220,6 +221,7 @@ def student_profile(request, admission):
                     "admission": user.admission,
                     "email": student.email,
                 }
+        
         # Format response
         portfolio_data = {
             'personalInfo': {
@@ -228,8 +230,8 @@ def student_profile(request, admission):
                 'phone': personal_info.phone if personal_info else '',
                 'location': personal_info.location if personal_info else '',
                 'summary': personal_info.summary if personal_info else '',
-                'profile_image': personal_info.profile_image if personal_info else '',
-                'cover_image': personal_info.cover_image if personal_info else '',
+                'profile_image': personal_info.profile_image if personal_info else 'img-profile.png',
+                'cover_image': personal_info.cover_image if personal_info else 'img-cover.png',
             },
             'skills': [skill.name for skill in skills],
             'experiences': [{
