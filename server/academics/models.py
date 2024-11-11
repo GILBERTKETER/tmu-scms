@@ -47,7 +47,7 @@ class Enrollment(models.Model):
 class Instructor(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)  
     bio = models.TextField(blank=True)  
-    expertise = models.CharField(max_length=255) 
+    expertise = models.CharField(max_length=255, blank=True) 
     courses = models.ManyToManyField(Course, related_name='instructors', blank=True)  
 
     def __str__(self):

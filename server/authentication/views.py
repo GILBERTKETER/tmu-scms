@@ -20,7 +20,7 @@ from django.utils.encoding import force_bytes
 from django.template.loader import render_to_string
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import EmailMessage
-
+from academics.models import Instructor
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
 import os
@@ -50,6 +50,8 @@ def user_registration(request):
         program = data.get('program', None)
         full_name = f"{first_name} {last_name}".strip()
 
+       
+                    
         if not all([first_name, last_name, admission, phone_number, password, cpassword, email]):
             return JsonResponse({"success":False,"message": "All required fields are missing."}, status=400)
 
@@ -71,6 +73,7 @@ def user_registration(request):
                     first_name=first_name,
                     last_name=last_name
                 )
+                
 
                 user.userprofile.phone_number = phone_number
                 user.userprofile.admission = admission
@@ -81,8 +84,12 @@ def user_registration(request):
                 user.userprofile.role = role
                 user.userprofile.email = email
                 
+                if role == 'lecturer':
+                    instructor = Instructor.objects.create(user_id = user.id)
+                    instructor.save()
+                
                 user.userprofile.save()
-
+                
                 login(request, user)
                 html_content = render_to_string('signup.html', {'firstName': first_name})
 
@@ -297,7 +304,9 @@ def update_user(request):
             profile.email = email
             profile.role = role
             profile.save()
-            
+            if role == 'lecturer':
+                instructor = Instructor.objects.create(user_id = user.id)
+                instructor.save()
             
 
             return JsonResponse({
@@ -408,7 +417,36 @@ def change_phone(request):
         return JsonResponse({"success":False, "message":"You are not aauthenticated."}, status=403)
     
 
-
+@csrf_exempt
+def edit_details(request):
+    user = request.user
+    data = json.loads(request.body)
+    if not user.is_authenticated:
+        return JsonResponse({"success":False, "message":"You are not authenticated."}, status=401)
+    if request.method != 'PUT':
+        return JsonResponse({"success":False, "message":"Invalid request method."}, status=405)
+    role = user.userprofile.role
+    
+    if role == 'lecturer':
+        semester = data.get('semester')
+        if not semester:
+            return JsonResponse({"success":False, "message":"All fields are required."}, status = 403)
+        user_profile = UserProfile.objects.get(user_id = user.id)
+        user_profile.semester = semester
+        user_profile.save()
+        return JsonResponse({"success":True, "message":"Your details have beeen updated."}, status=200)
+    elif role == 'student' or role == 'classrep':
+        semester = data.get('semester')
+        year = data.get("year")
+        if not all([semester, year]):
+            return JsonResponse({"success":False, "message":"All fields are required."}, status = 403)
+        user_profile = UserProfile.objects.get(user_id = user.id)
+        user_profile.semester = semester
+        user_profile.year_of_study = year
+        user_profile.save()
+        return JsonResponse({"success":True, "message":"Your details have beeen updated."}, status=200)
+    else:
+        return JsonResponse({"success":False, "message":"Invalid user role."}, status=404)
 
 
 @csrf_exempt

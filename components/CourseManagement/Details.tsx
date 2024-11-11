@@ -3,6 +3,7 @@ import App from "@/app/(site)/api/api";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useAuth } from "@/context/Auth";
+import EditDetails from "./EditDetails";
 function Details() {
   const { user } = useAuth();
   interface UserData {
@@ -104,9 +105,7 @@ function Details() {
 
         {/* Action Button */}
         <div className="mt-6 flex justify-center">
-          <button className="rounded-lg bg-blue-500 px-4 py-2 text-white shadow hover:bg-blue-600 focus:ring focus:ring-blue-300">
-            Update my details
-          </button>
+         <EditDetails/>
         </div>
       </div>
     </>

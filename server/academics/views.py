@@ -293,25 +293,34 @@ def get_activities(request):
                 user_year = user_profile.year_of_study
                 user_semester = user_profile.semester
 
-                # Get the courses the user is enrolled in for the current year and semester
-                enrolled_courses = Enrollment.objects.filter(
-                    user_id=user.id,
-                    semester=user_semester,
-                    year=user_year
-                ).values_list('course_id', flat=True)  # Retrieve only course IDs
+                if user_year and user_year:
+                        
+                    # Get the courses the user is enrolled in for the current year and semester
+                    enrolled_courses = Enrollment.objects.filter(
+                        user_id=user.id,
+                        semester=user_semester,
+                        year=user_year
+                    ).values_list('course_id', flat=True)  # Retrieve only course IDs
 
-                # Filter activities based on enrolled courses and upcoming dates
-                current_date = timezone.now().date()
-                activities = Activities.objects.filter(
-                    course_id__in=enrolled_courses,  # Only activities related to enrolled courses
-                    activity_date__gte=current_date  # Only activities that are not in the past
-                ).values()
+                    # Filter activities based on enrolled courses and upcoming dates
+                    current_date = timezone.now().date()
+                    activities = Activities.objects.filter(
+                        course_id__in=enrolled_courses,  # Only activities related to enrolled courses
+                        activity_date__gte=current_date  # Only activities that are not in the past
+                    ).values()
 
-                return JsonResponse({
-                    "success": True,
-                    "message": "Success",
-                    "data": list(activities)
-                }, status=200)
+                    return JsonResponse({
+                        "success": True,
+                        "message": "Success",
+                        "data": list(activities)
+                    }, status=200)
+                else:
+                    activities=""
+                    return JsonResponse({
+                        "success": True,
+                        "message": "Success",
+                        "data": list(activities)
+                    }, status=200)
             except UserProfile.DoesNotExist:
                 return JsonResponse({"success": False, "message": "User profile not found."}, status=404)
         else:

@@ -2,6 +2,7 @@ import { Button, Message, Popconfirm } from "@arco-design/web-react";
 import { IconEdit, IconDelete } from "@arco-design/web-react/icon";
 import ProgressBar from "./ProgressBar";
 import { useAuth } from "@/context/Auth";
+
 interface ClassCardProps {
   title: string;
   description: string;
@@ -35,11 +36,40 @@ const ClassCard: React.FC<ClassCardProps> = ({
   recurring_days,
 }) => {
   const { user } = useAuth();
+
+  const timeToMinutes = (time: string) => {
+    const [hours, minutes] = time.split(":").map(Number);
+    return hours * 60 + minutes;
+  };
+
+  // Function to calculate progress
+  const calculateProgress = () => {
+    const startMinutes = timeToMinutes(start_time);
+    const endMinutes = timeToMinutes(end_time);
+
+    // Get current time in minutes since midnight
+    const now = new Date();
+    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+    // Calculate progress percentage
+    if (currentMinutes < startMinutes) {
+      return 0; 
+    } else if (currentMinutes >= endMinutes) {
+      return 100; 
+    } else {
+      const totalDuration = endMinutes - startMinutes;
+      const elapsed = currentMinutes - startMinutes;
+      return (elapsed / totalDuration) * 100;
+    }
+  };
+
+  const progress = calculateProgress();
+
   return (
     <div className="rounded-lg bg-white p-4 shadow-md">
       <div className="flex justify-between">
         <h3 className="text-lg font-semibold">Program: {programName}</h3>
-        {user?.role == "student" ? null : (
+        {user?.role === "student" ? null : (
           <div className="flex space-x-2">
             <Button shape="circle" icon={<IconEdit />} onClick={onEdit} />
             <Popconfirm
@@ -60,7 +90,7 @@ const ClassCard: React.FC<ClassCardProps> = ({
       </div>
       <p className="mt-2 text-gray-500">{course_name + " " + course_code}</p>
       <div className="flex items-center justify-between">
-        <p className="text-gray-400">{start_time + "-" + end_time}</p>
+        <p className="text-gray-400">{start_time + " - " + end_time}</p>
         <p className="text-gray-500">
           {date ? `On: ${date}` : `Every: ${recurring_days}`}
         </p>
@@ -69,7 +99,7 @@ const ClassCard: React.FC<ClassCardProps> = ({
         Hall: {hallName} ({hallNumber})
       </p>
       <p className="text-gray-500">Instructor: {"Dr." + instructor}</p>
-      <ProgressBar progress={50} />
+      <ProgressBar progress={progress} />
     </div>
   );
 };

@@ -107,7 +107,8 @@ def create_schedule(request):
             date = data.get("date")
             time_start = data.get("time_start")
             time_end = data.get("time_end")
-            recurring_days = data.get("recurring_days").lower()
+            recurring_days = [day.lower() for day in data.get("recurring_days", [])]
+
 
             # Retrieve enrollment and instructor
             enrollment = Enrollment.objects.get(course_id=course_id)
