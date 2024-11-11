@@ -1,25 +1,30 @@
-// components/ClassList.tsx
-
 import React, { useEffect, useState, useRef } from "react";
-import { Table, Button, Modal, Spin } from "@arco-design/web-react";
+import { Table, Button, Modal, Spin, Tooltip, Input } from "@arco-design/web-react";
 import {
   IconEdit,
   IconDownload,
   IconQrcode,
+  IconPlus,
 } from "@arco-design/web-react/icon";
 import QRCode from "react-qr-code";
 import App from "@/app/(site)/api/api";
 import StudentCheckInDrawer from "./StudentCheckInDrawer";
 import { useAuth } from "@/context/Auth";
+import { toast, ToastContainer } from "react-toastify";
+
 const ClassList: React.FC = () => {
   const [visible, setVisible] = useState(false);
   const [qrVisible, setQrVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [qrData, setQrData] = useState<string | null>(null);
+  const [rfidVisible, setRfidVisible] = useState(false);
+  const [newRfid, setNewRfid] = useState("");
   const [classData, setClassData] = useState<any[]>([]);
-  const [selectedClass, setSelectedClass] = useState<any | null>(null); // State to hold selected class details
-  const qrCodeRef = useRef<HTMLDivElement>(null); // Ref to hold QR code container
+  const [selectedClass, setSelectedClass] = useState<any | null>(null);
+  const [selectedClassId, setSelectedClassId] = useState<number | null>(null);
+  const qrCodeRef = useRef<HTMLDivElement>(null);
   const { user } = useAuth();
+
   const fetchQrCode = async (classId: number) => {
     setLoading(true);
     try {
@@ -46,9 +51,11 @@ const ClassList: React.FC = () => {
         setQrVisible(true);
       } else {
         console.error("Failed to generate QR code:", response.data.message);
+        toast.error("Failed to generate QR code");
       }
     } catch (error) {
       console.error("Error generating QR code:", error);
+      toast.error("Error generating QR code");
     } finally {
       setLoading(false);
     }
@@ -62,14 +69,52 @@ const ClassList: React.FC = () => {
           setClassData(response.data.classes);
         } else {
           console.error("Failed to fetch classes:", response.data.message);
+          toast.error("Failed to fetch classes");
         }
       } catch (error) {
         console.error("Error fetching class data:", error);
+        toast.error("Error fetching class data");
       }
     };
 
     fetchClasses();
   }, []);
+
+  const handleOpenRfidModal = (classId: number) => {
+    setSelectedClassId(classId);
+    setRfidVisible(true);
+  };
+
+  const handleAddRfid = async () => {
+    if (!selectedClassId || !newRfid.trim()) {
+      toast.error("Please enter an RFID value");
+      return;
+    }
+
+    try {
+      const response = await App.put("/api/update-rfid/", {
+        id: selectedClassId,
+        rfid: newRfid.trim(),
+      });
+      
+      if (response.data.success) {
+        toast.success(response.data.message);
+        setRfidVisible(false);
+        setNewRfid("");
+        setSelectedClassId(null);
+        
+        // Refresh the class data after successful update
+        const updatedResponse = await App.get("/api/get-scheduled-classes/");
+        if (updatedResponse.data.success) {
+          setClassData(updatedResponse.data.classes);
+        }
+      } else {
+        toast.error(response.data.message || "AN error occured.");
+      }
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "An error occurred while updating RFID");
+    }
+  };
 
   const handleDownload = () => {
     if (qrCodeRef.current) {
@@ -104,15 +149,30 @@ const ClassList: React.FC = () => {
     { title: "Recurring Days", dataIndex: "recurring_days" },
     {
       title: "Actions",
-      render: (text: string, record: any) => (
+      render: (_: string, record: any) => (
         <>
-          {user?.role == "student" ? null : (
-            <>
+          {user?.role === "student" ? null : (
+            <div className="flex items-center gap-2">
               <Button type="text" onClick={() => fetchQrCode(record.id)}>
                 <IconQrcode /> Generate QR
               </Button>
-              <IconEdit onClick={() => handleEdit(record)} />
-            </>
+              <Tooltip
+                style={{ cursor: "pointer" }}
+                color="blue"
+                content="Manual Checkin"
+              >
+                <IconEdit onClick={() => handleEdit(record)} />
+              </Tooltip>
+              {user?.role === "lecturer" && (
+                <Tooltip
+                  style={{ cursor: "pointer" }}
+                  color="blue"
+                  content="Add RFID For your students"
+                >
+                  <IconPlus onClick={() => handleOpenRfidModal(record.course_id)} />
+                </Tooltip>
+              )}
+            </div>
           )}
         </>
       ),
@@ -120,17 +180,18 @@ const ClassList: React.FC = () => {
   ];
 
   const handleEdit = (classItem: any) => {
-    setSelectedClass(classItem); // Set selected class details
-    setVisible(true); // Open the drawer
+    setSelectedClass(classItem);
+    setVisible(true);
   };
 
   const handleClose = () => {
     setVisible(false);
-    setSelectedClass(null); // Clear selected class details when closing
+    setSelectedClass(null);
   };
 
   return (
     <div>
+      <ToastContainer/>
       <Table
         style={{ width: "100%" }}
         columns={columns}
@@ -182,9 +243,29 @@ const ClassList: React.FC = () => {
         <StudentCheckInDrawer
           visible={visible}
           onClose={handleClose}
-          classItem={selectedClass} // Pass the full class item details
+          classItem={selectedClass}
         />
       )}
+
+      {/* RFID Modal */}
+      <Modal
+        title="Set New RFID for your class"
+        visible={rfidVisible}
+        onOk={handleAddRfid}
+        onCancel={() => {
+          setRfidVisible(false);
+          setNewRfid("");
+          setSelectedClassId(null);
+        }}
+        autoFocus={false}
+        focusLock={true}
+      >
+        <Input
+          placeholder="Enter the new RFID (number or string)"
+          value={newRfid}
+          onChange={(value) => setNewRfid(value)}
+        />
+      </Modal>
     </div>
   );
 };

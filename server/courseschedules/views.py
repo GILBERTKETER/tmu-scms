@@ -454,7 +454,36 @@ def generate_qrcode(request):
         return JsonResponse({"success": False, "message": str(e)}, status=400)
     
     
-    
+@csrf_exempt
+def update_rfid(request):
+    user = request.user
+    if not user.is_authenticated:
+        return JsonResponse({"success": False, "message": "You are not authenticated."}, status=401)
+
+    if request.method != 'PUT':
+        return JsonResponse({"success": False, "message": "Invalid request method."}, status=405)
+
+    try:
+        data = json.loads(request.body)
+        course_id = data.get("id")
+        rfid = data.get("rfid")
+
+        if not all([course_id, rfid]):
+            return JsonResponse({"success": False, "message": "All fields are required"}, status=400)
+
+        enrollment = Enrollment.objects.get(course_id=course_id)
+        enrollment.rfid = rfid
+        enrollment.save()
+
+        return JsonResponse({"success": True, "message": "You have successfully added the RFID."})
+
+    except Enrollment.DoesNotExist:
+        return JsonResponse({"success": False, "message": "Enrollment not found for the given course ID."}, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({"success": False, "message": "Invalid JSON data."}, status=400)
+    except Exception as e:
+        return JsonResponse({"success": False, "message": f"An error occurred: {str(e)}"}, status=500)
+
 @csrf_exempt
 @require_http_methods(["POST"])
 def check_in_students_rfid(request):
