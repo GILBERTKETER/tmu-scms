@@ -9,9 +9,16 @@ from safetymonitoring.models import Incident
 from django.contrib.auth.models import User
 from Halls.models import Hall
 from django.db.models import Q
-
-
+from .utils import send_message
+from authentication.models import UserProfile
 from facilities.models import Facilities, FacilityBooking
+
+def format_kenyan_phone_number(phone_number):
+    # Ensure the phone number starts with '0' and replace it with '+254'
+    if phone_number.startswith("0"):
+        return "+254" + phone_number[1:]
+    return phone_number
+
 
 @shared_task
 def automatic_function():
@@ -32,7 +39,7 @@ def automatic_function():
     )
     
     for event in upcoming_events:
-        users_to_notify = User.objects.all()  # Adjust this queryset as needed
+        users_to_notify = User.objects.all()
         for user in users_to_notify:
             EventNotification.objects.create(
                 user=user,
@@ -41,6 +48,9 @@ def automatic_function():
                 location=event.address if event.address is not None else (event.link if event.link is not None else "null"),
                 expiry_date=expiry_time
             )
+            user_profile = UserProfile.objects.get(user_id=user.id)
+            user_phone = user_profile.phone_number 
+            send_message(to = format_kenyan_phone_number(user_phone), conversation=f"Upcoming event: {event.title} scheduled at {event.start_time}")
 
     # Create Class Notifications - classes starting within the next hour
     upcoming_classes = Schedule.objects.filter(
@@ -67,7 +77,10 @@ def automatic_function():
                 hall=hall_location,
                 expiry_date=expiry_time
             )
-
+            user_profile = UserProfile.objects.get(user_id=user.user_id)
+            user_phone = user_profile.phone_number 
+            send_message(to = format_kenyan_phone_number(user_phone), conversation=f"Upcoming class for {schedule.enrollment.course_name} {schedule.enrollment.course_code} in {hall_location} at {schedule.time_start.strftime('%H:%M')}")
+            
     # Create Activity Notifications - activities starting within the next hour
     upcoming_activities = Activities.objects.filter(
         activity_date=today,

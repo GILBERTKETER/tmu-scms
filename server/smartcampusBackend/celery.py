@@ -14,7 +14,7 @@ app.config_from_object('django.conf:settings', namespace='CELERY')
 app.conf.beat_schedule = {
     'check-upcoming-classes-every-20-hours': {
         'task': 'notifications.tasks.automatic_function',
-        'schedule': timedelta(hours=20),  # Run every 20 hours
+        'schedule': timedelta(minutes=1), 
 
     },
     'Update-halls-and-facilities-statuses-every 30-minutes': {
