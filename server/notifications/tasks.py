@@ -92,46 +92,60 @@ def automatic_function():
 
 @shared_task
 def update_hall_and_facility_status():
-   
     current_datetime = timezone.localtime(timezone.now())
     current_time = current_datetime.time()
     current_date = current_datetime.date()
-    current_weekday = current_datetime.strftime('%A').lower()  
+    current_weekday = current_datetime.strftime('%A').lower()
 
-    # Get all schedules for today
-    today_schedules = Schedule.objects.filter(
-        Q(date=current_date) |  # One-time schedules for today
-        Q(recurring_days__contains=[current_weekday])  # Recurring schedules for this weekday
-    )
-
-    # Check each schedule
-    for schedule in today_schedules:
-        start_time = schedule.time_start
-        end_time = schedule.time_end
-
-        # If the current time falls within a scheduled period
-        if start_time <= current_time <= end_time:
-            # Update hall status
-            try:
-                hall = Hall.objects.get(hall_number=schedule.hall)
-                hall.booked = True
-                hall.save()
-            except Hall.DoesNotExist:
-                # Log error or handle case where hall doesn't exist
-                print(f"Hall {schedule.hall} not found")
+    # Get all halls to process
+    halls = Hall.objects.all()
+    
+    # Process each hall individually
+    for hall in halls:
+        # Get today's schedules for this specific hall
+        hall_schedules = Schedule.objects.filter(
+            hall=hall.id,
+            recurring_days__contains=[current_weekday]
+        )
+        
+        # Default state is not booked
+        should_be_booked = False
+        
+        # Check if the hall should be booked right now based on any schedule
+        for schedule in hall_schedules:
+            start_time = schedule.time_start
+            end_time = schedule.time_end
+            
+            # If current time falls within this schedule period
+            if start_time <= current_time <= end_time:
+                should_be_booked = True
+                break  # Found an active schedule, no need to check others
+        
+        # Update hall status if it's different from current state
+        if hall.booked != should_be_booked:
+            hall.booked = should_be_booked
+            hall.save()
 
     # Update facility status based on FacilityBooking
-    facility_bookings = FacilityBooking.objects.filter(
-        created_at__date=current_date
-    )
-
-    # Update booked facilities
-    for booking in facility_bookings:
-        facility = booking.facility
-        facility.status = "Booked"
-        facility.save()
+    facilities = Facilities.objects.all()
+    
+    for facility in facilities:
+        # Check if there's an active booking for this facility
+        active_booking = FacilityBooking.objects.filter(
+            facility=facility,
+            activity_date=current_date,
+            activity_start_time__lte=current_time,
+            activity_end_time__gte=current_time
+        ).exists()
+        
+        # Update facility status based on active booking
+        new_status = "Booked" if active_booking else "Available"
+        if facility.status != new_status:
+            facility.status = new_status
+            facility.save()
 
     return {
+        'current weekday':current_weekday,
         'timestamp': current_datetime,
         'halls_updated': Hall.objects.filter(booked=True).count(),
         'facilities_updated': Facilities.objects.filter(status="Booked").count()

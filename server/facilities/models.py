@@ -13,6 +13,9 @@ class FacilityBooking(models.Model):
     activity_id = models.IntegerField(blank=True, null=True)
     title = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
+    activity_start_time = models.TimeField()
+    activity_end_time = models.TimeField()
+    activity_date = models.DateField(blank=True, null=True)
 
     def __str__(self):
         return f"{self.title} - {self.facility.name} on {self.booking_date}"

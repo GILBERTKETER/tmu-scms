@@ -8,7 +8,7 @@ import {
   Form,
   TimePicker,
 } from "@arco-design/web-react";
-import {  IconSearch } from "@arco-design/web-react/icon";
+import { IconSearch } from "@arco-design/web-react/icon";
 import App from "@/app/(site)/api/api";
 import Swal from "sweetalert2";
 import { toast, ToastContainer } from "react-toastify";
@@ -23,6 +23,8 @@ const FacilityList: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [form] = Form.useForm();
   const [activities, setActivities] = useState({});
+  const [selectedActivity, setSelectedActivity] = useState(null);
+
   const { Option } = Select;
 
   const columns = [
@@ -60,12 +62,18 @@ const FacilityList: React.FC = () => {
     setIsModalVisible(false);
     setSelectedFacility(null);
   };
-
+  const handleActivitySelect = (activityId) => {
+    const activity = activities.find((act) => act.id === activityId);
+    setSelectedActivity(activity);
+  };
   const handleBookingSubmit = async (values) => {
     const bookingData = {
       facility_id: selectedFacility.id,
       title: values.title,
-      activity_id: values.activity
+      activity_id: values.activity,
+      activity_start_time: selectedActivity.activity_start_time,
+      activity_end_time: selectedActivity.activity_end_time,
+      activity_date: selectedActivity.activity_date,
     };
 
     try {
@@ -219,7 +227,7 @@ const FacilityList: React.FC = () => {
               field="activity"
               rules={[{ required: true, message: "Please select a facility." }]}
             >
-              <Select>
+              <Select onChange={handleActivitySelect}>
                 {activities.map((activity) => (
                   <Option key={activity.id} value={activity.id}>
                     {activity.activity_name}

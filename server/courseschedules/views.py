@@ -105,16 +105,46 @@ def create_schedule(request):
             instructor_id = data.get("instructor_id")
             hall = data.get("hall")
             date = data.get("date")
-            time_start = data.get("time_start")
-            time_end = data.get("time_end")
+            time_start = parse_time(data.get("time_start"))
+            time_end = parse_time(data.get("time_end"))
             recurring_days = [day.lower() for day in data.get("recurring_days", [])]
 
+            # Check if the time period is valid
+            if time_start >= time_end:
+                return JsonResponse({
+                    "success": False,
+                    "message": "Start time must be before end time."
+                }, status=400)
 
             # Retrieve enrollment and instructor
             enrollment = Enrollment.objects.get(course_id=course_id)
             instructor = Instructor.objects.get(id=instructor_id)
 
-            print(f"Enrollment ID: {enrollment.id}, Scheduled Status: {enrollment.scheduled}")
+            # Check for time conflicts
+            existing_schedules = Schedule.objects.filter(hall=hall)
+            
+            for existing_schedule in existing_schedules:
+                # Check if there's any day overlap in recurring days
+                existing_days = [day.lower() for day in existing_schedule.recurring_days]
+                days_overlap = any(day in existing_days for day in recurring_days)
+                
+                if days_overlap:
+                    # Check for time overlap
+                    time_overlap = (
+                        (time_start >= existing_schedule.time_start and time_start < existing_schedule.time_end) or  # New start time falls within existing schedule
+                        (time_end > existing_schedule.time_start and time_end <= existing_schedule.time_end) or      # New end time falls within existing schedule
+                        (time_start <= existing_schedule.time_start and time_end >= existing_schedule.time_end)      # New schedule completely encompasses existing schedule
+                    )
+                    
+                    if time_overlap:
+                        conflicting_course = existing_schedule.enrollment.course_name
+                        return JsonResponse({
+                            "success": False,
+                            "message": f"Time conflict with existing class: {conflicting_course}. "
+                                     f"Existing schedule is from {existing_schedule.time_start.strftime('%I:%M %p')} "
+                                     f"to {existing_schedule.time_end.strftime('%I:%M %p')} on {', '.join(existing_schedule.recurring_days)}."
+                        }, status=409)
+
             not_enrolled = enrollment.scheduled
             # Check if the class is not already scheduled (1 means not scheduled)
             if not_enrolled:
@@ -123,31 +153,52 @@ def create_schedule(request):
                     instructor=instructor,
                     hall=hall,
                     date=parse_date(date) if date else None,
-                    time_start=parse_time(time_start),
-                    time_end=parse_time(time_end),
+                    time_start=time_start,
+                    time_end=time_end,
                     recurring_days=recurring_days if recurring_days else None
                 )
 
                 # Update the enrollment status to scheduled (0)
                 enrollment.scheduled = 0
                 enrollment.save()
-                enrollment.refresh_from_db()  # Refresh the instance with the latest values
-                print(f"Updated Scheduled Status: {enrollment.scheduled}")
+                enrollment.refresh_from_db()
 
-                return JsonResponse({"success": True, "message": "Schedule created successfully."}, status=201)
+                return JsonResponse({
+                    "success": True,
+                    "message": "Schedule created successfully.",
+                    "schedule": {
+                        "id": schedule.id,
+                        "course": enrollment.course_name,
+                        "days": schedule.recurring_days,
+                        "time": f"{schedule.time_start.strftime('%I:%M %p')} - {schedule.time_end.strftime('%I:%M %p')}"
+                    }
+                }, status=201)
             else:
-                print("The class is already scheduled.")
-                return JsonResponse({"success": False, "message": "The class is already scheduled."}, status=403)
+                return JsonResponse({
+                    "success": False,
+                    "message": "The class is already scheduled."
+                }, status=403)
 
         except Enrollment.DoesNotExist:
-            return JsonResponse({"success": False, "message": "Enrollment not found."}, status=404)
+            return JsonResponse({
+                "success": False,
+                "message": "Enrollment not found."
+            }, status=404)
         except Instructor.DoesNotExist:
-            return JsonResponse({"success": False, "message": "Instructor not found."}, status=404)
+            return JsonResponse({
+                "success": False,
+                "message": "Instructor not found."
+            }, status=404)
         except Exception as e:
-            return JsonResponse({"success": False, "message": str(e)}, status=400)
+            return JsonResponse({
+                "success": False,
+                "message": str(e)
+            }, status=400)
 
-    return JsonResponse({"success": False, "message": "Invalid request method."}, status=405)
-
+    return JsonResponse({
+        "success": False,
+        "message": "Invalid request method."
+    }, status=405)
 
 @csrf_exempt
 def update_class_details(request):

@@ -118,7 +118,9 @@ def book_facility(request):
         facility_id = data.get('facility_id')
         title = data.get('title')
         activity_id = data.get('activity_id')
-
+        activity_start_time = data.get('activity_start_time')
+        activity_end_time = data.get('activity_end_time')
+        activity_date = data.get('activity_date')
         if not all([facility_id, title, activity_id]):
             return JsonResponse({
                 'success': False,
@@ -129,10 +131,16 @@ def book_facility(request):
             facility = Facilities.objects.get(id=facility_id)
             if facility:
                 if facility.status == 'Available':
+                    facility_booked = FacilityBooking.objects.filter(activity_id = activity_id).count()
+                    if facility_booked > 0:
+                        return JsonResponse({"success":False, "message":"Activity room is booked already."}, status=403)
                     booking = FacilityBooking.objects.create(
                         facility=facility,
                         title=title,
-                        activity_id = activity_id
+                        activity_id = activity_id,
+                        activity_start_time = activity_start_time,
+                        activity_end_time = activity_end_time,
+                        activity_date = activity_date
                     )
                     booking.save()
                     facility.status = 'Occupied'
