@@ -10,25 +10,22 @@ export default function Bookings() {
       case "classes":
         return (
           <div>
-            <h2>Book Classes</h2>
+            <h2 className="text-secondary">Book Classes</h2>
             <p>Select a class to book and check availability.</p>
-            {/* Add your form or booking functionality here */}
           </div>
         );
       case "rooms":
         return (
           <div>
-            <h2>Book Rooms</h2>
+            <h2 className="text-secondary">Book Rooms</h2>
             <p>Select a room and reserve it for your needs.</p>
-            {/* Add your form or booking functionality here */}
           </div>
         );
       case "facilities":
         return (
           <div>
-            <h2>Book Facilities</h2>
+            <h2 className="text-secondary">Book Facilities</h2>
             <p>Select from available facilities to book.</p>
-            {/* Add your form or booking functionality here */}
           </div>
         );
       default:
@@ -149,7 +146,7 @@ export default function Bookings() {
               <div className=" rounded-full border-8 border-amber-400 p-4 ">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
+                  fill="#22409a"
                   viewBox="0 0 24 24"
                   stroke-width="1.5"
                   stroke="currentColor"
@@ -162,7 +159,7 @@ export default function Bookings() {
                   ></path>
                 </svg>
               </div>
-              <h3 className="text-3xl font-bold">Schedule Classes</h3>
+              <h3 className="text-3xl text-primary font-bold">Schedule Classes</h3>
               <p>
                 Plan and manage your classes seamlessly, ensuring optimal
                 scheduling for both instructors and students.
@@ -172,7 +169,7 @@ export default function Bookings() {
               <div className=" rounded-full border-8 border-amber-400 p-4 ">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
+                  fill="#22409a"
                   viewBox="0 0 24 24"
                   stroke-width="1.5"
                   stroke="currentColor"
@@ -185,7 +182,7 @@ export default function Bookings() {
                   ></path>
                 </svg>
               </div>
-              <h3 className="text-3xl font-bold">Book Facilities</h3>
+              <h3 className="text-3xl text-primary font-bold">Book Facilities</h3>
               <p>
                 {" "}
                 Effortlessly reserve classrooms, conference rooms, or other
@@ -196,7 +193,7 @@ export default function Bookings() {
               <div className=" rounded-full border-8 border-amber-400 p-4 ">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
+                  fill="#22409a"
                   viewBox="0 0 24 24"
                   stroke-width="1.5"
                   stroke="currentColor"
@@ -209,7 +206,7 @@ export default function Bookings() {
                   ></path>
                 </svg>
               </div>
-              <h3 className="text-3xl font-bold">Get Notifications</h3>
+              <h3 className="text-3xl text-primary font-bold">Get Notifications</h3>
               <p>
                 Stay informed with real-time notifications about your classes,
                 Bookings, schedule changes, and important updates through
