@@ -31,7 +31,7 @@ const SingleFeature = ({ feature }: { feature: Feature }) => {
           {/* <Image src={icon} width={36} height={36} alt="title" /> */}
           <p style={{ transform:"scale(2)"}}>{icon}</p>
         </div>
-        <h3 className="mb-5 mt-7.5 text-xl font-semibold text-black dark:text-white xl:text-itemtitle">
+        <h3 className="mb-5 mt-7.5 text-xl font-semibold text-primary dark:text-white xl:text-itemtitle">
           {title}
         </h3>
         <p>{description}</p>

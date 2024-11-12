@@ -39,7 +39,7 @@ function Description() {
                 <div className="mt-6">
                   <a
                     className="inline-flex rounded-lg bg-secondary px-4 py-1.5 text-base font-semibold leading-7 text-primary shadow-sm ring-1 ring-secondary hover:bg-primary hover:text-white"
-                    href="/learn-more"
+                    href="#"
                   >
                     SkillTrack: TMU Career Bot
                   </a>
@@ -98,7 +98,7 @@ function Description() {
                 <div className="mt-6">
                   <a
                     className="inline-flex rounded-lg bg-secondary px-4 py-1.5 text-base font-semibold leading-7 text-primary shadow-sm ring-1 ring-secondary hover:bg-primary hover:text-white"
-                    href="/learn-more"
+                    href="#"
                   >
                     FutureMentor
                   </a>
@@ -158,7 +158,7 @@ function Description() {
                 <div className="mt-6">
                   <a
                     className="inline-flex rounded-lg bg-secondary px-4 py-1.5 text-base font-semibold leading-7 text-primary shadow-sm ring-1 ring-secondary hover:bg-primary hover:text-white"
-                    href="/learn-more"
+                    href="#"
                   >
                     CareerCoach: TMU Edition
                   </a>

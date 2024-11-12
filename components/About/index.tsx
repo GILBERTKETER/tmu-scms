@@ -64,7 +64,7 @@ const About = () => {
                 </span>{" "}
                 A New Era in Campus Management"{" "}
               </span>
-              <h2 className="relative mb-6 text-3xl font-bold text-black dark:text-white xl:text-hero">
+              <h2 className="relative mb-6 text-3xl font-bold text-primary dark:text-white xl:text-hero">
                 A Complete Solution{" "}
                 <span className="relative inline-block before:absolute before:bottom-2.5 before:left-0 before:-z-1 before:h-3 before:w-full before:bg-titlebg dark:before:bg-titlebgdark">
                   Tailored for Campus Needs{" "}
@@ -84,7 +84,7 @@ const About = () => {
                   </p>
                 </div>
                 <div className="w-3/4">
-                  <h3 className="mb-0.5 text-metatitle2 text-black dark:text-white">
+                  <h3 className="mb-0.5 text-metatitle2 text-secondary dark:text-white">
                     Simplified Course Management{" "}
                   </h3>
                   <p>
@@ -101,7 +101,7 @@ const About = () => {
                   </p>
                 </div>
                 <div className="w-3/4">
-                  <h3 className="mb-0.5 text-metatitle2 text-black dark:text-white">
+                  <h3 className="mb-0.5 text-metatitle2 text-secondary dark:text-white">
                     Real-Time Student Data Monitoring{" "}
                   </h3>
                   <p>
@@ -139,7 +139,7 @@ const About = () => {
               <h4 className="font-medium uppercase text-black dark:text-white">
                 Accelerate Your Campus Management{" "}
               </h4>
-              <h2 className="relative mb-6 text-3xl font-bold text-black dark:text-white xl:text-hero">
+              <h2 className="relative mb-6 text-3xl font-bold text-primary dark:text-white xl:text-hero">
                 Comprehensive Campus Management Solutions Designed for Your{" "}
                 {"   "}
                 <span className="relative inline-block before:absolute before:bottom-2.5 before:left-0 before:-z-1 before:h-3 before:w-full before:bg-titlebg2 dark:before:bg-titlebgdark">
@@ -155,7 +155,7 @@ const About = () => {
               <div>
                 <a
                   href="#"
-                  className="group mt-7.5 inline-flex items-center gap-2.5 text-black hover:text-primary dark:text-white dark:hover:text-primary"
+                  className="group mt-7.5 inline-flex items-center gap-2.5 text-secondary hover:text-primary dark:text-white dark:hover:text-primary"
                 >
                   <span className="duration-300 group-hover:pr-2">
                     Learn More

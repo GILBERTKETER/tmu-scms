@@ -56,7 +56,7 @@ const Footer = () => {
                 </p>
                 <a
                   href="mailto:support@tmuscms.ac.ke"
-                  className="text-itemtitle font-medium text-black dark:text-white"
+                  className="text-itemtitle font-medium text-secondary dark:text-white"
                 >
                   support@tmuscms.ac.ke
                 </a>
@@ -81,7 +81,7 @@ const Footer = () => {
                   viewport={{ once: true }}
                   className="animate_top"
                 >
-                  <h4 className="mb-9 text-itemtitle2 font-medium text-black dark:text-white">
+                  <h4 className="mb-9 text-itemtitle2 font-medium text-primary dark:text-white">
                     Quick Links
                   </h4>
 
@@ -131,7 +131,7 @@ const Footer = () => {
                   viewport={{ once: true }}
                   className="animate_top"
                 >
-                  <h4 className="mb-9 text-itemtitle2 font-medium text-black dark:text-white">
+                  <h4 className="mb-9 text-itemtitle2 font-medium text-primary dark:text-white">
                     Support
                   </h4>
 
@@ -184,7 +184,7 @@ const Footer = () => {
                   viewport={{ once: true }}
                   className="animate_top"
                 >
-                  <h4 className="mb-9 text-itemtitle2 font-medium text-black dark:text-white">
+                  <h4 className="mb-9 text-itemtitle2 font-medium text-primary dark:text-white">
                     News letter
                   </h4>
                   <p className="mb-4 w-[90%]">

@@ -61,7 +61,7 @@ const FeaturesTab = () => {
                 </p>
               </div>
               <div className="md:w-3/5 lg:w-auto">
-                <button className="text-sm font-medium text-black dark:text-white xl:text-regular">
+                <button className="text-sm font-medium text-secondary dark:text-white xl:text-regular">
                   Students
                 </button>
               </div>
@@ -80,7 +80,7 @@ const FeaturesTab = () => {
                 </p>
               </div>
               <div className="md:w-3/5 lg:w-auto">
-                <button className="text-sm font-medium text-black dark:text-white xl:text-regular">
+                <button className="text-sm font-medium text-secondary dark:text-white xl:text-regular">
                   Dashboards
                 </button>
               </div>
@@ -99,7 +99,7 @@ const FeaturesTab = () => {
                 </p>
               </div>
               <div className="md:w-3/5 lg:w-auto">
-                <button className="text-sm font-medium text-black dark:text-white xl:text-regular">
+                <button className="text-sm font-medium text-secondary dark:text-white xl:text-regular">
                   Administrative tasks
                 </button>
               </div>
