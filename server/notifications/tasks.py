@@ -43,14 +43,14 @@ def automatic_function():
         for user in users_to_notify:
             EventNotification.objects.create(
                 user=user,
-                message=f"Upcoming event: {event.title} scheduled at {event.start_time}",
+                message=f"Upcoming event: {event.title} scheduled at {event.start_time.strftime('%I:%M %p')}",
                 event_time=event.start_time,
                 location=event.address if event.address is not None else (event.link if event.link is not None else "null"),
                 expiry_date=expiry_time
             )
             user_profile = UserProfile.objects.get(user_id=user.id)
             user_phone = user_profile.phone_number 
-            send_message(to = format_kenyan_phone_number(user_phone), conversation=f"Upcoming event: {event.title} scheduled at {event.start_time}")
+            send_message(to = format_kenyan_phone_number(user_phone), conversation=f"Upcoming event: {event.title} scheduled at {event.start_time.strftime('%I:%M %p')}")
 
     # Create Class Notifications - classes starting within the next hour
     upcoming_classes = Schedule.objects.filter(
@@ -72,14 +72,14 @@ def automatic_function():
             ClassNotification.objects.create(
                 user_id=user.user_id,
                 course_id=schedule.enrollment.course_id,
-                message=f"Upcoming class for {schedule.enrollment.course_name} {schedule.enrollment.course_code} in {hall_location} at {schedule.time_start.strftime('%H:%M')}",
+                message = f"Upcoming class for {schedule.enrollment.course_name} {schedule.enrollment.course_code} in {hall_location} at {schedule.time_start.strftime('%I:%M %p')}",
                 class_start_time=schedule.time_start,
                 hall=hall_location,
                 expiry_date=expiry_time
             )
             user_profile = UserProfile.objects.get(user_id=user.user_id)
             user_phone = user_profile.phone_number 
-            send_message(to = format_kenyan_phone_number(user_phone), conversation=f"Upcoming class for {schedule.enrollment.course_name} {schedule.enrollment.course_code} in {hall_location} at {schedule.time_start.strftime('%H:%M')}")
+            send_message(to = format_kenyan_phone_number(user_phone), conversation=f"Upcoming class for {schedule.enrollment.course_name} {schedule.enrollment.course_code} in {hall_location} at {schedule.time_start.strftime('%I:%M %p')}")
             
     # Create Activity Notifications - activities starting within the next hour
     upcoming_activities = Activities.objects.filter(
