@@ -24,7 +24,7 @@ from reportlab.lib.units import inch
 from reportlab.platypus import Table, TableStyle, Image
 from reportlab.lib.colors import Color
 from django.db.models import Q
-
+from notifications.utils import send_message
 import os
 from academics.models import Course
 def StudentDashboardView( request):
@@ -338,6 +338,13 @@ def add_announcement(request):
             expiry_date=expiry_date
         )
         
+        users = UserProfile.objects.all()
+        for user in users:
+            phone = user.phone_number
+            name = user.full_name
+            #send the message via whatsapp api
+            message = f"Hello {name}, here is a new announcement for you: Title: '{title}', Content: '{content}'. Thank you."
+            send_message(to=phone, conversation=message)
         return JsonResponse({"success": True, "message": "Announcement added successfully.", "announcement_id": announcement.id}, status=201)
     
     except json.JSONDecodeError:
