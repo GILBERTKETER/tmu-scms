@@ -44,7 +44,7 @@ function AddProgram() {
           text: response.data.message || "There was a problem submitting the program. Please try again.",
         });
       }
-    } catch (error) {
+    } catch (error:any) {
       toast.error(error.message || "An error occurred while adding the program.");
       Swal.fire({
         icon: "error",

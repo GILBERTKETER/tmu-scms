@@ -78,7 +78,7 @@ const HallManagement: React.FC = () => {
     { title: "Status", dataIndex: "booked" },
     {
       title: "Action",
-      render: (_, record: Hall) => (
+      render: (_:any, record: Hall) => (
         <div className="flex items-center justify-between gap-10">
           {user?.role == "student" || user?.role == "classrep" ? null : (
             <>

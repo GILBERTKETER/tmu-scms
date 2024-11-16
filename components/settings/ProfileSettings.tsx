@@ -6,16 +6,59 @@ import { Message } from "@arco-design/web-react";
 import App from "@/app/(site)/api/api";
 import { IconEmail, IconHome, IconPhone, IconGithub } from "@arco-design/web-react/icon";
 
+interface PersonalInfo {
+  fullName: string;
+  cover_image: string | null;
+  profile_image: string | null;
+  phone: string;
+  email: string;
+  location: string;
+  summary: string;
+}
+
+interface Experience {
+  position: string;
+  company: string;
+  duration: string;
+  description: string;
+}
+
+interface Education {
+  institution: string;
+  degree: string;
+  year: string;
+  gpa?: string;
+}
+
+interface Project {
+  name: string;
+  description: string;
+  technologies: string;
+  link: string;
+}
+
+interface SocialMedia {
+  platform: string;
+  url: string;
+}
+
+interface PortfolioData {
+  personalInfo: PersonalInfo;
+  skills: string[];
+  experiences: Experience[];
+  education: Education[];
+  projects: Project[];
+  socialMedia: SocialMedia[];
+}
+
 function Profile() {
   const { user } = useAuth();
-  const [portfolioData, setPortfolioData] = useState(null);
+  const [portfolioData, setPortfolioData] = useState<PortfolioData | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Helper function to construct image URL
-  const getImageUrl = (filename) => {
-    if (!filename) return '/default-placeholder.png'; // Provide a default image path
-    // Remove any 'filename=' prefix if it exists
-    const cleanFilename = filename.replace('filename=', '');
+  const getImageUrl = (filename: string | null) => {
+    if (!filename) return "/default-placeholder.png";
+    const cleanFilename = filename.replace("filename=", "");
     return `http://localhost:8000/media/${cleanFilename}`;
   };
 
@@ -24,7 +67,7 @@ function Profile() {
       try {
         const response = await App.get("/api/portfolio/get/");
         setPortfolioData(response.data.data);
-      } catch (error) {
+      } catch (error: any) {
         Message.error("An error occurred: " + error.message);
       } finally {
         setLoading(false);
@@ -54,7 +97,6 @@ function Profile() {
   return (
     <div className="mx-auto w-full max-w-7xl px-4">
       <div className="shadow-lg rounded-lg border border-stroke bg-white dark:border-strokedark dark:bg-boxdark overflow-hidden">
-        {/* Cover Image Section */}
         <div className="relative h-48 md:h-64 w-full bg-gray-100">
           {personalInfo.cover_image ? (
             <img
@@ -62,8 +104,9 @@ function Profile() {
               alt="profile cover"
               className="h-full w-full object-cover"
               onError={(e) => {
-                e.target.src = '/default-cover.jpg'; // Fallback image
-                e.target.onerror = null; // Prevent infinite loop
+                const target = e.target as HTMLImageElement;
+                target.src = "/default-cover.jpg";
+                target.onerror = null;
               }}
             />
           ) : (
@@ -71,12 +114,9 @@ function Profile() {
               <span className="text-gray-400">No cover image available</span>
             </div>
           )}
-         
         </div>
 
-        {/* Profile Content */}
         <div className="px-6 pb-8">
-          {/* Profile Image */}
           <div className="relative -mt-20 mb-6">
             <div className="w-32 h-32 mx-auto relative">
               <div className="rounded-full border-4 border-white shadow-lg overflow-hidden h-full w-full bg-gray-100">
@@ -88,31 +128,27 @@ function Profile() {
                     className="object-cover"
                     alt="profile"
                     onError={(e) => {
-                      e.target.src = '/default-avatar.jpg'; // Fallback image
-                      e.target.onerror = null; // Prevent infinite loop
+                      const target = e.target as HTMLImageElement;
+                      target.src = "/default-avatar.jpg";
+                      target.onerror = null;
                     }}
                   />
                 ) : (
                   <div className="h-full w-full bg-gray-200 flex items-center justify-center">
                     <span className="text-gray-400 text-2xl">
-                      {personalInfo.fullName?.charAt(0) || 'U'}
+                      {personalInfo.fullName?.charAt(0) || "U"}
                     </span>
                   </div>
                 )}
               </div>
-              
             </div>
           </div>
 
-          {/* Rest of the component remains the same... */}
-          {/* User Info */}
           <div className="text-center mb-8">
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
               {personalInfo.fullName}
             </h1>
             <p className="text-gray-600 dark:text-gray-400 mb-4">{user?.admission}</p>
-            
-            {/* Contact Info */}
             <div className="grid grid-cols-3 gap-4 max-w-2xl mx-auto bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
               <div className="flex flex-col items-center">
                 <IconPhone className="text-primary mb-2" />
@@ -129,13 +165,11 @@ function Profile() {
             </div>
           </div>
 
-          {/* About Section */}
           <div className="mb-8">
             <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">About Me</h2>
             <p className="text-gray-600 dark:text-gray-400">{personalInfo.summary}</p>
           </div>
 
-          {/* Skills Section */}
           <div className="mb-8">
             <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Skills</h2>
             <div className="flex flex-wrap gap-2">
@@ -150,7 +184,6 @@ function Profile() {
             </div>
           </div>
 
-          {/* Experience Section */}
           <div className="mb-8">
             <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Experience</h2>
             {experiences.map((exp, index) => (
@@ -163,7 +196,6 @@ function Profile() {
             ))}
           </div>
 
-          {/* Education Section */}
           <div className="mb-8">
             <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Education</h2>
             {education.map((edu, index) => (
@@ -176,7 +208,6 @@ function Profile() {
             ))}
           </div>
 
-          {/* Projects Section */}
           <div className="mb-8">
             <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Projects</h2>
             <div className="grid gap-4 md:grid-cols-2">
@@ -197,18 +228,12 @@ function Profile() {
             </div>
           </div>
 
-          {/* Social Media Section */}
           <div>
             <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Connect</h2>
             <div className="flex gap-4">
               {socialMedia.map((social, index) => (
-                <Link
-                  key={index}
-                  href={social.url}
-                  className="text-gray-600 hover:text-primary dark:text-gray-400 dark:hover:text-primary"
-                  target="_blank"
-                >
-                  {social.platform === 'github' && <IconGithub className="w-6 h-6" />}
+                <Link key={index} href={social.url} target="_blank">
+                  <IconGithub className="text-2xl text-primary" />
                 </Link>
               ))}
             </div>

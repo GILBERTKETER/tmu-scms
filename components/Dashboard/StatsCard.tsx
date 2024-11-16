@@ -1,10 +1,32 @@
 import App from "@/app/(site)/api/api";
 import React, { useEffect, useState } from "react";
 import { useAuth } from "@/context/Auth";
-
+interface UserStats {
+  title1?: string;
+  title2?: string;
+  title3?:string
+  title4?:string
+  student_count?: number;
+  lecturer_count?: number;
+  enrolled_courses_count?:string;
+scheduled_classes_count?:string;
+admin_count?:string
+  attendance_percentage?: number;
+  upcoming_class?: {
+    course_name?: string;
+    course_code?: string;
+    start_time?: string;
+    location?: string;
+  };
+  upcoming_event?:{
+    event_name?:string;
+    event_date?:string;
+    event_location?:string;
+  };
+}
 const DashboardCard = () => {
   const { user } = useAuth();
-  const [userStats, setUserStats] = useState({});
+  const [userStats, setUserStats] = useState<UserStats>({});
   useEffect(() => {
     console.log("useEffect is triggered");
     const getStats = async () => {
@@ -33,7 +55,7 @@ const DashboardCard = () => {
           setUserStats(response.data.data);
         }
       } else {
-        setUserStats("");
+        setUserStats({});
       }
     };
     getStats();

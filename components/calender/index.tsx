@@ -21,10 +21,14 @@ interface Event {
   date: string;
   start_time: string;
   end_time: string;
+  event_type:string;
+  is_online:boolean;
+  address:string;
+  link:string;
 }
 
 interface TransformedEvent {
-  id: number;
+  id: string;
   title: string;
   description: string;
   start: string;
@@ -53,11 +57,12 @@ function CalendarComponent() {
       const endDateTime = new Date(`${event.date} ${event.end_time}`);
 
       return {
-        id: event.id,
+        id: event.id.toString(),
         title: event.title,
         description: event.description,
         start: startDateTime.toISOString(),
         end: endDateTime.toISOString(),
+        date: event.date,
         isAllDay: false,
       };
     });

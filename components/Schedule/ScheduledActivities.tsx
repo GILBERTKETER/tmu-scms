@@ -20,7 +20,7 @@ const ScheduledActivities: React.FC = () => {
         } else {
           toast.warn("No activities found.");
         }
-      } catch (error) {
+      } catch (error:any) {
         toast.error(
           error.message || "An error occurred while fetching activities.",
         );
@@ -56,7 +56,7 @@ const ScheduledActivities: React.FC = () => {
             "There was a problem deleting the activity. Please try again.",
         });
       }
-    } catch (error) {
+    } catch (error:any) {
       toast.error(
         error.message || "An error occurred while deleting the activity.",
       );
@@ -93,10 +93,10 @@ const ScheduledActivities: React.FC = () => {
       title: "Action",
       key: "action",
 
-      render: (_, record) => (
+      render: (_:any, record:any) => (
         <>
           {user?.role == "student" ? null : (
-            <Space size="middle" className="cursor-pointer">
+            <Space size="medium" className="cursor-pointer">
               <EditActivityModal
                 activity_date={record.activity_date}
                 activity_end_time={record.activity_end_time}

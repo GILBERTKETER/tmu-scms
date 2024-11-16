@@ -3,6 +3,12 @@ import { Modal, Select, Message } from "@arco-design/web-react";
 import { useAuth } from "@/context/Auth";
 import App from "@/app/(site)/api/api";
 
+// Define types for program and option objects
+interface ProgramOption {
+  label: string;
+  value: string;
+}
+
 const semesters = [
   { label: "Semester 1", value: "1" },
   { label: "Semester 2", value: "2" },
@@ -15,18 +21,18 @@ const years = Array.from({ length: 4 }, (_, i) => ({
 
 const AutoModal = () => {
   const { user } = useAuth();
-  const [visible, setVisible] = useState(false);
-  const [program, setProgram] = useState("");
-  const [semester, setSemester] = useState("");
-  const [yearOfStudy, setYearOfStudy] = useState("");
-  const [programOptions, setProgramOptions] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [visible, setVisible] = useState<boolean>(false);
+  const [program, setProgram] = useState<string>("");  // Type as string
+  const [semester, setSemester] = useState<string>("");  // Type as string
+  const [yearOfStudy, setYearOfStudy] = useState<string>("");  // Type as string
+  const [programOptions, setProgramOptions] = useState<ProgramOption[]>([]);  // Type as array of ProgramOption objects
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchPrograms = async () => {
       try {
         const response = await App.get("/api/programs/");
-        const programs = response.data.map((program) => ({
+        const programs = response.data.map((program: { name: string, id: string }) => ({
           label: program.name,
           value: program.id,
         }));
@@ -59,16 +65,16 @@ const AutoModal = () => {
         semester,
         yearOfStudy,
       });
-      if (response.data.success == true) {
+      if (response.data.success === true) {
         // Close modal on success
         setVisible(false);
         Message.success(
-          response.data.message || "Profile updated successfully!",
+          response.data.message || "Profile updated successfully!"
         );
       } else {
         setVisible(true);
         Message.error(
-          response.data.message || "Failed to save. Please try again.",
+          response.data.message || "Failed to save. Please try again."
         );
       }
     } catch (error) {

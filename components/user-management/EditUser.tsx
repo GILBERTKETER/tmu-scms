@@ -6,8 +6,11 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Swal from "sweetalert2";
 const FormItem = Form.Item;
-
-function EditUser({ email, role }) {
+interface UserType{
+  email:string;
+  role:string;
+}
+function EditUser({ email, role }:UserType) {
   const [visible, setVisible] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [form] = Form.useForm();

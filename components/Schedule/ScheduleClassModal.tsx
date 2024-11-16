@@ -30,7 +30,7 @@ const ScheduledClasses: React.FC<ScheduledClassesProps> = ({
   const [visible, setVisible] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [form] = Form.useForm();
-  const [halls, setHalls] = useState<{ id: number; hall_name: string }[]>([]);
+  const [halls, setHalls] = useState<{ id: number; hall_name: string; hall_number:string; }[]>([]);
   const [instructors, setInstructors] = useState<
     { id: number; name: string }[]
   >([]);
@@ -60,7 +60,7 @@ const ScheduledClasses: React.FC<ScheduledClassesProps> = ({
       try {
         const response = await App.get("/api/get-instructors/");
         setInstructors(response.data.data);
-      } catch (error) {
+      } catch (error:any) {
         toast.error(error.message || "An unknown error occured");
       }
     };
@@ -104,7 +104,7 @@ const ScheduledClasses: React.FC<ScheduledClassesProps> = ({
         });
         setVisible(false);
       }
-    } catch (error) {
+    } catch (error:any) {
       toast.error(error.message || "An error occured.");
       Swal.fire({
         icon: "error",

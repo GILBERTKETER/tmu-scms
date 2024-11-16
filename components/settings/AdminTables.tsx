@@ -1,20 +1,43 @@
-import { useState, useEffect, useRef } from 'react';
-import { Table, Input, Button, Message } from '@arco-design/web-react';
-import { IconSearch } from '@arco-design/web-react/icon';
-import App from '@/app/(site)/api/api';
+import React, { useState, useEffect, useRef } from "react";
+import { Table, Input, Button, Message } from "@arco-design/web-react";
+import { IconSearch } from "@arco-design/web-react/icon";
+import { ColumnProps } from "@arco-design/web-react/es/Table/interface";
+import App from "@/app/(site)/api/api";
+import { RefInputType } from "@arco-design/web-react/es/Input/interface";
 
-function Admins() {
-  const [admins, setAdmins] = useState([]); 
+type AdminData = {
+  key: number;
+  name: string;
+  department: string;
+  email: string;
+};
+
+type APIAdmin = {
+  full_name: string;
+  program: string;
+  email: string;
+};
+
+type APIResponse = {
+  success: boolean;
+  message?: string;
+  data: APIAdmin[];
+};
+
+const Admins = (): JSX.Element => {
+  const [admins, setAdmins] = useState<AdminData[]>([]);
   const [loading, setLoading] = useState(false);
-  const inputRef = useRef(null);
+  const inputRef = useRef<RefInputType | null>(null);
 
   useEffect(() => {
     const fetchAdmins = async () => {
       setLoading(true);
       try {
-        const response = await App.get("/api/auth/get-all-admins/");
-        if (response.data.success) {
-          const adminData = response.data.data.map((admin, index) => ({
+        const { data } = await App.get<APIResponse>(
+          "/api/auth/get-all-admins/",
+        );
+        if (data.success) {
+          const adminData = data.data.map((admin, index) => ({
             key: index + 1,
             name: admin.full_name,
             department: admin.program,
@@ -22,7 +45,7 @@ function Admins() {
           }));
           setAdmins(adminData);
         } else {
-          Message.error(response.data.message || "Failed to fetch admin data");
+          Message.error(data.message || "Failed to fetch admin data");
         }
       } catch (error) {
         Message.error("Error fetching admin data");
@@ -34,45 +57,48 @@ function Admins() {
     fetchAdmins();
   }, []);
 
-  const columns = [
+  const columns: ColumnProps<AdminData>[] = [
     {
-      title: 'Admin Name',
-      dataIndex: 'name',
+      title: "Admin Name",
+      dataIndex: "name",
       filterIcon: <IconSearch />,
       filterDropdown: ({ filterKeys, setFilterKeys, confirm }) => (
-        <div className='arco-table-custom-filter'>
+        <div className="arco-table-custom-filter">
           <Input.Search
             ref={inputRef}
             searchButton
-            placeholder='Please enter name'
-            value={filterKeys[0] || ''}
+            placeholder="Please enter name"
+            value={filterKeys?.[0] || ""}
             onChange={(value) => {
-              setFilterKeys(value ? [value] : []);
+              setFilterKeys?.(value ? [value] : []);
             }}
             onSearch={() => {
-              confirm();
+              confirm?.();
             }}
           />
         </div>
       ),
-      onFilter: (value, row) => (value ? row.name.indexOf(value) !== -1 : true),
+      onFilter: (value, row) =>
+        value
+          ? row.name.toLowerCase().includes(String(value).toLowerCase())
+          : true,
       onFilterDropdownVisibleChange: (visible) => {
         if (visible) {
-          setTimeout(() => inputRef.current.focus(), 150);
+          setTimeout(() => inputRef.current?.dom?.focus(), 150);
         }
       },
     },
     {
-      title: 'Department',
-      dataIndex: 'department',
+      title: "Department",
+      dataIndex: "department",
     },
     {
-      title: 'Email',
-      dataIndex: 'email',
+      title: "Email",
+      dataIndex: "email",
     },
   ];
 
-  return <Table columns={columns} data={admins} loading={loading} />;
-}
+  return <Table<AdminData> columns={columns} data={admins} loading={loading} />;
+};
 
 export default Admins;

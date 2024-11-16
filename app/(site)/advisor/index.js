@@ -5,7 +5,7 @@ import { Hero, AdvisorCTA, Description } from "@/components";
 
 import HomeLayout from "@/components/Layouts/homeLayout";
 
-const Home: React.FC = () => {
+function Home(){
 
   useEffect(()=>{
     window.watsonAssistantChatOptions = {

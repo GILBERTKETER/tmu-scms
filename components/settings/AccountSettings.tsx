@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import { useAuth } from "@/context/Auth";
 import ChangeEmail from "./ChangeEmail";
-import ChangePhone from "./ChangePhone"
+import ChangePhone from "./ChangePhone";
 import LoadingLayout from "../Layouts/LoadingLayout";
 import {
   Form,
@@ -10,6 +10,7 @@ import {
   Grid,
   Tooltip,
   Space,
+  FormInstance,
 } from "@arco-design/web-react";
 import { IconExclamationCircle } from "@arco-design/web-react/icon";
 import Swal from "sweetalert2";
@@ -17,12 +18,30 @@ import { toast, ToastContainer } from "react-toastify";
 import App from "@/app/(site)/api/api";
 import "react-toastify/dist/ReactToastify.css";
 
+interface User {
+  email: string;
+  phone_number: string;
+}
+
+interface FormValues {
+  currentpassword: string;
+  newPassword: string;
+  cpassword: string;
+}
+
+interface ApiResponse {
+  success: boolean;
+  message?: string;
+  data?: any;
+}
+
 const AccountSettings = () => {
-  const formRef = useRef();
+  // Specify the type of formRef to FormInstance to avoid type errors
+  const formRef = useRef<FormInstance<FormValues>>(null);
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = async (values) => {
+  const handleSubmit = async (values: FormValues) => {
     setIsLoading(true);
 
     try {
@@ -32,7 +51,7 @@ const AccountSettings = () => {
         newPassword: values.newPassword,
         confirmNewPassword: values.cpassword,
       });
-      if (response.data.success == true) {
+      if (response.data.success) {
         Swal.fire({
           icon: "success",
           title: "Password Updated",
@@ -40,7 +59,6 @@ const AccountSettings = () => {
             response.data.message ||
             "Your password has been successfully updated!",
         });
-
         toast.success(
           response.data.message || "Password successfully updated!",
         );
@@ -53,13 +71,12 @@ const AccountSettings = () => {
             response.data.message ||
             "An error occurred while changing the password",
         });
-
         toast.error(
           response.data.message ||
             "An error occurred while changing the password",
         );
       }
-    } catch (err:any) {
+    } catch (err: any) {
       Swal.fire({
         icon: "error",
         title: "Error",
@@ -67,7 +84,6 @@ const AccountSettings = () => {
           err.response?.data?.message ||
           "An error occurred while changing the password",
       });
-
       toast.error("An error occurred while changing the password");
     } finally {
       setIsLoading(false);
@@ -86,9 +102,7 @@ const AccountSettings = () => {
                 Manage your account settings and preferences
               </p>
             </div>
-
             <hr className="mb-8 mt-4" />
-
             <p className="py-2 text-xl font-semibold">Email Address</p>
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
               <p className="text-gray-600">
@@ -96,9 +110,7 @@ const AccountSettings = () => {
               </p>
               <ChangeEmail />
             </div>
-
             <hr className="mb-8 mt-4" />
-
             <p className="py-2 text-xl font-semibold">Phone Number</p>
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
               <p className="text-gray-600">
@@ -106,7 +118,6 @@ const AccountSettings = () => {
               </p>
               <ChangePhone />
             </div>
-
             <hr className="mb-8 mt-4" />
 
             <Form ref={formRef} autoComplete="off" onSubmit={handleSubmit}>
@@ -151,17 +162,12 @@ const AccountSettings = () => {
                   </Grid.Col>
                 </Grid.Row>
               </Form.Item>
-
               <Form.Item>
                 <Space size={24}>
                   <Button type="primary" htmlType="submit" loading={isLoading}>
                     Change password
                   </Button>
-                  <Button
-                    onClick={() => {
-                      formRef.current?.resetFields();
-                    }}
-                  >
+                  <Button onClick={() => formRef.current?.resetFields()}>
                     Reset
                   </Button>
                 </Space>

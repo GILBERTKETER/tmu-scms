@@ -2,7 +2,7 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useSearchParams } from "next/navigation";
@@ -36,7 +36,7 @@ const ForgotPassword = () => {
     setShowPassword(!showPassword);
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e:any) => {
     e.preventDefault();
     try {
       const response = await App.post("/api/auth/reset-password/", {
@@ -48,13 +48,13 @@ const ForgotPassword = () => {
 
       toast.success(response.data.message);
       router.push("/auth/signin");
-    } catch (error) {
+    } catch (error:any) {
       toast.error(error.response?.data?.message || "Failed to reset password");
     }
   };
 
   return (
-    <>
+    <Suspense fallback="Please wait">
       <ToastContainer />
 
       <section className="pb-12.5 pt-32.5 lg:pb-25 lg:pt-45 xl:pb-30 xl:pt-50">
@@ -189,7 +189,7 @@ const ForgotPassword = () => {
           </motion.div>
         </div>
       </section>
-    </>
+    </Suspense>
   );
 };
 

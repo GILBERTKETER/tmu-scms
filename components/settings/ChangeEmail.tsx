@@ -18,7 +18,7 @@ function ChangeEmail() {
       setConfirmLoading(true);
 
       const response = await App.post("/api/auth/change-email/", {
-          currentEmail: user.email,
+          currentEmail: user?.email,
           newEmail: values.email,
         
       });

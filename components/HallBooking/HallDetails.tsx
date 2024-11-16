@@ -115,7 +115,7 @@ const HallsDisplay: React.FC<HallsDisplayProps> = ({ halls, currentDay, currentT
                 </Col>
                 <Col>
                   <Badge
-                    status={hall.current_status.status === 'Occupied' ? 'danger' : 'success'}
+                    status={hall.current_status.status === 'Occupied' ? 'error' : 'success'}
                     text={hall.current_status.status}
                   />
                 </Col>

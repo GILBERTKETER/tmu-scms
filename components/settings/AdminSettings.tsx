@@ -5,22 +5,26 @@ import AddCourse from "./AddCourse";
 import AddProgram from "./AddProgram";
 import App from "@/app/(site)/api/api";
 import LoadingLayout from "../Layouts/LoadingLayout";
-
+interface Card {
+  year: string;
+  numberOfCourses: number;
+  semesters: string[];
+  enrolledCount: number;
+}
 function AdminSettings() {
-  const [cards, setCards] = useState([]);
+  const [cards, setCards] = useState<Card[]>([]);
 
   useEffect(() => {
     const getProgramDetails = async () => {
       const response = await App.get("/api/program-details/");
       if (response.data.success) {
-        // Convert data object to array of objects with year included
-        const formattedCards = Object.entries(response.data.data).map(
-          ([year, details]) => ({
+        const formattedCards: Card[] = Object.entries(response.data.data).map(
+          ([year, details]: [string, any]) => ({
             year,
             numberOfCourses: details.number_of_courses,
             semesters: details.semesters,
             enrolledCount: details.enrolled_count,
-          }),
+          })
         );
         setCards(formattedCards);
       }

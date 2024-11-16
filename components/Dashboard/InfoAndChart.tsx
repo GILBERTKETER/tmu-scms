@@ -2,17 +2,37 @@
 import React, { useEffect, useState } from "react";
 import { Card, Select, Button, Empty } from "@arco-design/web-react";
 import DashboardBarChart from "./DashboardChart";
-import App from "@/app/(site)/api/api"; // Adjust based on your API configuration
+import App from "@/app/(site)/api/api";
 import { useAuth } from "@/context/Auth";
 import Link from "next/link";
 
-const InfoAndChart = () => {
-  const [latestIncident, setLatestIncident] = useState(null);
-  const [latestLog, setLatestLog] = useState(null);
-  const [courses, setCourses] = useState([]);
-  const [selectedCourse, setSelectedCourse] = useState(null);
-  const [selectedYear, setSelectedYear] = useState(null);
-  const [selectedsemester, setSelectedSemester] = useState(null);
+interface Incident {
+  title: string;
+  description: string;
+  severity: string;
+  status: string;
+  report_date: string;
+}
+
+interface Log {
+  course: string;
+  method: string;
+  timestamp: string;
+}
+
+interface Course {
+  id: string;
+  name: string;
+  code: string;
+}
+
+const InfoAndChart: React.FC = () => {
+  const [latestIncident, setLatestIncident] = useState<Incident | null>(null);
+  const [latestLog, setLatestLog] = useState<Log | null>(null);
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
+  const [selectedYear, setSelectedYear] = useState<number | null>(null);
+  const [selectedSemester, setSelectedSemester] = useState<number | null>(null);
   const { user } = useAuth();
 
   // Fetch latest active incident
@@ -21,7 +41,7 @@ const InfoAndChart = () => {
       try {
         const response = await App.get("/api/latest-active-incident");
         if (response.data.success) {
-          setLatestIncident(response.data.data);
+          setLatestIncident(response.data.data as Incident);
         } else {
           setLatestIncident(null);
         }
@@ -38,7 +58,7 @@ const InfoAndChart = () => {
       try {
         const response = await App.get("/api/latest-log");
         if (response.data.success) {
-          setLatestLog(response.data.data);
+          setLatestLog(response.data.data as Log);
         } else {
           setLatestLog(null);
         }
@@ -47,7 +67,6 @@ const InfoAndChart = () => {
       }
     };
 
-    // Only fetch latest log if the user is a student or lecturer
     if (user?.role === "student" || user?.role === "classrep") {
       fetchLatestLog();
     }
@@ -64,8 +83,8 @@ const InfoAndChart = () => {
       const fetchCourses = async () => {
         try {
           const response = await App.get("/api/get-courses/admins/");
-          if (response.data.success == true) {
-            setCourses(response.data.data);
+          if (response.data.success) {
+            setCourses(response.data.data as Course[]);
           }
         } catch (error) {
           console.error("Error fetching courses:", error);
@@ -83,9 +102,9 @@ const InfoAndChart = () => {
     }
 
     try {
-      const response = await App.post(`/api/download-attendance/`, {
+      const response = await App.post("/api/download-attendance/", {
         responseType: "blob",
-        data: { selectedCourse, selectedsemester, selectedYear },
+        data: { selectedCourse, selectedSemester, selectedYear },
       });
 
       const url = window.URL.createObjectURL(new Blob([response.data]));
@@ -107,7 +126,7 @@ const InfoAndChart = () => {
           extra={<Link href="/smartcampus/safety-monitoring">Learn more</Link>}
           style={{
             width: "100%",
-            maxWidth: "50% !important",
+            maxWidth: "100% !important",
             height: "50% !important",
           }}
         >
@@ -129,16 +148,15 @@ const InfoAndChart = () => {
                 <div className="flex flex-col gap-2">
                   <p className="text-sm font-bold text-primary">Severity</p>
                   <p className="text-xs text-black">
-                    {" "}
                     {latestIncident.severity}
                   </p>
                 </div>
                 <div className="flex flex-col gap-2">
                   <p className="text-sm font-bold text-primary">Status</p>
-                  <p className="text-xs text-black"> {latestIncident.status}</p>
+                  <p className="text-xs text-black">{latestIncident.status}</p>
                 </div>
               </div>
-              <p className=" text-sm font-bold text-primary">
+              <p className="text-sm font-bold text-primary">
                 <strong>Reported on:</strong>{" "}
                 {new Date(latestIncident.report_date).toLocaleDateString()}
               </p>
@@ -146,7 +164,11 @@ const InfoAndChart = () => {
           ) : (
             <Empty
               imgSrc="//p1-arco.byteimg.com/tos-cn-i-uwbnlip3yd/a0082b7754fbdb2d98a5c18d0b0edd25.png~tplv-uwbnlip3yd-webp.webp"
-              description={<Button onClick={()=>window.location.reload()} type="primary">Refresh</Button>}
+              description={
+                <Button onClick={() => window.location.reload()} type="primary">
+                  Refresh
+                </Button>
+              }
             />
           )}
         </Card>
@@ -155,7 +177,7 @@ const InfoAndChart = () => {
           title={`${user?.role === "admin" || user?.role === "Admin" || user?.role === "lecturer" || user?.role === "Lecturer" ? "Attendance downloads" : "Latest log"}`}
           style={{
             width: "100%",
-            maxWidth: "50% !important",
+            maxWidth: "100% !important",
             height: "50% !important",
             minHeight: "50% !important",
           }}
@@ -170,7 +192,7 @@ const InfoAndChart = () => {
                 style={{ width: "100%", marginBottom: "10px" }}
                 onChange={(value) => setSelectedCourse(value)}
                 options={courses.map((course) => ({
-                  label: course.name + " " + course.code,
+                  label: `${course.name} ${course.code}`,
                   value: course.id,
                 }))}
               />
@@ -216,7 +238,11 @@ const InfoAndChart = () => {
           ) : (
             <Empty
               imgSrc="//p1-arco.byteimg.com/tos-cn-i-uwbnlip3yd/a0082b7754fbdb2d98a5c18d0b0edd25.png~tplv-uwbnlip3yd-webp.webp"
-              description={<Button onClick={()=>window.location.reload()} type="primary">Refresh</Button>}
+              description={
+                <Button onClick={() => window.location.reload()} type="primary">
+                  Refresh
+                </Button>
+              }
             />
           )}
         </Card>

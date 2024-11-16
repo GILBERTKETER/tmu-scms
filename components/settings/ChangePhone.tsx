@@ -18,7 +18,7 @@ function ChangePhone() {
       setConfirmLoading(true);
 
       const response = await App.post("/api/auth/change-phone/", {
-          currentEmail: user.email,
+          currentEmail: user?.email,
           phoneNumber: values.phone,
         
       });

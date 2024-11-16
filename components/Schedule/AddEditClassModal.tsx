@@ -24,7 +24,19 @@ interface AddEditClassModalProps {
   recurring_days: string[];
   id: string;
 }
-
+interface Hall {
+  label: string;
+  value: string;
+  hall_name: string;
+  hall_number: string;
+  id: string;
+}
+interface Instructor {
+  label: string;
+  value: string;
+  name:string;
+  id:string;
+}
 const AddEditClassModal: React.FC<AddEditClassModalProps> = ({
   visible,
   onClose,
@@ -36,10 +48,8 @@ const AddEditClassModal: React.FC<AddEditClassModalProps> = ({
   id,
 }) => {
   const [form] = Form.useForm();
-  const [instructors, setInstructors] = useState<
-    { label: string; value: string }[]
-  >([]);
-  const [halls, setHalls] = useState<{ label: string; value: string }[]>([]);
+  const [instructors, setInstructors] = useState<Instructor[]>([]);
+  const [halls, setHalls] = useState<Hall[]>([]);
   const recurringOptions = [
     "Monday",
     "Tuesday",
@@ -63,7 +73,7 @@ const AddEditClassModal: React.FC<AddEditClassModalProps> = ({
       try {
         const response = await App.get("/api/get-instructors/");
         setInstructors(response.data.data);
-      } catch (error) {
+      } catch (error:any) {
         toast.error(error.message || "An unknown error occurred");
       }
     };
@@ -180,14 +190,25 @@ const AddEditClassModal: React.FC<AddEditClassModalProps> = ({
             field="recurring_days"
             rules={[{ required: true, message: "Recurring days are required" }]}
           >
-            <Select
-              mode="multiple"
-              options={recurringOptions.map((day) => ({
-                label: day,
-                value: day,
-              }))}
-              tagRender={(props) => <Tag color="blue">{props.label}</Tag>}
-            />
+        <Select
+  mode="multiple"
+  options={recurringOptions.map((day) => ({
+    label: day,
+    value: day,
+  }))}
+  renderFormat={(options) => (
+    <>
+      {(Array.isArray(options) ? options : []).map((option) => (
+        <Tag color="blue" key={option.value}>
+          {option.label}
+        </Tag>
+      ))}
+    </>
+  )}
+/>
+
+
+
           </Form.Item>
         </Form>
       </Modal>

@@ -8,7 +8,7 @@ const CheckInModal: React.FC = () => {
   const [visible, setVisible] = useState(false);
   const [checkInMethod, setCheckInMethod] = useState('');
 
-  const openModal = (method) => {
+  const openModal = (method:any) => {
     setCheckInMethod(method);
     setVisible(true);
   };

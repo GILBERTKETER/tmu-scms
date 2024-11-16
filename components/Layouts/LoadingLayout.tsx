@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from 'react';
-
-const LoadingLayout = ({ children }) => {
+import React, { useState, useEffect, ReactNode } from 'react';
+interface LoadingLayoutProps {
+  children: ReactNode;
+}
+const LoadingLayout: React.FC<LoadingLayoutProps> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {

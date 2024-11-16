@@ -23,7 +23,14 @@ interface ColumnType {
   width?: number;
   render?: (value: any) => JSX.Element;
 }
-
+interface Incident {
+  key: string;
+  id: string;
+  title: string;
+  status: string;
+  date: string;
+  severity: string;
+}
 interface DataType {
   key: string;
   id: string; // Add id to the DataType
@@ -145,7 +152,7 @@ const IncidentTable: React.FC = () => {
         const response = await App.get("/api/get-all-incidents/");
         if (response.data && response.data.success) {
           const incidents = response.data.data
-            .map((incident) => ({
+            .map((incident:any) => ({
               key: incident.id.toString(),
               id: incident.id.toString(),
               title: incident.title,
@@ -153,7 +160,7 @@ const IncidentTable: React.FC = () => {
               date: incident.date,
               severity: incident.severity,
             }))
-            .sort((a, b) => new Date(b.date) - new Date(a.date)); // Sort by date
+            .sort((a: Incident, b: Incident) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
           setData(incidents);
         }

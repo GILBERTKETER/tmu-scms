@@ -3,8 +3,10 @@
 import { useEffect } from "react";
 import NProgress from "nprogress";
 import "nprogress/nprogress.css";
-
-const LoadingBar = ({ loading }) => {
+interface LoadingBarProps {
+  loading: boolean;
+}
+const LoadingBar: React.FC<LoadingBarProps> = ({ loading }) => {
   useEffect(() => {
     if (loading) {
       NProgress.start();

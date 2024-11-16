@@ -6,7 +6,7 @@ function App() {
     description: 'Beijing ByteDance Technology Co., Ltd. is an enterprise located in China.',
   });
 
-  const render = (actions, item, index) => (
+  const render = (actions:any, item:any, index:any) => (
     <List.Item key={index} actions={actions}>
       <List.Item.Meta
         avatar={<Avatar shape='square'>A</Avatar>}

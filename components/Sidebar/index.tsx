@@ -16,11 +16,6 @@ interface SidebarProps {
 const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   const { user } = useAuth();
 
-  const isStudent = user?.role === "student";
-  const isClassRep = user?.role === "classrep";
-  const isLecturer = user?.role === "lecturer";
-  const isAdmin = user?.role === "admin";
-
   const pathname = usePathname();
   const [pageName, setPageName] = useLocalStorage("selectedMenu", "dashboard");
   const menuGroups = [
@@ -553,8 +548,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                   const allowedRoles = menuItem.requiredRole
                     .split(",")
                     .map((role) => role.trim());
-                  return allowedRoles.includes(user?.role);
-                });
+                    return allowedRoles.includes(user?.role ?? '');
+                  });
                 return visibleItems.length > 0; // Only keep the group if it has visible items
               })
               .map((group, groupIndex) => (
@@ -569,8 +564,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                         const allowedRoles = menuItem.requiredRole
                           .split(",")
                           .map((role) => role.trim());
-                        return allowedRoles.includes(user?.role);
-                      })
+                          return allowedRoles.includes(user?.role ?? '');
+                        })
                       .map((menuItem, menuIndex) => (
                         <SidebarItem
                           key={menuIndex}

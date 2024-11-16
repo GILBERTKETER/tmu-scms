@@ -1,14 +1,14 @@
-import { notification } from '@arco-design/web-react';
+import { Notification } from '@arco-design/web-react';
 
 export const showSuccessNotification = (message: string) => {
-  notification.success({
+  Notification.success({
     title: 'Success',
     content: message,
   });
 };
 
 export const showErrorNotification = (message: string) => {
-  notification.error({
+  Notification.error({
     title: 'Error',
     content: message,
   });

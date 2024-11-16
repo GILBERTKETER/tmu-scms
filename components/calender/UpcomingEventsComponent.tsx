@@ -6,8 +6,10 @@ import { useAuth } from "@/context/Auth";
 interface Event {
   id: number;
   title: string;
-  date: string;
   description: string;
+  startTime: string;
+  endTime: string;
+  date: string;
   start_time: string;
   end_time: string;
   event_type: string;
@@ -18,7 +20,7 @@ interface Event {
 
 interface UpcomingEventsComponentProps {
   events: Event[];
-  onEdit: (updatedEvent: Event) => void;
+  onEdit: (updatedEvent: number) => void;
   onDelete: (eventId: number) => void;
 }
 
@@ -58,7 +60,7 @@ const UpcomingEventsComponent: React.FC<UpcomingEventsComponentProps> = ({
           ...editingEvent,
           ...values,
         };
-        onEdit(updatedEvent);
+        onEdit(updatedEvent.id);
         setIsModalVisible(false);
         form.clearFields();
       }

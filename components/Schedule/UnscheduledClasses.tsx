@@ -42,7 +42,7 @@ const UnscheduledClasses: React.FC = () => {
       title: "Action",
       key: "action",
       render: (_: any, record: any) => (
-        <Space size="middle">
+        <Space size="medium">
           {user?.role == "student" ? null : (
             <ScheduleClassModal
               course_code={record.course_code}

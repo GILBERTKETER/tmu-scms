@@ -6,7 +6,6 @@ import {
   Select,
   Input,
   Form,
-  TimePicker,
 } from "@arco-design/web-react";
 import { IconSearch } from "@arco-design/web-react/icon";
 import App from "@/app/(site)/api/api";
@@ -14,16 +13,32 @@ import Swal from "sweetalert2";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+interface Facility {
+  id: number;
+  facility_name: string;
+  capacity: number;
+  facility_type: string;
+  status: string;
+}
+
+interface Activity {
+  id: number;
+  activity_name: string;
+  activity_start_time: string;
+  activity_end_time: string;
+  activity_date: string;
+}
+
 const FacilityList: React.FC = () => {
-  const [filterType, setFilterType] = useState("");
-  const [searchText, setSearchText] = useState("");
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [selectedFacility, setSelectedFacility] = useState(null);
-  const [facilities, setFacilities] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [filterType, setFilterType] = useState<string>("");
+  const [searchText, setSearchText] = useState<string>("");
+  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+  const [selectedFacility, setSelectedFacility] = useState<Facility | null>(null);
+  const [facilities, setFacilities] = useState<Facility[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [activities, setActivities] = useState<Activity[]>([]);
+  const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
   const [form] = Form.useForm();
-  const [activities, setActivities] = useState({});
-  const [selectedActivity, setSelectedActivity] = useState(null);
 
   const { Option } = Select;
 
@@ -46,13 +61,13 @@ const FacilityList: React.FC = () => {
     {
       title: "Status",
       dataIndex: "status",
-      render: (status) => (
+      render: (status: string) => (
         <Tag color={status === "Available" ? "green" : "red"}>{status}</Tag>
       ),
     },
   ];
 
-  const handleBook = (facility) => {
+  const handleBook = (facility: Facility) => {
     setSelectedFacility(facility);
     setIsModalVisible(true);
     form.resetFields();
@@ -62,11 +77,15 @@ const FacilityList: React.FC = () => {
     setIsModalVisible(false);
     setSelectedFacility(null);
   };
-  const handleActivitySelect = (activityId) => {
-    const activity = activities.find((act) => act.id === activityId);
+
+  const handleActivitySelect = (activityId: number) => {
+    const activity = activities.find((act) => act.id === activityId) || null;
     setSelectedActivity(activity);
   };
-  const handleBookingSubmit = async (values) => {
+
+  const handleBookingSubmit = async (values: any) => {
+    if (!selectedFacility || !selectedActivity) return;
+
     const bookingData = {
       facility_id: selectedFacility.id,
       title: values.title,
@@ -90,8 +109,7 @@ const FacilityList: React.FC = () => {
         Swal.fire({
           icon: "error",
           title: "Booking Failed",
-          text:
-            response.data.message || "There was a problem with the booking.",
+          text: response.data.message || "There was a problem with the booking.",
         });
         toast.error(response.data.message || "Error occurred while booking!");
       }
@@ -101,21 +119,18 @@ const FacilityList: React.FC = () => {
         title: "Booking Failed",
         text: "An error occurred while processing your booking. Please try again.",
       });
-      toast.error(
-        "An error occurred while processing your booking. Please try again.",
-      );
+      toast.error("An error occurred while processing your booking. Please try again.");
     }
   };
 
   useEffect(() => {
-    //fetching the activities
-    const get_activities = async () => {
+    const getActivities = async () => {
       const response = await App.get("/api/get-activities/");
-      if (response.data.success == true) {
+      if (response.data.success) {
         setActivities(response.data.data);
       }
     };
-    get_activities();
+    getActivities();
   }, []);
 
   useEffect(() => {
@@ -142,7 +157,7 @@ const FacilityList: React.FC = () => {
   }
 
   const filteredFacilities = facilities.filter((facility) => {
-    const matchesType = filterType ? facility.type === filterType : true;
+    const matchesType = filterType ? facility.facility_type === filterType : true;
     const matchesSearch = facility.facility_name
       .toLowerCase()
       .includes(searchText.toLowerCase());
@@ -166,9 +181,9 @@ const FacilityList: React.FC = () => {
           onChange={setFilterType}
           style={{ width: "100%" }}
         >
-          <Select.Option value="Hall">Hall</Select.Option>
-          <Select.Option value="Lab">Lab</Select.Option>
-          <Select.Option value="Library">Library</Select.Option>
+          <Option value="Hall">Hall</Option>
+          <Option value="Lab">Lab</Option>
+          <Option value="Library">Library</Option>
         </Select>
       </div>
       <Table
@@ -176,7 +191,7 @@ const FacilityList: React.FC = () => {
         columns={columns}
         data={filteredFacilities}
         pagination={{ pageSize: 5 }}
-        onRow={(record) => ({
+        onRow={(record: Facility) => ({
           onClick: () => handleBook(record),
         })}
       />

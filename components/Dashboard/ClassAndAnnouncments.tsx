@@ -5,27 +5,51 @@ import AddAnnouncements from "./AddAnnouncements";
 import App from "@/app/(site)/api/api";
 import { useAuth } from "@/context/Auth";
 
-const ClasAndAnnouncements = () => {
-  const [announcements, setAnnouncements] = useState([]);
-  const [latestAnnouncement, setLatestAnnouncement] = useState(null);
+interface Announcement {
+  title: string;
+  content: string;
+  datePosted: string;
+}
+
+interface ClassDetails {
+  course_code: string;
+  course_name: string;
+}
+
+interface AdminDetails {
+  highest_attended?: {
+    course_code: string;
+    course_name: string;
+    attendance_count: number;
+  };
+  least_attended?: {
+    course_code: string;
+    course_name: string;
+    attendance_count: number;
+  };
+}
+
+const ClasAndAnnouncements: React.FC = () => {
+  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+  const [latestAnnouncement, setLatestAnnouncement] = useState<Announcement | null>(null);
   const { user } = useAuth();
 
-  const [classes, setClasses] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [adminDetails, setAdminDetails] = useState(null);
+  const [classes, setClasses] = useState<ClassDetails[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [adminDetails, setAdminDetails] = useState<AdminDetails | null>(null);
 
   useEffect(() => {
     App.post("/api/get-classes/")
       .then((response) => {
         const data = response.data.data;
         if (user?.role.toLowerCase() === "admin") {
-          setAdminDetails(data);
+          setAdminDetails(data as AdminDetails);
         } else if (
           user?.role.toLowerCase() === "student" ||
           user?.role.toLowerCase() === "classrep" ||
           user?.role.toLowerCase() === "lecturer"
         ) {
-          setClasses(data);
+          setClasses(data as ClassDetails[]);
         }
         setLoading(false);
       })
@@ -39,9 +63,9 @@ const ClasAndAnnouncements = () => {
     const fetchAnnouncements = async () => {
       try {
         const response = await App.get("/api/announcements");
-        setAnnouncements(response.data.data);
+        setAnnouncements(response.data.data as Announcement[]);
         if (response.data.data.length > 0) {
-          setLatestAnnouncement(response.data.data[0]);
+          setLatestAnnouncement(response.data.data[0] as Announcement);
         }
       } catch (error) {
         console.error("Failed to fetch announcements:", error);
@@ -67,7 +91,6 @@ const ClasAndAnnouncements = () => {
         {loading ? (
           <div>Loading...</div>
         ) : user?.role.toLowerCase() === "admin" ? (
-          // Render admin details (highest and least attended courses)
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-xl font-bold text-primary">
@@ -100,7 +123,6 @@ const ClasAndAnnouncements = () => {
             </div>
           </div>
         ) : (
-          // Render classes for students/lecturers
           <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
             {classes.length > 0 ? (
               classes.map((course) => (
@@ -111,7 +133,7 @@ const ClasAndAnnouncements = () => {
             ) : (
               <Empty
                 imgSrc="//p1-arco.byteimg.com/tos-cn-i-uwbnlip3yd/a0082b7754fbdb2d98a5c18d0b0edd25.png~tplv-uwbnlip3yd-webp.webp"
-                description={<Button onClick={()=>window.location.reload()} type="primary">Refresh</Button>}
+                description={<Button onClick={() => window.location.reload()} type="primary">Refresh</Button>}
               />
             )}
           </div>
@@ -147,7 +169,7 @@ const ClasAndAnnouncements = () => {
         ) : (
           <Empty
             imgSrc="//p1-arco.byteimg.com/tos-cn-i-uwbnlip3yd/a0082b7754fbdb2d98a5c18d0b0edd25.png~tplv-uwbnlip3yd-webp.webp"
-            description={<Button type="primary" onClick={()=>window.location.reload()}>Refresh</Button>}
+            description={<Button type="primary" onClick={() => window.location.reload()}>Refresh</Button>}
           />
         )}
       </Card>

@@ -4,11 +4,8 @@ import ProgressBar from "./ProgressBar";
 import { useAuth } from "@/context/Auth";
 
 interface ClassCardProps {
-  title: string;
-  description: string;
   start_time: string;
   end_time: string;
-  progress: number;
   hallName: string;
   course_name: string;
   instructor: string;
@@ -16,7 +13,7 @@ interface ClassCardProps {
   programName: string;
   course_code: string;
   date: string;
-  recurring_days: string;
+  recurring_days: string[];
   onEdit: () => void;
   onDelete: () => void;
 }

@@ -13,7 +13,7 @@ const ForgotPassword = () => {
 
   const [email, setEmail] = useState("");
 
-  const requestResetLink = async (e) => {
+  const requestResetLink = async (e:any) => {
     e.preventDefault();
 
     try {
@@ -32,7 +32,7 @@ const ForgotPassword = () => {
       } else {
         toast.error(response.data.message);
       }
-    } catch (error) {
+    } catch (error:any) {
       toast.error(error.response?.data?.message || "An error occurred");
     }
   };

@@ -48,9 +48,12 @@ const DashboardBarChart: React.FC = () => {
 
   const fetchAttendanceData = async (courseCode: string): Promise<void> => {
     try {
-      const response = await App.post<ApiResponse>("/api/get-attendance-data/", {
-        course_code: courseCode,
-      });
+      const response = await App.post<ApiResponse>(
+        "/api/get-attendance-data/",
+        {
+          course_code: courseCode,
+        },
+      );
       if (response.data.success) {
         setAttendanceData(response.data.data);
       }
@@ -66,9 +69,9 @@ const DashboardBarChart: React.FC = () => {
 
   return (
     <div className="flex h-full w-full flex-col">
-      <Card 
-        title="Monthly Attendance Statistics" 
-        className="h-full w-full" 
+      <Card
+        title="Monthly Attendance Statistics"
+        className="h-full w-full"
         extra={
           <Select
             placeholder="Select a Course"
@@ -82,7 +85,7 @@ const DashboardBarChart: React.FC = () => {
           />
         }
       >
-        <div style={{ height: "100% !important" }} className="h-[350px] w-full">
+        <div className="h-[350px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={attendanceData}

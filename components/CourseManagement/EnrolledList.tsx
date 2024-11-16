@@ -6,22 +6,27 @@ import Swal from "sweetalert2";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+interface EnrolledCourse {
+  course__code: string;
+  course__name: string;
+  year: number;
+  semester: string;
+}
+
 function EnrolledCourses() {
-  const [loading, setLoading] = useState(false);
-  const [enrolledCourses, setEnrolledCourses] = useState([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [enrolledCourses, setEnrolledCourses] = useState<EnrolledCourse[]>([]);
 
   useEffect(() => {
     const fetchEnrolledCourses = async () => {
       setLoading(true);
       try {
-        const response = await App.get('/api/get-enrolled-courses/');
+        const response = await App.get<{ success: boolean; enrolled_courses: EnrolledCourse[] }>('/api/get-enrolled-courses/');
 
         if (response.data.success) {
           setEnrolledCourses(response.data.enrolled_courses);
-        } else {
-          console.error(response.data.message);
-        }
-      } catch (error) {
+        } 
+      } catch (error: any) {
         console.error('Error fetching enrolled courses:', error);
       } finally {
         setLoading(false);
@@ -31,9 +36,9 @@ function EnrolledCourses() {
     fetchEnrolledCourses();
   }, []);
 
-  const de_enrollCourse = async (courseCode) => {
+  const de_enrollCourse = async (courseCode: string) => {
     try {
-      const response = await App.post("/api/de-enroll-course/", { courseCode });
+      const response = await App.post<{ success: boolean; message: string }>("/api/de-enroll-course/", { courseCode });
       if (response.data.success) {
         toast.success("Course discarded successfully!");
         Swal.fire({
@@ -49,7 +54,7 @@ function EnrolledCourses() {
           text: response.data.message || "There was a problem discarding the course. Please try again.",
         });
       }
-    } catch (error) {
+    } catch (error: any) {
       toast.error("Error discarding the course: " + error.message);
       Swal.fire({
         icon: "error",
@@ -59,7 +64,7 @@ function EnrolledCourses() {
     }
   };
 
-  const render = (actions, item, index) => (
+  const render = (actions: React.ReactNode[], item: EnrolledCourse, index: number) => (
     <List.Item key={index} actions={actions}>
       <List.Item.Meta
         avatar={<Avatar shape='square'>C</Avatar>}

@@ -1,7 +1,10 @@
 "use client";
-import Link from "next/link";
+type SidebarLinkProps = {
+  activeTab: string;
+  setActiveTab: (tab: string) => void;
+};
 
-const SidebarLink = ({ activeTab, setActiveTab }) => {
+const SidebarLink = ({ activeTab, setActiveTab }:SidebarLinkProps) => {
   return (
     <>
       <li className="block">

@@ -3,10 +3,16 @@ import Link from "next/link";
 import ClickOutside from "@/components/ClickOutside";
 import App from "@/app/(site)/api/api"
 import { format } from "date-fns";
+interface Notification {
+  id: number;
+  type: "event" | "class" | "activity" | "other"; // restricts to expected types
+  message: string;
+  date: string; // Add date or timestamp if available
+}
 // import format
 const DropdownNotification = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [notifications, setNotifications] = useState([]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -29,7 +35,7 @@ const DropdownNotification = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const getNotificationIcon = (type) => {
+  const getNotificationIcon = (type:any) => {
     switch (type) {
       case 'event':
         return '🎉';

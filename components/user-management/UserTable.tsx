@@ -5,11 +5,14 @@ import EditUser from "./EditUser"; // Ensure correct naming
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import App from "@/app/(site)/api/api";
-
+interface userTypes{
+  full_name:string;
+  role:string;
+}
 const UserTable: React.FC = () => {
   const [filterRole, setFilterRole] = useState("");
   const [searchText, setSearchText] = useState("");
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState<userTypes[]>([]);
 
   useEffect(() => {
     const get_all_users = async () => {
@@ -19,7 +22,7 @@ const UserTable: React.FC = () => {
           toast.error(response.data.message);
         }
         setUsers(response.data.data);
-      } catch (error) {
+      } catch (error:any) {
         toast.error("An error occurred: " + error.message);
       }
     };
@@ -51,12 +54,12 @@ const UserTable: React.FC = () => {
         { text: "Lecturer", value: "lecturer" },
         { text: "Admin", value: "admin" },
       ],
-      onFilter: (value, record) => record.role.includes(value),
+      onFilter: (value:any, record:any) => record.role.includes(value),
     },
     {
       title: "Action",
       dataIndex: "action",
-      render: (_, record) => (
+      render: (_:any, record:any) => (
         <Space>
           <EditUser email={record.email} role={record.role} />
           <Popconfirm
@@ -77,7 +80,7 @@ const UserTable: React.FC = () => {
     },
   ];
 
-  const handleDeleteUser = (id) => {
+  const handleDeleteUser = (id:string) => {
     // Handle deleting user
   };
 

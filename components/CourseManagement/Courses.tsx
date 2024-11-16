@@ -12,6 +12,13 @@ interface Course {
   name: string;
   program__name: string; 
 }
+
+
+
+interface Program {
+  id: string;
+  name: string;
+}
  // Enrollment function
  const enrollCourse = async (courseId: string) => {
   try {
@@ -35,7 +42,7 @@ interface Course {
           "There was a problem enrolling on the course. Please try again.",
       });
     }
-  } catch (error) {
+  } catch (error:any) {
     toast.error("Error enrolling course: " + error.message);
     Swal.fire({
       icon: "error",
@@ -58,7 +65,7 @@ const columns = [
   {
     title: "Operation",
     dataIndex: "operation",
-    render: (_, record: Course) => (
+    render: (_:any, record: Course) => (
       <Popconfirm
       focusLock
       title='Confirm'
@@ -85,12 +92,12 @@ const Courses: React.FC = () => {
   const [courses, setCourses] = useState<Course[]>([]);
   const [filteredData, setFilteredData] = useState<Course[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
+  // const [program, setSelectedProgram] = useState<Program[]>([]);
   const [selectedProgram, setSelectedProgram] = useState<string>("");
-
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const response = await App.get<Course[]>("/api/get-courses/");
+        const response = await App.get<{ data: Course[] }>("/api/get-courses/");
         setCourses(response.data.data);
         setFilteredData(response.data.data); 
       } catch (error) {
@@ -122,9 +129,10 @@ const Courses: React.FC = () => {
     setFilteredData(filtered);
   };
 
+
  
 
-  const [programs, setPrograms] = useState([]);
+  const [programs, setPrograms] = useState<Program[]>([]);
 
   useEffect(() => {
     const fetchPrograms = async () => {
@@ -135,7 +143,7 @@ const Courses: React.FC = () => {
         } else {
           toast.error("An error occurred while fetching programs.");
         }
-      } catch (error) {
+      } catch (error:any) {
         toast.error(error.message || "An error occurred while fetching programs.");
       }
     };
@@ -149,18 +157,18 @@ const Courses: React.FC = () => {
     <div className="shadow-lg bg-gray-50">
       {/* Program filter dropdown */}
       <Select
-        placeholder="Select Program"
-        style={{ width: 300, marginBottom: 20 }}
-        onChange={handleProgramChange}
-        allowClear
-      >
-        <Option value="">All Programs</Option>
-        {programs.map((program) => (
-          <Option key={program.id} value={program.name}>
-            {program.name}
-          </Option>
-        ))}
-      </Select>
+          placeholder="Select Program"
+          style={{ width: 300, marginBottom: 20 }}
+          onChange={handleProgramChange}
+          allowClear
+        >
+          <Option value="">All Programs</Option>
+          {programs.map((program) => (
+            <Option key={program.id} value={program.name}>
+              {program.name}
+            </Option>
+          ))}
+        </Select>
 
       {/* Filter input */}
       <Input.Search

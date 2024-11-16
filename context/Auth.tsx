@@ -17,6 +17,7 @@ interface User {
   program: number;
 }
 
+
 export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -41,7 +42,7 @@ export const useAuth = () => {
   }, []);
   const login = async (admission: string, password: string) => {
     try {
-      const response = await App.post<{ message: string; user: User }>(
+      const response = await App.post<{ message: string; user: User, logged:boolean; }>(
         "/api/auth/signin/",
         { admission, password },
         { withCredentials: true },

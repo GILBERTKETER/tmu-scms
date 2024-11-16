@@ -122,7 +122,7 @@ const EditActivityModal: React.FC<EditActivityModalProps> = ({
           }}
         >
           <FormItem label="ID" field="id" rules={[{ required: true }]}>
-            <Input value={id} hidden />
+            <Input defaultValue={id.toString()} hidden />
           </FormItem>
           <FormItem
             label="Activity Name"

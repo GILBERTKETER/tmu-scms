@@ -41,7 +41,7 @@ function AddFacility() {
 
       setVisible(false);
       form.resetFields();
-    } catch (error) {
+    } catch (error:any) {
       toast.error(error.message || "There was a problem submitting your facility. Please try again.");
       Swal.fire({
         icon: "error",
