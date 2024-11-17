@@ -1,3 +1,6 @@
+"use client"
+import { Button, Tag } from "@arco-design/web-react";
+import "@arco-design/web-react/dist/css/arco.css";
 const Hero: React.FC = () => (
   <div className="relative z-[1] h-[80vh] overflow-hidden bg-gradient-to-r from-purple-600 to-blue-600 text-white">
     <div className="absolute inset-0">
@@ -20,12 +23,12 @@ const Hero: React.FC = () => (
         the right career path, preparing for opportunities, and offering
         tailored advice to help you succeed in your professional journey.
       </p>
-      <a
-        href="#"
+      <Tag
+        color="blue"
         className="transform rounded-full bg-yellow-400 px-6 py-2 text-lg font-semibold text-gray-900 transition duration-300 ease-in-out hover:scale-105 hover:bg-yellow-300 hover:shadow-lg"
       >
         Lets chat
-      </a>
+      </Tag>
     </div>
   </div>
 );

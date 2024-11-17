@@ -1,7 +1,8 @@
 "use client";
 import SidebarLink from "@/components/Bookings/SidebarLink";
 import { useState } from "react";
-
+import { Button } from "@arco-design/web-react";
+import "@arco-design/web-react/dist/css/arco.css";
 export default function Bookings() {
   const [activeTab, setActiveTab] = useState("classes");
 
@@ -130,12 +131,13 @@ export default function Bookings() {
                     Get to know about the Bookings and notification features{" "}
                   </p>
                 </div>
-                <a
-                  href="#"
+                <Button
+                type="primary"
+                  href="/auth/signin/"
                   className="mx-auto mt-5 inline-block w-auto rounded-md border border-transparent bg-gray-900 px-5 py-3 text-base font-medium text-white shadow hover:bg-black focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-rose-500 sm:px-10"
                 >
                   Get started →
-                </a>
+                </Button>
               </div>
             </div>
           </div>

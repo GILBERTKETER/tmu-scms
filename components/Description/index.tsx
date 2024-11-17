@@ -1,10 +1,13 @@
+"use client";
 import React from "react";
+import { Button, Tag } from "@arco-design/web-react";
+import "@arco-design/web-react/dist/css/arco.css";
 function Description() {
   return (
-    <div className="relative overflow-hidden bg-extendlight pt-16 pb-32 space-y-24">
+    <div className="bg-extendlight relative space-y-24 overflow-hidden pb-32 pt-16">
       <div className="relative ">
         <div className=" lg:mx-auto lg:grid lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-2 lg:gap-24 lg:px-8">
-          <div className="mx-auto sm:w-full w-xl sm:px-0px-6 lg:mx-0 lg:max-w-none lg:py-16 lg:px-0">
+          <div className="w-xl sm:px-0px-6 mx-auto sm:w-full lg:mx-0 lg:max-w-none lg:px-0 lg:py-16">
             <div>
               <div>
                 <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-secondary">
@@ -37,12 +40,7 @@ function Description() {
                   help users discover the best career paths.
                 </p>
                 <div className="mt-6">
-                  <a
-                    className="inline-flex rounded-lg bg-secondary px-4 py-1.5 text-base font-semibold leading-7 text-primary shadow-sm ring-1 ring-secondary hover:bg-primary hover:text-white"
-                    href="#"
-                  >
-                    SkillTrack: TMU Career Bot
-                  </a>
+                  <Tag color="blue">SkillTrack: TMU Career Bot</Tag>
                 </div>
               </div>
             </div>
@@ -65,7 +63,7 @@ function Description() {
 
       <div className="relative">
         <div className="lg:mx-auto lg:grid lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-2 lg:gap-24 lg:px-8">
-          <div className="mx-auto max-w-xl px-6 lg:mx-0 lg:max-w-none lg:py-16 lg:px-0 lg:col-start-2">
+          <div className="mx-auto max-w-xl px-6 lg:col-start-2 lg:mx-0 lg:max-w-none lg:px-0 lg:py-16">
             <div>
               <div>
                 <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-secondary">
@@ -90,18 +88,13 @@ function Description() {
                 <h2 className="text-3xl font-bold tracking-tight text-primary">
                   Career Insights and Trends:
                 </h2>
-                <p className="mt-4 text-lg dark:text-white text-black">
+                <p className="mt-4 text-lg text-black dark:text-white">
                   Stay informed with up-to-date industry insights, job market
                   trends, and career opportunities. Our system provides valuable
                   data to help users stay ahead and make informed decisions.
                 </p>
                 <div className="mt-6">
-                  <a
-                    className="inline-flex rounded-lg bg-secondary px-4 py-1.5 text-base font-semibold leading-7 text-primary shadow-sm ring-1 ring-secondary hover:bg-primary hover:text-white"
-                    href="#"
-                  >
-                    FutureMentor
-                  </a>
+                  <Tag color="blue">FutureMentor</Tag>
                 </div>
               </div>
             </div>
@@ -124,7 +117,7 @@ function Description() {
 
       <div className="relative">
         <div className="lg:mx-auto lg:grid lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-2 lg:gap-24 lg:px-8">
-          <div className="mx-auto max-w-xl px-6 lg:mx-0 lg:max-w-none lg:py-16 lg:px-0">
+          <div className="mx-auto max-w-xl px-6 lg:mx-0 lg:max-w-none lg:px-0 lg:py-16">
             <div>
               <div>
                 <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-secondary">
@@ -156,12 +149,7 @@ function Description() {
                   network.
                 </p>
                 <div className="mt-6">
-                  <a
-                    className="inline-flex rounded-lg bg-secondary px-4 py-1.5 text-base font-semibold leading-7 text-primary shadow-sm ring-1 ring-secondary hover:bg-primary hover:text-white"
-                    href="#"
-                  >
-                    CareerCoach: TMU Edition
-                  </a>
+                  <Tag color="blue">CareerCoach: TMU Edition</Tag>
                 </div>
               </div>
             </div>

@@ -1,11 +1,12 @@
 "use client";
 import Image from "next/image";
 import { useState } from "react";
-
+import { Button } from "@arco-design/web-react";
+import "@arco-design/web-react/dist/css/arco.css";
 const Hero = () => {
   const [email, setEmail] = useState("");
 
-  const handleSubmit = (e:any) => {
+  const handleSubmit = (e: any) => {
     e.preventDefault();
   };
 
@@ -43,12 +44,13 @@ const Hero = () => {
                       placeholder="Enter your email address"
                       className="rounded-full border border-stroke px-6 py-2.5 shadow-solid-2 focus:border-primary focus:outline-none dark:border-strokedark dark:bg-black dark:shadow-none dark:focus:border-primary"
                     />
-                    <button
+                    <Button
+                      type="outline"
                       aria-label="get started button"
                       className="flex rounded-full bg-black px-7.5 py-2.5 text-white duration-300 ease-in-out hover:bg-blackho dark:bg-btndark dark:hover:bg-blackho"
                     >
                       Get Started
-                    </button>
+                    </Button>
                   </div>
                 </form>
 
@@ -89,7 +91,7 @@ const Hero = () => {
                     fill
                   />
                   <Image
-                    className="rounded-lg hidden shadow-solid-l dark:block"
+                    className="hidden rounded-lg shadow-solid-l dark:block"
                     src="/images/hero/tmu.jpg"
                     alt="Hero"
                     fill

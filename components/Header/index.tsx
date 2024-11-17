@@ -7,6 +7,8 @@ import { useAuth } from "@/context/Auth";
 import ThemeToggler from "./ThemeToggler";
 import menuData from "./menuData";
 import LoadingBar from "./LoadingBar";
+import { Button } from "@arco-design/web-react";
+import "@arco-design/web-react/dist/css/arco.css";
 
 const Header = () => {
   const [navigationOpen, setNavigationOpen] = useState(false);
@@ -170,24 +172,33 @@ const Header = () => {
                   </span>
                   <button
                     onClick={handleLogout}
-                    className="flex items-center justify-center rounded-full bg-primary px-7.5 py-2.5 text-regular text-white duration-300 ease-in-out hover:bg-primaryho"
+                    // className="flex items-center justify-center rounded-full bg-primary px-7.5 py-2.5 text-regular text-white duration-300 ease-in-out hover:bg-primaryho"
                   >
+                    <Button type="outline">
                     Logout
+
+                    </Button>
                   </button>
                 </>
               ) : (
                 <>
                   <Link
                     href="/auth/signin"
-                    className="text-regular font-medium text-waterloo hover:text-primary"
+                    // className="text-regular font-medium text-waterloo hover:text-primary"
                   >
+                    <Button type="outline">
                     Sign In
+
+                    </Button>
                   </Link>
                   <Link
                     href="/auth/signup"
-                    className="flex items-center justify-center rounded-full bg-primary px-7.5 py-2.5 text-regular text-white duration-300 ease-in-out hover:bg-primaryho"
+                    // className="flex items-center justify-center rounded-full bg-primary px-7.5 py-2.5 text-regular text-white duration-300 ease-in-out hover:bg-primaryho"
                   >
+                    <Button type="primary">
                     Sign Up
+
+                    </Button>
                   </Link>
                 </>
               )}
