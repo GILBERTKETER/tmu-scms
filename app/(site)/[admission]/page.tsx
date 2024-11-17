@@ -46,18 +46,18 @@ export default function StudentProfile() {
   useEffect(() => {
     if (admission) {
 
-    const getPortfolio = async () => {
-      try {
-        const response = await App.get(`/api/students/${admission}`);
-        setPortfolioData(response.data.data);
-      } catch (error: any) {
-        Message.error("An error occurred: " + error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-    getPortfolio();
-  }
+      const getPortfolio = async () => {
+        try {
+          const response = await App.get(`/api/students/${admission}`);
+          setPortfolioData(response.data.data);
+        } catch (error: any) {
+          Message.error("An error occurred: " + error.message);
+        } finally {
+          setLoading(false);
+        }
+      };
+      getPortfolio();
+    }
   }, []);
 
   useEffect(() => {
@@ -90,7 +90,7 @@ export default function StudentProfile() {
 
   return (
     <Layout>
-      <div className="mx-auto mt-50 w-full max-w-7xl px-4">
+      <div className="mx-auto w-full max-w-7xl">
         <div className="overflow-hidden rounded-lg border border-stroke bg-white shadow-lg dark:border-strokedark dark:bg-boxdark">
           {/* Cover Image Section */}
           <div className="relative h-48 w-full bg-gray-100 md:h-64">
