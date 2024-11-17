@@ -40,7 +40,7 @@ export default function StudentProfile() {
   const getImageUrl = (filename: any) => {
     if (!filename) return "/default-placeholder.png";
     const cleanFilename = filename.replace("filename=", "");
-    return `http://localhost:8000/media/${cleanFilename}`;
+    return `https://ketercoder.pythonanywhere.com/media/${cleanFilename}`;
   };
 
   useEffect(() => {
