@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import AddIncidentModal from "./IncidentModal";
-import { Space } from "@arco-design/web-react";
+import { Grid } from "@arco-design/web-react";
 import Charts from "./chart";
 import IncidentsTable from "./incidentsTable";
 import Alerts from "./alerts";
@@ -87,7 +87,7 @@ const SafetyPage = () => {
   }, []);
 
   return (
-    <div className="min-h-screen w-full bg-gray-100 p-6">
+    <div className="min-h-screen w-full bg-gray-100">
       <div className="flex justify-between">
         <h1 className="mb-6 text-center text-3xl font-bold text-blue-600">
           Safety Monitoring Dashboard
@@ -97,25 +97,23 @@ const SafetyPage = () => {
         )}
       </div>
 
-      <Space
-        className="flex-cards"
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-          gap: "16px",
-          marginBottom: "30px",
-        }}
-      >
+      <Grid.Row gutter={[16, 16]} style={{ marginBottom: "30px" }}>
         {cardData.map((card, index) => (
-          <Card
+          <Grid.Col
             key={index}
-            title={card.title}
-            content={card.content}
-            contentclass={card.contentClass}
-          />
+            xs={24}
+            sm={12}
+            md={8}
+            lg={6}
+          >
+            <Card
+              title={card.title}
+              content={card.content}
+              contentclass={card.contentClass}
+            />
+          </Grid.Col>
         ))}
-      </Space>
-
+      </Grid.Row>
       <Charts />
       <IncidentsTable />
     </div>

@@ -7,7 +7,7 @@ import { useAuth } from '@/context/Auth';
 const Facilities: React.FC = () => {
   const {user} = useAuth()
   return (
-    <div className="p-6">
+    <div >
       <h1 className="text-2xl font-bold mb-4">Facility Booking & Activities</h1>
       <FacilityDashboard />
       <div className="my-6">

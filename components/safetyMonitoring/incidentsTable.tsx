@@ -282,14 +282,17 @@ const IncidentTable: React.FC = () => {
   return (
     <>
       <ToastContainer />
+      <div className="facilities-table">
       <Table
-        className="table-demo-resizable-column mb-10"
+        className="facilities-table-component table-demo-resizable-column mb-10"
         components={components}
         border
         borderCell
         columns={columns}
         data={data}
       />
+
+      </div>
 
       <Modal
         title="Edit Incident"

@@ -11,7 +11,7 @@ import App from "@/app/(site)/api/api";
 import StudentCheckInDrawer from "./StudentCheckInDrawer";
 import { useAuth } from "@/context/Auth";
 import { toast, ToastContainer } from "react-toastify";
-
+import "./styles.css"
 const ClassList: React.FC = () => {
   const [visible, setVisible] = useState(false);
   const [qrVisible, setQrVisible] = useState(false);
@@ -96,13 +96,13 @@ const ClassList: React.FC = () => {
         id: selectedClassId,
         rfid: newRfid.trim(),
       });
-      
+
       if (response.data.success) {
         toast.success(response.data.message);
         setRfidVisible(false);
         setNewRfid("");
         setSelectedClassId(null);
-        
+
         // Refresh the class data after successful update
         const updatedResponse = await App.get("/api/get-scheduled-classes/");
         if (updatedResponse.data.success) {
@@ -191,16 +191,20 @@ const ClassList: React.FC = () => {
 
   return (
     <div>
-      <ToastContainer/>
-      <Table
-        style={{ width: "100%" }}
-        columns={columns}
-        data={classData}
-        pagination={false}
-        rowKey="id"
-      />
+      <ToastContainer />
+      <div className="responsive-container">
+        <Table
+          columns={columns}
+          data={classData}
+          pagination={true}
+          rowKey="id"
+          className="responsive-table"
+        />
+      </div>
 
-      {/* QR Code Modal */}
+
+
+
       <Modal
         visible={qrVisible}
         title="Generated QR Code"

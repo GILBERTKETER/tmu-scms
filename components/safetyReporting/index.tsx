@@ -1,18 +1,18 @@
 // IncidentReporting.tsx
 "use client"
 import React, { useEffect, useState } from 'react';
-import { 
-  Button, 
-  Input, 
-  Card, 
-  Comment, 
-  Avatar, 
+import {
+  Button,
+  Input,
+  Card,
+  Comment,
+  Avatar,
   List,
   Message,
   Spin
 } from '@arco-design/web-react';
-import { 
-  IconMessage, 
+import {
+  IconMessage,
   IconLoading
 } from '@arco-design/web-react/icon';
 import ReactMarkdown from 'react-markdown';
@@ -49,7 +49,7 @@ const IncidentReporting: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
   const [replySubmitting, setReplySubmitting] = useState<{ [key: string]: boolean }>({});
 
-  const {user} = useAuth()
+  const { user } = useAuth()
   useEffect(() => {
     fetchIncidents();
   }, []);
@@ -73,7 +73,7 @@ const IncidentReporting: React.FC = () => {
     try {
       setSubmitting(true);
       const post = {
-        author: user?.first_name, 
+        author: user?.first_name,
         content: newPost,
         profile: user?.profile_image
       };
@@ -93,32 +93,32 @@ const IncidentReporting: React.FC = () => {
     if (!newReply[postId]?.trim() || replySubmitting[postId]) return;
 
     try {
-        setReplySubmitting(prev => ({ ...prev, [postId]: true }));
-        const reply = {
-            incident_id: postId,  // Changed from 'incident' to 'incident_id'
-            author: user?.first_name,
-            content: newReply[postId],
-            profile: user?.profile_image
-        };
-        const response = await App.post('/api/reply-incident/', reply);
-        setPosts(posts.map(post => {
-            if (post.id === postId) {
-                return {
-                    ...post,
-                    replies: [...post.replies, response.data]
-                };
-            }
-            return post;
-        }));
-        setNewReply(prev => ({ ...prev, [postId]: '' }));
-        Message.success('Reply added successfully');
+      setReplySubmitting(prev => ({ ...prev, [postId]: true }));
+      const reply = {
+        incident_id: postId,  // Changed from 'incident' to 'incident_id'
+        author: user?.first_name,
+        content: newReply[postId],
+        profile: user?.profile_image
+      };
+      const response = await App.post('/api/reply-incident/', reply);
+      setPosts(posts.map(post => {
+        if (post.id === postId) {
+          return {
+            ...post,
+            replies: [...post.replies, response.data]
+          };
+        }
+        return post;
+      }));
+      setNewReply(prev => ({ ...prev, [postId]: '' }));
+      Message.success('Reply added successfully');
     } catch (err) {
-        Message.error('Failed to submit reply. Please try again.');
-        console.error('Error adding reply:', err);
+      Message.error('Failed to submit reply. Please try again.');
+      console.error('Error adding reply:', err);
     } finally {
-        setReplySubmitting(prev => ({ ...prev, [postId]: false }));
+      setReplySubmitting(prev => ({ ...prev, [postId]: false }));
     }
-};
+  };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleString();
@@ -133,7 +133,7 @@ const IncidentReporting: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto p-6">
+    <div className="container mx-auto">
       <h1 className="text-3xl font-bold mb-6">Incident Reporting System</h1>
 
       {/* New Post Section */}
@@ -164,12 +164,14 @@ const IncidentReporting: React.FC = () => {
         render={(post: Post) => (
           <Card key={post.id} className="mb-4">
             <Comment
-              author={<span className="font-semibold">{post.author}</span>}
+              author={<span className="font-semibold p-2">{post.author}</span>}
               content={
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm]}
                   rehypePlugins={[rehypeRaw]}
-                  className="prose"
+                  className="prose "
+
+
                 >
                   {post.content}
                 </ReactMarkdown>
@@ -177,11 +179,16 @@ const IncidentReporting: React.FC = () => {
               datetime={formatDate(post.created_at)}
               avatar={
                 <Avatar size={40}>
-                  <img alt={post.author} src={`http://127.0.0.1:8000/media/${post.avatar}`} />
+                  <img
+                    alt={post.author}
+                    src={`https://ketercoder.pythonanywhere.com/media/${post.avatar}`}
+                    style={{ width: "100%", height: "auto" }} // Makes avatar responsive
+                  />
                 </Avatar>
               }
             />
-            
+
+
             <div className="ml-10 mt-4">
               {/* Replies Section */}
               {post.replies.length > 0 && (
@@ -205,7 +212,7 @@ const IncidentReporting: React.FC = () => {
                       datetime={formatDate(reply.created_at)}
                       avatar={
                         <Avatar size={32}>
-                          <img alt={reply.author} src={`http://127.0.0.1:8000/media/${reply.avatar}`} />
+                          <img alt={reply.author} src={`https://ketercoder.pythonanywhere.com/media/${reply.avatar}`} />
                         </Avatar>
                       }
                     />

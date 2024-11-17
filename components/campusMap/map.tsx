@@ -26,8 +26,8 @@ const MapComponent = () => {
       title={
         <Space>
           <IconLocation style={{ color: "rgb(var(--primary-6))" }} />
-          <Title heading={4} style={{ margin: 0 }}>
-            Tom Mboya University Map
+          <Title heading={5} style={{ margin: 0 }}>
+            Tom Mboya University
           </Title>
         </Space>
       }
@@ -44,14 +44,14 @@ const MapComponent = () => {
           />
         </div>
 
-        <Card
+        {/* <Card
           className="legend-card"
           size="small"
           title="Key Locations"
           style={{
-            position: "absolute",
-            top: "16px",
-            right: "16px",
+            position: "relative",
+            display:"flex",
+            
             width: "280px",
             background: "var(--color-bg-2)",
             boxShadow: "var(--shadow-2)",
@@ -62,7 +62,7 @@ const MapComponent = () => {
               <div key={location.id} className="location-item">
                 <Space align="start">
                   <img
-                    src="./img/placeholder.png"
+                    src="https://static-00.iconduck.com/assets.00/map-marker-icon-342x512-gd1hf1rz.png"
                     alt="marker"
                     style={{ width: 24, height: 24, marginTop: 4 }}
                   />
@@ -82,7 +82,7 @@ const MapComponent = () => {
               </div>
             ))}
           </Space>
-        </Card>
+        </Card> */}
 
         <Tag
           color="arcoblue"

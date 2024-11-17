@@ -4,8 +4,8 @@ import AttendanceDashboard from './AttendanceDashboard'
 import AttendanceLogs from './AttendanceLogs'
 function Attendance() {
   return (
-    <div>
-      <AttendanceDashboard/>
+    <div className='relative'>
+      <AttendanceDashboard />
       <AttendanceLogs />
     </div>
   )

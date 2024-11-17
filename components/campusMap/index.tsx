@@ -4,7 +4,7 @@ import Map from "./map"
 
 const Home: React.FC = () => {
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto">
       <div className="w-full">
         <Map/>
       </div>

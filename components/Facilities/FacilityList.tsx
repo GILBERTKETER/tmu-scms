@@ -186,7 +186,11 @@ const FacilityList: React.FC = () => {
           <Option value="Library">Library</Option>
         </Select>
       </div>
+      <div className="facilities-table">
+
+
       <Table
+      className="facilities-table-component"
         style={{ width: "100%" }}
         columns={columns}
         data={filteredFacilities}
@@ -195,6 +199,8 @@ const FacilityList: React.FC = () => {
           onClick: () => handleBook(record),
         })}
       />
+      </div>
+
 
       <Modal
         title={`Book Facility: ${selectedFacility?.facility_name}`}

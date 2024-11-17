@@ -295,8 +295,8 @@ const StudentPortfolio: React.FC = () => {
 
   const imageUploadSection = (
     <Row gutter={[16, 16]}>
-      <Col span={12}>
-        <FormItem label="Profile Image" field="personalInfo.profileImage">
+  <Col xs={24} sm={12}>
+  <FormItem label="Profile Image" field="personalInfo.profileImage">
           <Upload
             listType="picture-card"
             limit={1}
@@ -308,12 +308,12 @@ const StudentPortfolio: React.FC = () => {
             defaultFileList={
               profileImageUrl
                 ? [
-                    {
-                      uid: "1",
-                      name: "profile",
-                      url: profileImageUrl,
-                    },
-                  ]
+                  {
+                    uid: "1",
+                    name: "profile",
+                    url: profileImageUrl,
+                  },
+                ]
                 : []
             }
           >
@@ -337,12 +337,12 @@ const StudentPortfolio: React.FC = () => {
             defaultFileList={
               coverPhotoUrl
                 ? [
-                    {
-                      uid: "1",
-                      name: "cover",
-                      url: coverPhotoUrl,
-                    },
-                  ]
+                  {
+                    uid: "1",
+                    name: "cover",
+                    url: coverPhotoUrl,
+                  },
+                ]
                 : []
             }
           >
@@ -358,7 +358,7 @@ const StudentPortfolio: React.FC = () => {
 
   return (
     <LoadingLayout>
-      <div className="student-portfolio" style={{ padding: "24px" }}>
+      <div className="student-portfolio" >
         <Card>
           <Title heading={2} style={{ marginBottom: "24px" }}>
             Student Portfolio Builder
@@ -374,7 +374,7 @@ const StudentPortfolio: React.FC = () => {
             {/* Personal Information Section */}
             <Card title="Personal Information" bordered={false}>
               <Row gutter={[16, 16]}>
-                <Col span={12}>
+                <Col xs={24} sm={12}>
                   <FormItem
                     label="Full Name"
                     field="personalInfo.fullName"
@@ -388,7 +388,7 @@ const StudentPortfolio: React.FC = () => {
                     <Input readOnly placeholder="Enter your full name" />
                   </FormItem>
                 </Col>
-                <Col span={12}>
+                <Col xs={24} sm={12}>
                   <FormItem
                     label="Email"
                     field="personalInfo.email"
@@ -402,7 +402,7 @@ const StudentPortfolio: React.FC = () => {
                 </Col>
               </Row>
               <Row gutter={[16, 16]}>
-                <Col span={12}>
+                <Col xs={24} sm={12}>
                   <FormItem
                     label="Phone"
                     field="personalInfo.phone"
@@ -416,7 +416,7 @@ const StudentPortfolio: React.FC = () => {
                     <Input readOnly placeholder="Enter your phone number" />
                   </FormItem>
                 </Col>
-                <Col span={12}>
+                <Col xs={24} sm={12}>
                   <FormItem
                     label="Location"
                     field="personalInfo.location"
@@ -474,7 +474,7 @@ const StudentPortfolio: React.FC = () => {
                       />
                     </FormItem>
                   </Col>
-                  <Col span={4}>
+                  <Col span={8}>
                     <Button
                       type="primary"
                       icon={<IconPlus />}
@@ -517,7 +517,7 @@ const StudentPortfolio: React.FC = () => {
                       icon={<IconPlus />}
                       onClick={() => add()}
                     >
-                      Add Experience
+                      {/* Add Experience */}
                     </Button>
                   }
                 >
@@ -594,7 +594,7 @@ const StudentPortfolio: React.FC = () => {
                       icon={<IconPlus />}
                       onClick={() => add()}
                     >
-                      Add Education
+                      {/* Add Education */}
                     </Button>
                   }
                 >
@@ -666,7 +666,7 @@ const StudentPortfolio: React.FC = () => {
                       icon={<IconPlus />}
                       onClick={() => add()}
                     >
-                      Add Project
+                      {/* Add Project */}
                     </Button>
                   }
                 >
@@ -738,7 +738,7 @@ const StudentPortfolio: React.FC = () => {
                       icon={<IconPlus />}
                       onClick={() => add()}
                     >
-                      Add Social Media
+                      {/* Add Social Media */}
                     </Button>
                   }
                 >

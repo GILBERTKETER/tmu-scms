@@ -17,7 +17,7 @@ const UserManagement: React.FC = () => {
   };
 
   return (
-    <div style={{ padding: 20 }}>
+    <div>
       <UserStats />
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
         <h2 className='text-primary font-bold'>User Management</h2>

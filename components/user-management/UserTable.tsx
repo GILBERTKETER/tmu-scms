@@ -107,12 +107,16 @@ const UserTable: React.FC = () => {
           <Select.Option value="admin">Admin</Select.Option>
         </Select>
       </Space>
+      <div className="facilities-table">
+
       <Table
+      className="facilities-table-component"
         columns={columns}
         data={filteredData}
         pagination={{ pageSize: 5 }}
         rowKey="id"
       />
+      </div>
     </div>
   );
 };

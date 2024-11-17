@@ -135,7 +135,7 @@ const ScheduledClasses: React.FC<ScheduledClassesProps> = ({
         icon={<IconCalendar />}
         onClick={() => setVisible(true)}
       >
-        Schedule Class
+        Schedule
       </Button>
       <Modal
         title={`Schedule ${course_name} ${course_code} Class`}

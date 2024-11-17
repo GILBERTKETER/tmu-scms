@@ -15,6 +15,7 @@ import Swal from "sweetalert2";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useAuth } from "@/context/Auth";
+import "./styles.css"
 const FormItem = Form.Item;
 
 interface Hall {
@@ -156,8 +157,12 @@ const HallManagement: React.FC = () => {
   return (
     <>
       <ToastContainer />
-      <div style={{ padding: "20px", width: "100%" }}>
+      <div style={{ width: "100%" }}>
+        <div className="my-table">
+
         <Table columns={columns} data={halls} />
+
+        </div>
         <Modal
           title="Edit Hall"
           visible={visible}

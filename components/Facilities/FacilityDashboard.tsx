@@ -31,13 +31,13 @@ const FacilityDashboard: React.FC = () => {
   useEffect(() => {
     const fetchFacilities = async () => {
       try {
-        const response = await App.get<ApiResponse>("/api/get-all-facilities-count/"); 
+        const response = await App.get<ApiResponse>("/api/get-all-facilities-count/");
         if (response.data.success) {
           const data = response.data.type_counts;
           const summary: FacilitySummaryItem[] = Object.entries(data).map(([key, value]) => ({
             title: key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' '), // Format title
             count: value.total,
-            icon: key === 'library' ? <IconBook /> : key === 'home' ? <IconHome /> : <IconThunderbolt />, 
+            icon: key === 'library' ? <IconBook /> : key === 'home' ? <IconHome /> : <IconThunderbolt />,
             available: value.available,
             booked: value.booked,
           }));
@@ -56,13 +56,19 @@ const FacilityDashboard: React.FC = () => {
   }, []);
 
   if (loading) {
-    return <div>Loading...</div>; // You can add a loading spinner or skeleton here
+    return <div>Loading...</div>;
   }
 
   return (
-    <Grid.Row>
+    <Grid.Row gutter={16}>
       {facilitySummary.map((facility, index) => (
-        <Grid.Col span={8} key={index}>
+        <Grid.Col
+          key={index}
+          xs={24}
+          sm={12}
+          md={8}
+          lg={6}
+        >
           <Card>
             <Statistic title={facility.title} value={facility.count} />
             <div>
@@ -73,6 +79,7 @@ const FacilityDashboard: React.FC = () => {
         </Grid.Col>
       ))}
     </Grid.Row>
+
   );
 };
 

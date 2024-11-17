@@ -1,0 +1,9 @@
+@media screen and (max-width:450px) {
+    .my-table{
+        width: 90vw !important;
+        overflow: auto;
+        box-sizing: border-box;
+        margin: auto;
+    }
+    
+}

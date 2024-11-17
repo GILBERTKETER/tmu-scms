@@ -1,4 +1,4 @@
-import { Card, Space } from "@arco-design/web-react";
+import { Card, Grid } from "@arco-design/web-react";
 import React from "react";
 
 interface CardsProps {
@@ -9,18 +9,16 @@ interface CardsProps {
 
 const Cards: React.FC<CardsProps> = ({ title, content, contentclass }) => {
   return (
-    <div>
-      <Space>
-        <Card
-          style={{width:"300px"}}
-          title={title}
-          className="card-custom-hover-style"
-          hoverable
-        >
-          <p className={`${contentclass}`}>{content}</p>
-        </Card>
-      </Space>
-    </div>
+
+    <Card
+      style={{ width: "100%" }}
+      title={title}
+      className="card-custom-hover-style"
+      hoverable
+    >
+      <p className={`${contentclass}`}>{content}</p>
+    </Card>
+
   );
 };
 

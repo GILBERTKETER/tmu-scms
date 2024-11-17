@@ -1,0 +1,34 @@
+.responsive-container {
+    width: 90vw;
+    box-sizing: border-box;
+    height: auto;
+    overflow-x: auto;
+    margin: auto;
+  }
+  
+  .responsive-table {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 1800px;
+    display: block;
+    overflow-x: auto;
+  }
+  
+  /* For medium screens and up */
+  @media (min-width: 768px) {
+    .responsive-container {
+      width: 90vw; 
+    }
+  }
+  
+  /* For large screens */
+  @media (min-width: 1024px) {
+    .responsive-container {
+      width: 100% !important;
+    }
+    .responsive-table {
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+  }
+  

@@ -36,7 +36,7 @@ function Charts() {
       </h2>
       <div className="flex justify-center">
         <ResponsiveContainer width="100%" height={400}>
-          <LineChart data={data} className="rounded-lg bg-white p-4 shadow-lg">
+          <LineChart data={data} className="rounded bg-white">
             <Line type="monotone" dataKey="incidents" stroke="#8884d8" />
             <CartesianGrid stroke="#ccc" />
             <XAxis dataKey="name" />

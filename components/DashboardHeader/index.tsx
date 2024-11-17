@@ -1,5 +1,5 @@
 import Link from "next/link";
-import DarkModeSwitcher from "./DarkModeSwitcher";
+// import DarkModeSwitcher from "./DarkModeSwitcher";
 // import DropdownMessage from "./DropdownMessage";
 import DropdownNotification from "./DropdownNotification";
 import DropdownUser from "./DropdownUser";
@@ -117,7 +117,7 @@ const Header = (props: {
 
         <div className="2xsm:gap-7 flex items-center gap-3">
           <ul className="2xsm:gap-4 flex items-center gap-2">
-            <DarkModeSwitcher />
+            {/* <DarkModeSwitcher /> */}
 
             <DropdownNotification />
 
