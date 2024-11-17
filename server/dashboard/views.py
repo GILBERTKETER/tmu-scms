@@ -618,7 +618,7 @@ def download_attendance_pdf(request):
         # Parse JSON body
         body = json.loads(request.body).get('data')
         course_id = body.get("selectedCourse")
-        semester = body.get("selectedsemester")
+        semester = body.get("selectedSemester")
         year = body.get("selectedYear")
 
         # Validate input
