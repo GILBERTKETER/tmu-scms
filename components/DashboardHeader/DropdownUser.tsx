@@ -34,7 +34,7 @@ const DropdownUser = () => {
             <Image
               width={112}
               height={112}
-              src={`http://localhost:8000/media/${user?.profile_image}`}
+              src={`https://ketercoder.pythonanywhere.com/media/${user?.profile_image}`}
               style={{
                 width: "100%",
                 height: "100%",
