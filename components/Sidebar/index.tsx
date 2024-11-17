@@ -558,7 +558,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                     {group.name}
                   </h3>
 
-                  <ul className="mb-6 flex flex-col gap-1.5">
+                  <ul className="mb-6 flex flex-col gap-1.5"             onClick={() => setSidebarOpen(!sidebarOpen)}
+ >
                     {group.menuItems
                       .filter((menuItem) => {
                         const allowedRoles = menuItem.requiredRole
@@ -568,6 +569,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                         })
                       .map((menuItem, menuIndex) => (
                         <SidebarItem
+                        onClick={() => setSidebarOpen(!sidebarOpen)}
                           key={menuIndex}
                           item={menuItem}
                           pageName={pageName}
