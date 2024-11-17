@@ -90,7 +90,7 @@ export default function StudentProfile() {
 
   return (
     <Layout>
-      <div className="mx-auto w-full max-w-7xl">
+      <div className="mx-auto w-full max-w-7xl mt-20">
         <div className="overflow-hidden rounded-lg border border-stroke bg-white shadow-lg dark:border-strokedark dark:bg-boxdark">
           {/* Cover Image Section */}
           <div className="relative h-48 w-full bg-gray-100 md:h-64">
@@ -151,7 +151,7 @@ export default function StudentProfile() {
               </p>
 
               {/* Contact Info */}
-              <div className="mx-auto grid max-w-2xl grid-cols-3 gap-4 rounded-lg bg-gray-50 p-4 dark:bg-gray-800">
+              <div className="mx-auto grid max-w-2xl grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 rounded-lg bg-gray-50 p-4 dark:bg-gray-800">
                 <div className="flex flex-col items-center">
                   <IconPhone className="mb-2 text-primary" />
                   <span className="text-sm">{personalInfo.phone}</span>
