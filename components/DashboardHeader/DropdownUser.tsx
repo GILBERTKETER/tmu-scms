@@ -71,7 +71,7 @@ const DropdownUser = () => {
               <li className="w-auto">
                 <Link
                   target="_blank"
-                  href={`https://ketercoder.pythonanywhere.com/${username}/`}
+                  href={`https://smartcampus-lilac.vercel.app/${username}/`}
                   className="flex items-center gap-3.5 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base"
                 >
                   <svg
