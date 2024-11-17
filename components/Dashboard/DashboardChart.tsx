@@ -73,7 +73,10 @@ const DashboardBarChart: React.FC = () => {
         title="Monthly Attendance Statistics"
         className="h-full w-full"
         extra={
-          <Select
+         
+        }
+      >
+      <Select
             placeholder="Select a Course"
             value={selectedCourse}
             onChange={handleCourseChange}
@@ -83,8 +86,6 @@ const DashboardBarChart: React.FC = () => {
             }))}
             style={{ marginBottom: "20px", width: "200px" }}
           />
-        }
-      >
         <div className="h-[350px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
