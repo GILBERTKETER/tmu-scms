@@ -22,73 +22,139 @@ from authentication.models import UserProfile
 def get_scheduled_classes(request):
     user = request.user
     if request.method == 'GET':
-        try:
-            userprofile = UserProfile.objects.get(user_id = user.id)
-            user_year = userprofile.year_of_study
-            user_sem = userprofile.semester
-            
-            enrollments = Enrollment.objects.filter(
-                user=user,
-                semester=user_sem,
-                year=user_year,
-                scheduled='0'
-            ).values_list('id', flat=True)
-
-            schedules = Schedule.objects.filter(
-                enrollment_id__in=enrollments
-            ).select_related(
-                'enrollment',
-                'enrollment__course',
-                'enrollment__course__program',
-                'instructor',
-                'instructor__user'
-            )
-
-            schedule_data = []
-            for schedule in schedules:
-                try:
-                    # Get hall information
-                    hall = Hall.objects.get(id=schedule.hall)
-                    hall_name = hall.hall_name
-                    hall_number = hall.hall_number
-                    hall_id = hall.id
-                except Hall.DoesNotExist:
-                    hall_name = "Unknown"
-                    hall_number = "N/A"
-                    hall_id = None
+        if user.userprofile.role == 'student' or user.userprofile.role == 'classrep':
+            try:
+                userprofile = UserProfile.objects.get(user_id = user.id)
+                user_year = userprofile.year_of_study
+                user_sem = userprofile.semester
                 
-                # Format the schedule data
-                schedule_info = {
-                    'id': schedule.id,
-                    'course_id': schedule.enrollment.course_id,
-                    'course_name': schedule.enrollment.course_name,
-                    'course_code': schedule.enrollment.course_code,
-                    'program_name': schedule.enrollment.course.program.name,
-                    'instructor_name': schedule.instructor.user.first_name,
-                    'hall_name': hall_name,
-                    'hallId': hall_id,
-                    'hall_number': hall_number,
-                    'date': schedule.date,
-                    'time_start': schedule.time_start.strftime("%H:%M:%S") if schedule.time_start else None,
-                    'time_end': schedule.time_end.strftime("%H:%M:%S") if schedule.time_end else None,
-                    'recurring_days': schedule.recurring_days
-                }
-                schedule_data.append(schedule_info)
-            
-            return JsonResponse({
-                'success': True,
-                'classes': schedule_data,
-                'total_classes': len(schedule_data)
-            }, status=200)
+                enrollments = Enrollment.objects.filter(
+                    user=user,
+                    semester=user_sem,
+                    year=user_year,
+                    scheduled='0'
+                ).values_list('course_id', flat=True)
+                schedules = Schedule.objects.filter(
+                    course_id__in=enrollments
+                ).select_related(
+                    'enrollment',
+                    'enrollment__course',
+                    'enrollment__course__program',
+                    'instructor',
+                    'instructor__user'
+                )
 
-        except Exception as e:
-            import traceback
-            error_details = traceback.format_exc()
-            return JsonResponse({
-                'success': False,
-                'message': str(e),
-                'error_details': error_details
-            }, status=400)
+                schedule_data = []
+                for schedule in schedules:
+                    try:
+                        # Get hall information
+                        hall = Hall.objects.get(id=schedule.hall)
+                        hall_name = hall.hall_name
+                        hall_number = hall.hall_number
+                        hall_id = hall.id
+                    except Hall.DoesNotExist:
+                        hall_name = "Unknown"
+                        hall_number = "N/A"
+                        hall_id = None
+                    
+                    # Format the schedule data
+                    schedule_info = {
+                        'id': schedule.id,
+                        'course_id': schedule.enrollment.course_id,
+                        'course_name': schedule.enrollment.course_name,
+                        'course_code': schedule.enrollment.course_code,
+                        'program_name': schedule.enrollment.course.program.name,
+                        'instructor_name': schedule.instructor.user.first_name,
+                        'hall_name': hall_name,
+                        'hallId': hall_id,
+                        'hall_number': hall_number,
+                        'date': schedule.date,
+                        'time_start': schedule.time_start.strftime("%H:%M:%S") if schedule.time_start else None,
+                        'time_end': schedule.time_end.strftime("%H:%M:%S") if schedule.time_end else None,
+                        'recurring_days': schedule.recurring_days
+                    }
+                    schedule_data.append(schedule_info)
+                
+                return JsonResponse({
+                    'success': True,
+                    'classes': schedule_data,
+                    'total_classes': len(schedule_data)
+                }, status=200)
+
+            except Exception as e:
+                import traceback
+                error_details = traceback.format_exc()
+                return JsonResponse({
+                    'success': False,
+                    'message': str(e),
+                    'error_details': error_details
+                }, status=400)
+        else:
+            try:
+                userprofile = UserProfile.objects.get(user_id = user.id)
+                user_sem = userprofile.semester
+                
+                enrollments = Enrollment.objects.filter(
+                    user=user,
+                    semester=user_sem,
+                    scheduled='0'
+                ).values_list('course_id', flat=True)
+
+                schedules = Schedule.objects.filter(
+                    course_id__in=enrollments
+                ).select_related(
+                    'enrollment',
+                    'enrollment__course',
+                    'enrollment__course__program',
+                    'instructor',
+                    'instructor__user'
+                )
+
+                schedule_data = []
+                for schedule in schedules:
+                    try:
+                        # Get hall information
+                        hall = Hall.objects.get(id=schedule.hall)
+                        hall_name = hall.hall_name
+                        hall_number = hall.hall_number
+                        hall_id = hall.id
+                    except Hall.DoesNotExist:
+                        hall_name = "Unknown"
+                        hall_number = "N/A"
+                        hall_id = None
+                    
+                    # Format the schedule data
+                    schedule_info = {
+                        'id': schedule.id,
+                        'course_id': schedule.enrollment.course_id,
+                        'course_name': schedule.enrollment.course_name,
+                        'course_code': schedule.enrollment.course_code,
+                        'program_name': schedule.enrollment.course.program.name,
+                        'instructor_name': schedule.instructor.user.first_name,
+                        'hall_name': hall_name,
+                        'hallId': hall_id,
+                        'hall_number': hall_number,
+                        'date': schedule.date,
+                        'time_start': schedule.time_start.strftime("%H:%M:%S") if schedule.time_start else None,
+                        'time_end': schedule.time_end.strftime("%H:%M:%S") if schedule.time_end else None,
+                        'recurring_days': schedule.recurring_days
+                    }
+                    schedule_data.append(schedule_info)
+                
+                return JsonResponse({
+                    'success': True,
+                    'classes': schedule_data,
+                    'total_classes': len(schedule_data)
+                }, status=200)
+
+            except Exception as e:
+                import traceback
+                error_details = traceback.format_exc()
+                return JsonResponse({
+                    'success': False,
+                    'message': str(e),
+                    'error_details': error_details
+                }, status=400)
 
     return JsonResponse({
         'success': False,
@@ -99,7 +165,7 @@ def get_scheduled_classes(request):
 def create_schedule(request):
     if request.method == 'POST':
         data = json.loads(request.body)
-
+        user = request.user
         try:
             course_id = data.get("course_id")
             instructor_id = data.get("instructor_id")
@@ -117,7 +183,7 @@ def create_schedule(request):
                 }, status=400)
 
             # Retrieve enrollment and instructor
-            enrollment = Enrollment.objects.get(course_id=course_id)
+            enrollment = Enrollment.objects.get(course_id=course_id, user_id = user.id)
             instructor = Instructor.objects.get(id=instructor_id)
 
             # Check for time conflicts
@@ -149,7 +215,8 @@ def create_schedule(request):
             # Check if the class is not already scheduled (1 means not scheduled)
             if not_enrolled:
                 schedule = Schedule.objects.create(
-                    enrollment=enrollment,
+                    enrollment = enrollment,
+                    course_id = course_id,
                     instructor=instructor,
                     hall=hall,
                     date=parse_date(date) if date else None,
@@ -158,8 +225,12 @@ def create_schedule(request):
                     recurring_days=recurring_days if recurring_days else None
                 )
 
-                # Update the enrollment status to scheduled (0)
-                enrollment.scheduled = 0
+                enrollments = Enrollment.objects.filter(course_id=course_id)
+                for enrollment in enrollments:
+                    enrollment.scheduled = 0
+                    enrollment.save()
+
+                
                 enrollment.save()
                 enrollment.refresh_from_db()
 

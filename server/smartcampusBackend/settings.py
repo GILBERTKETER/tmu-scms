@@ -31,7 +31,7 @@ CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'images')  
+MEDIA_ROOT = os.path.join(BASE_DIR, 'images')
 MEDIA_URL = '/media/'
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -59,7 +59,7 @@ LOGGING = {
 }
 LOGIN_URL = 'http://localhost:3000/auth/signin/'
 
-ALLOWED_HOSTS = ['localhost:3000', 'localhost','127.0.0.1']
+ALLOWED_HOSTS = ['localhost:3000', 'localhost','127.0.0.1','ketercoder.pythonanywhere.com']
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 # CSRF_COOKIE_SECURE = True
@@ -104,7 +104,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:3000', 
+    'http://localhost:3000',
     'http://127.0.0.1:3000',
 ]
 CSRF_TRUSTED_ORIGINS = [
@@ -139,15 +139,15 @@ WSGI_APPLICATION = "smartcampusBackend.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
-        "NAME": "scms",
-        "USER": "root",
-        "PASSWORD": "",
-        "HOST": "localhost",
+        "NAME": "ketercoder$default",
+        "USER": "ketercoder",
+        "PASSWORD": "WEB DESIGNER7680.g",
+        "HOST": "ketercoder.mysql.pythonanywhere-services.com",
         "PORT": 3306
     }
 }
 EMAIL_USE_TLS = True
-EMAIL_TIMEOUT = 10 
+EMAIL_TIMEOUT = 10
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'

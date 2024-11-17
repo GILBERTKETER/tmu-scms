@@ -92,29 +92,40 @@ def fetch_courses(request):
     user = request.user
     if not user.is_authenticated:
         return JsonResponse({"success": False, "message": "You are not authenticated."}, status=401)
-    
-    try:
-        user_id = user.id
-        _student = UserProfile.objects.get(id=user_id)
-        
-        program_id_of_student = _student.program_id
-        year_of_student = _student.year_of_study
-        semester_of_student = _student.semester
-
-        eligible_courses = Course.objects.filter(
-            program_id=program_id_of_student,
-            year=year_of_student,
-            semester=semester_of_student
+    if user.userprofile.role == 'lecturer' or user.userprofile.role == 'admin':
+        #we fetch all courses irregardless
+        profile = UserProfile.objects.get(id=user.id)
+        semester = profile.semester
+        courses = Course.objects.filter(
+            semester=semester
         ).values('id', 'code', 'name', 'description', 'program__name', 'semester')
         
-        course_list = list(eligible_courses)
+        course_list = list(courses)
 
         return JsonResponse({"success": True, "data": course_list}, status=200)
+    else:
+        try:
+            user_id = user.id
+            _student = UserProfile.objects.get(id=user_id)
+            
+            program_id_of_student = _student.program_id
+            year_of_student = _student.year_of_study
+            semester_of_student = _student.semester
 
-    except UserProfile.DoesNotExist:
-        return JsonResponse({"success": False, "message": "Student profile not found."}, status=404)
-    except Exception as e:
-        return JsonResponse({"success": False, "error": str(e)}, status=500)
+            eligible_courses = Course.objects.filter(
+                program_id=program_id_of_student,
+                year=year_of_student,
+                semester=semester_of_student
+            ).values('id', 'code', 'name', 'description', 'program__name', 'semester')
+            
+            course_list = list(eligible_courses)
+
+            return JsonResponse({"success": True, "data": course_list}, status=200)
+
+        except UserProfile.DoesNotExist:
+            return JsonResponse({"success": False, "message": "Student profile not found."}, status=404)
+        except Exception as e:
+            return JsonResponse({"success": False, "error": str(e)}, status=500)
 
 
 @csrf_exempt
@@ -166,20 +177,30 @@ def get_enrolled_courses(request):
     user_profile = UserProfile.objects.get(user_id = user.id)
     user_year = user_profile.year_of_study
     user_sem = user_profile.semester
-    user_prog = user_profile.program_id
     if not user.is_authenticated:
         return JsonResponse({"success": False, "message": "User is not authenticated."}, status=401)
+    if user_profile.role == 'admin' or user_profile.role == 'lecturer':
+        try:
+            enrollments = Enrollment.objects.filter(user=user, semester = user_sem).select_related('course').values(
+                'course__name', 'course__code', 'year', 'semester'
+            )
+            
+            enrolled_courses = list(enrollments)
 
-    try:
-        enrollments = Enrollment.objects.filter(user=user, semester = user_sem, year = user_year).select_related('course').values(
-            'course__name', 'course__code', 'year', 'semester'
-        )
-        
-        enrolled_courses = list(enrollments)
+            return JsonResponse({"success": True, "enrolled_courses": enrolled_courses})
+        except Exception as e:
+            return JsonResponse({"success": False, "message": str(e)})
+    else:
+        try:
+            enrollments = Enrollment.objects.filter(user=user, semester = user_sem, year = user_year).select_related('course').values(
+                'course__name', 'course__code', 'year', 'semester'
+            )
+            
+            enrolled_courses = list(enrollments)
 
-        return JsonResponse({"success": True, "enrolled_courses": enrolled_courses})
-    except Exception as e:
-        return JsonResponse({"success": False, "message": str(e)})
+            return JsonResponse({"success": True, "enrolled_courses": enrolled_courses})
+        except Exception as e:
+            return JsonResponse({"success": False, "message": str(e)})
     
 @csrf_exempt
 def discard_course(request):
@@ -212,12 +233,17 @@ def get_unscheduled_courses(request):
     if user.is_authenticated:
         user_id = user.id
         _student = UserProfile.objects.get(id=user_id)
-        
-        year_of_student = _student.year_of_study
-        semester_of_student = _student.semester
-        
-        unscheduled_courses = Enrollment.objects.filter(year= year_of_student, semester= semester_of_student, user_id = user_id, scheduled=1).values()
-        return JsonResponse({"success": True, "message": "Enrolled courses fetched.", "data": list(unscheduled_courses)}, status=200)
+        if _student.role == 'student' or _student.role == 'classrep':
+            year_of_student = _student.year_of_study
+            semester_of_student = _student.semester
+            
+            unscheduled_courses = Enrollment.objects.filter(year= year_of_student, semester= semester_of_student, user_id = user_id, scheduled=1).values()
+            return JsonResponse({"success": True, "message": "Enrolled courses fetched.", "data": list(unscheduled_courses)}, status=200)
+        else:
+            semester_of_student = _student.semester
+            
+            unscheduled_courses = Enrollment.objects.filter(semester= semester_of_student, user_id = user_id, scheduled=1).values()
+            return JsonResponse({"success": True, "message": "Enrolled courses fetched.", "data": list(unscheduled_courses)}, status=200)
     else:
         return JsonResponse({"success": False, "message": "You are not authenticated."}, status=401)
     

@@ -95,7 +95,7 @@ const ClassCard: React.FC<ClassCardProps> = ({
       <p className="text-gray-500">
         Hall: {hallName} ({hallNumber})
       </p>
-      <p className="text-gray-500">Instructor: {"Dr." + instructor}</p>
+      <p className="text-gray-500">Instructor: {instructor}</p>
       <ProgressBar progress={progress} />
     </div>
   );

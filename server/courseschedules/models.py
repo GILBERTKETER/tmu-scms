@@ -7,6 +7,7 @@ from django.utils import timezone
 from academics.models import Course
 
 class Schedule(models.Model):
+    course_id = models.CharField(max_length=200)
     enrollment = models.ForeignKey(Enrollment, on_delete=models.CASCADE, related_name="schedules")
     instructor = models.ForeignKey(Instructor, on_delete=models.CASCADE, related_name="instructor_schedules")
     hall = models.CharField(max_length=100)

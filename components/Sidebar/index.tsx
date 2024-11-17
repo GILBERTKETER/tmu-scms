@@ -499,9 +499,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
     <ClickOutside onClick={() => setSidebarOpen(false)}>
       <aside
         id="sidebar"
-        className={`z-9999999 w-72.5 fixed left-0 top-0 flex h-screen flex-col overflow-y-hidden bg-light duration-300 ease-linear dark:bg-boxdark lg:relative lg:translate-x-0 ${
-          sidebarOpen ? " translate-x-0" : "-translate-x-full"
-        }`}
+        className={`z-9999999 w-72.5 fixed left-0 top-0 flex h-screen flex-col overflow-y-hidden bg-light duration-300 ease-linear dark:bg-boxdark lg:relative lg:translate-x-0 ${sidebarOpen ? " translate-x-0" : "-translate-x-full"
+          }`}
       >
         {/* <!-- SIDEBAR HEADER --> */}
         <div className="flex items-center justify-between gap-2 px-6 py-5.5 lg:py-6.5">
@@ -548,8 +547,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                   const allowedRoles = menuItem.requiredRole
                     .split(",")
                     .map((role) => role.trim());
-                    return allowedRoles.includes(user?.role ?? '');
-                  });
+                  return allowedRoles.includes(user?.role ?? '');
+                });
                 return visibleItems.length > 0; // Only keep the group if it has visible items
               })
               .map((group, groupIndex) => (
@@ -558,18 +557,18 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                     {group.name}
                   </h3>
 
-                  <ul className="mb-6 flex flex-col gap-1.5"             onClick={() => setSidebarOpen(!sidebarOpen)}
- >
+                  <ul className="mb-6 flex flex-col gap-1.5" onClick={() => setSidebarOpen(!sidebarOpen)}
+                  >
                     {group.menuItems
                       .filter((menuItem) => {
                         const allowedRoles = menuItem.requiredRole
                           .split(",")
                           .map((role) => role.trim());
-                          return allowedRoles.includes(user?.role ?? '');
-                        })
+                        return allowedRoles.includes(user?.role ?? '');
+                      })
                       .map((menuItem, menuIndex) => (
                         <SidebarItem
-                        onClick={() => setSidebarOpen(!sidebarOpen)}
+                          onClick={() => setSidebarOpen(!sidebarOpen)}
                           key={menuIndex}
                           item={menuItem}
                           pageName={pageName}
